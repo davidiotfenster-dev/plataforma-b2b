@@ -1,15 +1,19 @@
 # Contexto de la sesión en curso (2026-09-29)
 
 Este archivo es un "volcado" del estado exacto de esta sesión de trabajo con
-Claude Code, para poder retomarla igual desde otra cuenta/máquina si hace
-falta. Es información **temporal** (a diferencia de `SETUP.md`, `TAREAS.md`,
-`DECISIONES.md` y `PROGRESO.md`, que son documentación permanente del
-proyecto) — bórralo cuando ya no lo necesites.
+Claude Code, para poder retomarla igual tras un `/clear` o desde otra
+cuenta/máquina si hace falta. Es información **temporal** (a diferencia de
+`SETUP.md`, `TAREAS.md`, `DECISIONES.md` y `PROGRESO.md`, que son
+documentación permanente del proyecto) — bórralo cuando ya no lo necesites.
+
+**Resumen de una línea**: repo git creado y con 3 commits, demo en vivo
+funcionando por túnel de Cloudflare, ficha cliente completa + rol Comercial
++ validaciones de formato ya implementados y verificados. Nada roto, nada a
+medias ahora mismo.
 
 ## 1. Repositorio Git
 
 - Se inicializó `git init` en la raíz del proyecto (antes no había repo).
-- Ya hay un primer commit con todo el estado actual del backend + frontend.
 - **No hay ningún remoto configurado** (no está en GitHub/GitLab/etc., solo
   local). Si quieres subirlo a algún sitio, decide primero dónde (GitHub
   privado, etc.) y lo configuramos.
@@ -20,6 +24,16 @@ proyecto) — bórralo cuando ya no lo necesites.
   cuando quieras.
 - A partir de ahora, cada cambio importante debería ir con su propio commit
   (pídemelo explícitamente cuando quieras que lo haga, no lo hago solo).
+- **Commits hechos hasta ahora** (`git log --oneline`):
+  1. Commit inicial: plataforma B2B IoT FENSTER (backend + frontend completos
+     tal como estaban al empezar esta sesión).
+  2. Preparar demo por túnel de Cloudflare (cookie `SameSite` configurable,
+     `frontend-prod` en `launch.json`, este mismo archivo de contexto).
+  3. Ficha cliente + rol COMERCIAL con partners acotados por
+     `creadoPorUsuarioId` (ver sección 4).
+  4. Formulario de alta de partner completado (le faltaban campos respecto
+     al de edición) + validaciones de formato en correo/teléfono/dominio/
+     código postal (ver sección 5).
 
 ## 2. Túneles de Cloudflare (para que tu compañero vea la web en vivo)
 
@@ -122,7 +136,41 @@ aplicada, DTO/servicio/formulario de edición (`admin/partners`) y traducciones
   "Credenciales inválidas". Corregido para tratar `ADMIN_FENSTER` y
   `COMERCIAL` igual (personal interno, sin partner).
 
-## 5. Ideas pendientes de valorar (no pedidas todavía)
+## 5. Formulario de alta de partner + validaciones — YA IMPLEMENTADO
+
+David detectó que el formulario de "Nuevo partner" no tenía todos los campos
+que sí tiene "Editar" (los de la ficha cliente: teléfonos, dirección
+desglosada, dirección de envío, correos, forma de pago, divisa, IVA). Ya
+está corregido: ambos formularios tienen exactamente los mismos campos.
+
+De paso pidió validación para reducir errores al teclear. Implementado en
+`backend/src/partners/dto/validadores-ficha-cliente.ts` (usado por
+`crear-partner.dto.ts` y `actualizar-partner.dto.ts`):
+- **Correos** (`correoContacto1/2`, `correoFacturacion`, `emailUsuario`):
+  `@IsEmail()`, formato real de email.
+- **Teléfonos** (`telefono1/2`): solo dígitos/espacios/guiones/paréntesis y
+  un `+` inicial opcional, 6-20 caracteres. Deliberadamente permisivo (no
+  exige prefijo de país) para no romper la entrada de números reales del
+  ERP como `954351212`.
+- **Dominio web**: debe tener al menos un punto y no llevar espacios ni
+  `http://`, para que no se cuele por error una URL completa o el nombre de
+  la empresa.
+- **Código postal** (`codigoPostal`, `codigoPostalEnvio`): alfanumérico
+  corto (3-10 caracteres).
+- **CIF: deliberadamente SIN validar el formato.** Un CIF español real tiene
+  un patrón estricto, pero forzarlo rompería el convenio ya usado de
+  `PENDIENTE-<código>` para los partners reales aún sin CIF definitivo (ver
+  sección de partners reales en `PROGRESO.md`). Si en el futuro se quiere
+  validar, habría que excluir explícitamente ese prefijo.
+- Frontend: los inputs de correo/teléfono llevan `type="email"`/`type="tel"`
+  (ayuda del navegador), y el mensaje de error del backend se muestra tal
+  cual en el formulario si falla la validación.
+
+Probado con curl (teléfono con letras → 400, email inválido → 400, dominio
+con espacios → 400, todo válido → 201) y visualmente en el navegador por el
+túnel (mensaje de error visible en el formulario, partner no se crea).
+
+## 6. Ideas pendientes de valorar (no pedidas todavía)
 
 Nada bloqueante ahora mismo. Cosas que podrían surgir más adelante y que no
 se han tocado: rellenar CIF/dirección/email reales de los 12 partners que
@@ -130,7 +178,15 @@ aún tienen datos `PENDIENTE-*` (ya se puede hacer desde el propio "Editar"),
 y decidir si el `COMERCIAL` debería también poder cambiar el estado de un
 pedido (hoy solo puede verlos, no tocarlos).
 
-## 6. Cómo arrancar todo desde cero
+## 7. Credenciales de prueba
+
+| Tipo de usuario | Email | Contraseña |
+|---|---|---|
+| Admin FENSTER | `admin@fenster.test` | `Fenster2026!` |
+| Comercial | `comercial@fenster.test` | `Fenster2026!` |
+| Partner (cliente) | `partner@fenster.test` | `Fenster2026!` |
+
+## 8. Cómo arrancar todo desde cero
 
 ```bash
 docker compose up -d
@@ -144,5 +200,6 @@ cd backend && npm run start:dev
 cd frontend && npm run dev
 ```
 
-Backend en `localhost:3010`, frontend en `localhost:3004`. Credenciales de
-prueba en `SETUP.md` (admin: `admin@fenster.test` / `Fenster2026!`).
+Backend en `localhost:3010`, frontend en `localhost:3004` (en modo dev
+normal, sin túnel; para el túnel ver sección 2, usa `frontend-prod` en vez
+de `frontend`).
