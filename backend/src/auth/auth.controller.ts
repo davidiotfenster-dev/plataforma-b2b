@@ -22,7 +22,7 @@ import { OlvidePasswordDto } from './dto/olvide-password.dto.js';
 import { ResetearPasswordDto } from './dto/resetear-password.dto.js';
 import { LocalAuthGuard } from './guards/local-auth.guard.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
-import { JWT_COOKIE_NAME } from './strategies/jwt.strategy.js';
+import { JWT_COOKIE_NAME, cookieSameSite } from './strategies/jwt.strategy.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { RolUsuario } from '../generated/prisma/enums.js';
@@ -84,7 +84,7 @@ export class AuthController {
     res.cookie(JWT_COOKIE_NAME, token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: cookieSameSite(),
       maxAge: 8 * 60 * 60 * 1000,
     });
 

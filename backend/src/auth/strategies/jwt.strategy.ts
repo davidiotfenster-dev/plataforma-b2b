@@ -8,6 +8,14 @@ import type { UsuarioAutenticado } from '../../common/decorators/current-user.de
 
 export const JWT_COOKIE_NAME = 'fenster_session';
 
+/// 'strict' en local/producción normales. Solo se pone a 'none' cuando front
+/// y back se sirven en dominios distintos (p. ej. demo por túnel de Cloudflare),
+/// caso en el que el navegador no envía cookies "strict" entre subdominios.
+export const cookieSameSite = (): 'strict' | 'lax' | 'none' => {
+  const valor = process.env.COOKIE_SAME_SITE;
+  return valor === 'none' || valor === 'lax' ? valor : 'strict';
+};
+
 export interface JwtPayload {
   sub: string;
   partnerId: string | null;

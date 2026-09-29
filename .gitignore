@@ -4,6 +4,7 @@ node_modules/
 # Builds
 backend/dist/
 backend/src/generated/
+backend/*.tsbuildinfo
 frontend/.next/
 frontend/out/
 
@@ -19,3 +20,6 @@ npm-debug.log*
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Restos de la migración del repo (git anidado de create-next-app)
+_frontend-git-backup-do-not-need/
