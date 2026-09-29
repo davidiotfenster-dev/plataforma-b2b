@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Builds
+backend/dist/
+backend/src/generated/
+frontend/.next/
+frontend/out/
+
+# Entornos (contienen credenciales locales)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db

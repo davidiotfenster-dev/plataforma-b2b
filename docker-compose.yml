@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: fenster-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fenster
+      POSTGRES_PASSWORD: fenster_dev
+      POSTGRES_DB: fenster
+    ports:
+      - "5433:5432"
+    volumes:
+      - fenster_pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: fenster-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - fenster_redisdata:/data
+
+volumes:
+  fenster_pgdata:
+  fenster_redisdata:

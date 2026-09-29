@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run:*)",
+      "Bash(npx @nestjs/cli:*)",
+      "Bash(npx nest:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker ps:*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(touch:*)",
+      "Bash(sleep:*)",
+      "Bash(npm view:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(cd:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(docker exec:*)"
+    ],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(sudo:*)",
+      "Bash(npm install -g:*)",
+      "Edit(CLAUDE.md)",
+      "Edit(INFORME_TECNICO.md)"
+    ]
+  }
+}

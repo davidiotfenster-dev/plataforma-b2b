@@ -1,0 +1,342 @@
+// Prisma schema — Plataforma B2B IoT FENSTER
+// Fuente de verdad de arquitectura: CLAUDE.md e INFORME_TECNICO.md (raíz del proyecto).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------------------------
+
+/// Roles de usuario (RBAC). ADMIN_FENSTER gestiona la plataforma globalmente;
+/// los roles PARTNER_* operan siempre dentro del partner_id asociado al usuario.
+enum RolUsuario {
+  ADMIN_FENSTER
+  PARTNER_ADMIN
+  PARTNER_COMPRADOR
+  PARTNER_CONSULTA
+}
+
+/// Estado del ciclo de vida de alta de un partner (onboarding en 2 pasos +
+/// aprobación manual, ver INFORME_TECNICO.md §2.1).
+enum EstadoPartner {
+  PENDIENTE_VERIFICACION_EMAIL
+  PENDIENTE_APROBACION
+  ACTIVO
+  SUSPENDIDO
+  RECHAZADO
+}
+
+/// Máquina de estados del pedido (INFORME_TECNICO.md §5.2).
+enum EstadoPedido {
+  RECIBIDO
+  CONFIRMADO
+  EN_PREPARACION
+  PREPARADO
+  ENVIADO
+  CANCELADO
+}
+
+/// Idioma preferido del usuario: idioma de la interfaz (vía cookie en el
+/// frontend, ver frontend/src/i18n) y de los emails transaccionales que le
+/// llegan (confirmación de pedido, cambios de estado).
+enum Idioma {
+  ES
+  EN
+  DE
+  IT
+  PT
+}
+
+// ---------------------------------------------------------------------------
+// IDENTIDAD Y PARTNERS
+// ---------------------------------------------------------------------------
+
+model User {
+  id       String @id @default(uuid()) @db.Uuid
+  email    String @unique
+  /// Nunca se almacena la contraseña en claro: siempre hash bcrypt/argon2.
+  passwordHash String
+  nombre   String
+  rol      RolUsuario
+  idioma   Idioma @default(ES)
+
+  /// Nulo únicamente para ADMIN_FENSTER; obligatorio para roles PARTNER_*.
+  partnerId String?  @db.Uuid
+  partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  activo               Boolean   @default(true)
+  emailVerificadoEn    DateTime?
+  tokenVerificacion    String?   @unique
+  tokenVerificacionExpira DateTime?
+
+  /// Token de un solo uso para "olvidé mi contraseña" (mismo patrón que
+  /// `tokenVerificacion`). Se limpia al usarse o al pedirse uno nuevo.
+  tokenResetPassword       String?   @unique
+  tokenResetPasswordExpira DateTime?
+
+  /// Cualquier JWT de sesión emitido ANTES de esta fecha deja de ser válido
+  /// (comparado contra el `iat` del token en `JwtStrategy`). Se actualiza al
+  /// forzar el cierre de sesión de un usuario desde el panel admin y al
+  /// completar un reseteo de contraseña.
+  sesionInvalidadaEn DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  carts       Cart[]
+  ordenes     Order[]
+  auditLogs   AuditLog[]
+
+  @@index([partnerId])
+}
+
+model Partner {
+  id              String        @id @default(uuid()) @db.Uuid
+  razonSocial     String
+  cif             String        @unique
+  direccionFiscal String
+  pais            String
+  dominioWeb      String
+
+  /// Código de cliente del ERP/sistema interno de IoT FENSTER (ver "FICHA
+  /// CLIENTE"). Opcional: solo los partners dados de alta manualmente desde
+  /// un listado interno lo tienen; el alta por registro público no lo pide.
+  codigoCliente String? @unique
+
+  /// Asignados por el Administrador IoT FENSTER en la aprobación manual.
+  marcaComercial      String?
+  tarifa              String?
+  descuentoPorcentaje Decimal   @default(0) @db.Decimal(5, 2)
+
+  // --- Campos de la "FICHA CLIENTE" (ficha interna del ERP) ---------------
+  telefono1    String?
+  telefono2    String?
+  codigoPostal String?
+  localidad    String?
+  provincia    String?
+
+  /// Dirección de envío por defecto: solo se rellena si difiere de la fiscal.
+  /// Se usa como sugerencia al crear un pedido; el partner puede cambiarla
+  /// puntualmente en cada pedido concreto.
+  direccionEnvioDefecto String?
+  codigoPostalEnvio     String?
+  localidadEnvio        String?
+  provinciaEnvio        String?
+  paisEnvio             String?
+
+  correoContacto1   String?
+  correoContacto2   String?
+  correoFacturacion String?
+  formaPago         String?
+  divisa            String?
+  iva               Decimal? @db.Decimal(5, 2)
+
+  /// Notas internas de IoT FENSTER sobre este partner (condiciones
+  /// especiales, incidencias, cualquier apunte libre). Uso libre, nunca
+  /// visible para el propio partner.
+  notas String?
+
+  estado EstadoPartner @default(PENDIENTE_VERIFICACION_EMAIL)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios         User[]
+  representaciones RepresentacionPartner[]
+  carts            Cart[]
+  ordenes          Order[]
+  auditLogs        AuditLog[]
+
+  @@index([estado])
+}
+
+// ---------------------------------------------------------------------------
+// CATÁLOGO MULTIMARCA (ProductoBase -> RepresentacionPartner)
+// ---------------------------------------------------------------------------
+
+model ProductoBase {
+  id                   String  @id @default(uuid()) @db.Uuid
+  skuIndustrial        String  @unique
+  nombreTecnico        String
+  especificacionesJson Json?
+  activo               Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  representaciones RepresentacionPartner[]
+}
+
+/// Mapeo Producto Base -> catálogo autorizado y comercializado por cada partner.
+/// La existencia (y el flag `activo`) de una fila aquí ES el catálogo autorizado
+/// del partner: toda consulta de catálogo/pedido debe filtrar por partnerId.
+model RepresentacionPartner {
+  id             String @id @default(uuid()) @db.Uuid
+  productoBaseId String @db.Uuid
+  partnerId      String @db.Uuid
+
+  skuComercial     String
+  nombreComercial  String
+  imagenUrl        String?
+  documentacionUrl String?
+  pvpBase          Decimal @db.Decimal(12, 2)
+  activo           Boolean @default(true)
+
+  /// Descuento específico para este producto en este partner. Si es `null`,
+  /// se aplica el descuento general del partner (`Partner.descuentoPorcentaje`).
+  descuentoOverride Decimal? @db.Decimal(5, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productoBase ProductoBase @relation(fields: [productoBaseId], references: [id], onDelete: Cascade)
+  partner      Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@unique([partnerId, skuComercial])
+  @@index([productoBaseId])
+  @@index([partnerId, activo])
+}
+
+// ---------------------------------------------------------------------------
+// CARRITO PERSISTENTE
+// ---------------------------------------------------------------------------
+
+model Cart {
+  id        String @id @default(uuid()) @db.Uuid
+  partnerId String @db.Uuid
+  userId    String @db.Uuid
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partner Partner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  usuario User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items   CartItem[]
+
+  /// Un carrito activo por usuario dentro de su partner.
+  @@unique([partnerId, userId])
+}
+
+model CartItem {
+  id                       String @id @default(uuid()) @db.Uuid
+  cartId                   String @db.Uuid
+  representacionPartnerId  String @db.Uuid
+  cantidad                 Int    @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart                   Cart                   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  representacionPartner  RepresentacionPartner  @relation(fields: [representacionPartnerId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, representacionPartnerId])
+  @@index([representacionPartnerId])
+}
+
+// ---------------------------------------------------------------------------
+// PEDIDOS Y CONGELACIÓN DE PRECIOS
+// ---------------------------------------------------------------------------
+
+model Order {
+  id        String @id @default(uuid()) @db.Uuid
+  /// Código de pedido legible, p. ej. "PED-000123".
+  codigoPed String @unique
+
+  partnerId String @db.Uuid
+  userId    String @db.Uuid
+
+  estado EstadoPedido @default(RECIBIDO)
+
+  direccionEnvio String
+  poNumber       String
+  notas          String?
+
+  totalNeto Decimal @db.Decimal(12, 2)
+
+  /// Datos de expedición, rellenados al pasar a estado ENVIADO.
+  transportista    String?
+  numeroExpedicion String?
+  trackingUrl      String?
+
+  /// Motivo indicado por el admin al cancelar el pedido (estado CANCELADO).
+  motivoCancelacion String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partner Partner     @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  usuario User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items   OrderItem[]
+
+  @@index([partnerId, estado])
+  @@index([userId])
+}
+
+/// "Fotografía comercial" congelada en la confirmación del pedido: los valores
+/// históricos aquí NUNCA se recalculan a partir de tarifas/descuentos vigentes.
+model OrderItem {
+  id      String  @id @default(uuid()) @db.Uuid
+  orderId String  @db.Uuid
+
+  /// Referencia de trazabilidad al origen del catálogo; no se usa para
+  /// recalcular precios y puede quedar huérfana si el producto se retira.
+  representacionPartnerId String? @db.Uuid
+
+  skuComercial       String
+  nombreProducto     String
+  pvpHistorico       Decimal @db.Decimal(12, 2)
+  descuentoAplicado  Decimal @db.Decimal(5, 2)
+  precioNetoUnitario Decimal @db.Decimal(12, 2)
+  cantidad           Int
+  totalLinea         Decimal @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now())
+
+  order                 Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  representacionPartner RepresentacionPartner?  @relation(fields: [representacionPartnerId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// AUDITORÍA
+// ---------------------------------------------------------------------------
+
+/// Registro de auditoría inmutable (append-only), ver INFORME_TECNICO.md §7.1.
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  timestamp DateTime @default(now())
+
+  level     String
+  eventType String
+
+  userId    String? @db.Uuid
+  partnerId String? @db.Uuid
+
+  ipAddress String?
+  userAgent String?
+
+  endpoint String?
+  method   String?
+
+  payload    Json?
+  statusCode Int?
+
+  usuario User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  partner Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([partnerId])
+  @@index([userId])
+}
