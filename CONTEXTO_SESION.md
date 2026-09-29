@@ -170,6 +170,19 @@ Probado con curl (teléfono con letras → 400, email inválido → 400, dominio
 con espacios → 400, todo válido → 201) y visualmente en el navegador por el
 túnel (mensaje de error visible en el formulario, partner no se crea).
 
+## 5bis. Aviso: acentos/ñ corrompidos si se usa `curl` con heredoc en este shell
+
+Al rellenar los datos reales de **PTA HERRAJES SL** (código 3949) desde una
+ficha ERP, un `PATCH` hecho con `curl` + heredoc de Bash en este entorno
+corrompió los caracteres con tilde/ñ (p. ej. "España" se guardó como
+"Espa�a" — comprobado que era corrupción real en la base de datos, no solo
+un problema de cómo se veía en la terminal). **Corregido para PTA**, pero
+si se rellenan más partners reales con acentos: usar `node` con `fetch`
+(login + PATCH) en vez de `curl` con el JSON inline, o escribir el JSON a un
+archivo con la herramienta Write (UTF-8 seguro) y pasarlo con
+`curl --data-binary @archivo.json`. Revisar visualmente en el navegador tras
+guardar cualquier dato con tildes.
+
 ## 6. Ideas pendientes de valorar (no pedidas todavía)
 
 Nada bloqueante ahora mismo. Cosas que podrían surgir más adelante y que no
