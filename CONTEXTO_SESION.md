@@ -185,11 +185,33 @@ guardar cualquier dato con tildes.
 
 ## 6. Ideas pendientes de valorar (no pedidas todavía)
 
-Nada bloqueante ahora mismo. Cosas que podrían surgir más adelante y que no
-se han tocado: rellenar CIF/dirección/email reales de los 12 partners que
-aún tienen datos `PENDIENTE-*` (ya se puede hacer desde el propio "Editar"),
-y decidir si el `COMERCIAL` debería también poder cambiar el estado de un
-pedido (hoy solo puede verlos, no tocarlos).
+Nada bloqueante ahora mismo. Decidir si el `COMERCIAL` debería también poder
+cambiar el estado de un pedido (hoy solo puede verlos, no tocarlos).
+
+## 6bis. Datos reales de los 13 partners — YA COMPLETADO (solo falta VBH)
+
+David compartió fichas ERP (capturas en `Downloads\fichas clientes\`) de 12
+de los 13 partners reales. Ya están todos rellenados con sus datos reales
+(razón social, CIF, dirección completa, teléfonos, correos de contacto y
+facturación, forma de pago, divisa, IVA, tarifa) vía `PATCH /partners/:id`
+(usando `node` con `fetch`, no `curl`, por el aviso de la sección 5bis).
+
+**Solo queda pendiente `VBH` (código 2537)** — no se compartió su ficha, sigue
+con datos `PENDIENTE-2537` / `vbh.pendiente.test`. Rellenar en cuanto llegue
+su ficha, con el mismo procedimiento.
+
+En 3 partners (Armando Carracedo, AEDOS, BIEMME FINESTRE) el dominio web y
+el email de acceso se dejaron **a propósito** como placeholder
+(`*.pendiente.test`) aunque ya se conoce el dominio de correo real de sus
+contactos — es una decisión de negocio (quién tendrá login) que no me
+correspondía tomar sola. Igual que con PTA/Suministros Alcantarilla.
+
+Casos con matices que David debería revisar cuando pueda:
+- **Armando Carracedo**: la ficha dice "se le aplicará un 5% de descuento
+  especial al presupuesto" — interpretado como `descuentoPorcentaje: 5` en
+  el partner. Si el descuento especial era solo puntual (no general),
+  corregirlo desde "Editar".
+- **AEDOS y BIEMME FINESTRE**: operadores intracomunitarios, IVA puesto a 0%.
 
 ## 7. Credenciales de prueba
 
