@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import {
+  CODIGO_POSTAL_MENSAJE,
+  CODIGO_POSTAL_REGEX,
+  DOMINIO_MENSAJE,
+  DOMINIO_REGEX,
+  TELEFONO_MENSAJE,
+  TELEFONO_REGEX,
+} from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
   @IsOptional()
@@ -24,6 +32,7 @@ export class ActualizarPartnerDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @Matches(DOMINIO_REGEX, { message: DOMINIO_MENSAJE })
   dominioWeb?: string;
 
   /// Código de cliente del ERP interno (ver "FICHA CLIENTE"). `null`
@@ -52,14 +61,17 @@ export class ActualizarPartnerDto {
   // --- Campos de la "FICHA CLIENTE" (ficha interna del ERP) ---------------
   @IsOptional()
   @IsString()
+  @Matches(TELEFONO_REGEX, { message: TELEFONO_MENSAJE })
   telefono1?: string | null;
 
   @IsOptional()
   @IsString()
+  @Matches(TELEFONO_REGEX, { message: TELEFONO_MENSAJE })
   telefono2?: string | null;
 
   @IsOptional()
   @IsString()
+  @Matches(CODIGO_POSTAL_REGEX, { message: CODIGO_POSTAL_MENSAJE })
   codigoPostal?: string | null;
 
   @IsOptional()
@@ -76,6 +88,7 @@ export class ActualizarPartnerDto {
 
   @IsOptional()
   @IsString()
+  @Matches(CODIGO_POSTAL_REGEX, { message: CODIGO_POSTAL_MENSAJE })
   codigoPostalEnvio?: string | null;
 
   @IsOptional()
@@ -91,15 +104,15 @@ export class ActualizarPartnerDto {
   paisEnvio?: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
   correoContacto1?: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
   correoContacto2?: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
   correoFacturacion?: string | null;
 
   @IsOptional()

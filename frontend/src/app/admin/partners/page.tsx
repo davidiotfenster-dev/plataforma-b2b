@@ -93,6 +93,23 @@ function CrearPartnerForm({ onDone }: { onDone: () => void }) {
   const [marcaComercial, setMarcaComercial] = useState("");
   const [tarifa, setTarifa] = useState("");
   const [descuentoPorcentaje, setDescuentoPorcentaje] = useState("0");
+  const [telefono1, setTelefono1] = useState("");
+  const [telefono2, setTelefono2] = useState("");
+  const [codigoPostal, setCodigoPostal] = useState("");
+  const [localidad, setLocalidad] = useState("");
+  const [provincia, setProvincia] = useState("");
+  const [direccionEnvioDefecto, setDireccionEnvioDefecto] = useState("");
+  const [codigoPostalEnvio, setCodigoPostalEnvio] = useState("");
+  const [localidadEnvio, setLocalidadEnvio] = useState("");
+  const [provinciaEnvio, setProvinciaEnvio] = useState("");
+  const [paisEnvio, setPaisEnvio] = useState("");
+  const [correoContacto1, setCorreoContacto1] = useState("");
+  const [correoContacto2, setCorreoContacto2] = useState("");
+  const [correoFacturacion, setCorreoFacturacion] = useState("");
+  const [formaPago, setFormaPago] = useState("");
+  const [divisa, setDivisa] = useState("");
+  const [iva, setIva] = useState("");
+  const [notas, setNotas] = useState("");
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [emailUsuario, setEmailUsuario] = useState("");
   const [passwordUsuario, setPasswordUsuario] = useState("");
@@ -110,6 +127,23 @@ function CrearPartnerForm({ onDone }: { onDone: () => void }) {
         marcaComercial: marcaComercial.trim() || undefined,
         tarifa: tarifa.trim() || undefined,
         descuentoPorcentaje: Number(descuentoPorcentaje),
+        telefono1: telefono1.trim() || undefined,
+        telefono2: telefono2.trim() || undefined,
+        codigoPostal: codigoPostal.trim() || undefined,
+        localidad: localidad.trim() || undefined,
+        provincia: provincia.trim() || undefined,
+        direccionEnvioDefecto: direccionEnvioDefecto.trim() || undefined,
+        codigoPostalEnvio: codigoPostalEnvio.trim() || undefined,
+        localidadEnvio: localidadEnvio.trim() || undefined,
+        provinciaEnvio: provinciaEnvio.trim() || undefined,
+        paisEnvio: paisEnvio.trim() || undefined,
+        correoContacto1: correoContacto1.trim() || undefined,
+        correoContacto2: correoContacto2.trim() || undefined,
+        correoFacturacion: correoFacturacion.trim() || undefined,
+        formaPago: formaPago.trim() || undefined,
+        divisa: divisa.trim() || undefined,
+        iva: iva.trim() === "" ? undefined : Number(iva),
+        notas: notas.trim() || undefined,
         nombreUsuario,
         emailUsuario,
         passwordUsuario,
@@ -189,6 +223,123 @@ function CrearPartnerForm({ onDone }: { onDone: () => void }) {
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
       </div>
+      <p className="text-xs font-medium text-neutral-500">{t("fichaClienteTitle")}</p>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <input
+          type="tel"
+          value={telefono1}
+          onChange={(e) => setTelefono1(e.target.value)}
+          placeholder={t("phone1Placeholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          type="tel"
+          value={telefono2}
+          onChange={(e) => setTelefono2(e.target.value)}
+          placeholder={t("phone2Placeholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={codigoPostal}
+          onChange={(e) => setCodigoPostal(e.target.value)}
+          placeholder={t("postalCodePlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={localidad}
+          onChange={(e) => setLocalidad(e.target.value)}
+          placeholder={t("cityPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={provincia}
+          onChange={(e) => setProvincia(e.target.value)}
+          placeholder={t("provincePlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          type="email"
+          value={correoContacto1}
+          onChange={(e) => setCorreoContacto1(e.target.value)}
+          placeholder={t("contactEmail1Placeholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          type="email"
+          value={correoContacto2}
+          onChange={(e) => setCorreoContacto2(e.target.value)}
+          placeholder={t("contactEmail2Placeholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          type="email"
+          value={correoFacturacion}
+          onChange={(e) => setCorreoFacturacion(e.target.value)}
+          placeholder={t("billingEmailPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={formaPago}
+          onChange={(e) => setFormaPago(e.target.value)}
+          placeholder={t("paymentMethodPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={divisa}
+          onChange={(e) => setDivisa(e.target.value)}
+          placeholder={t("currencyPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={iva}
+          onChange={(e) => setIva(e.target.value)}
+          placeholder={t("ivaPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+      </div>
+      <p className="text-xs font-medium text-neutral-500">{t("shippingAddressTitle")}</p>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <input
+          value={direccionEnvioDefecto}
+          onChange={(e) => setDireccionEnvioDefecto(e.target.value)}
+          placeholder={t("shippingAddressPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm sm:col-span-2"
+        />
+        <input
+          value={codigoPostalEnvio}
+          onChange={(e) => setCodigoPostalEnvio(e.target.value)}
+          placeholder={t("shippingPostalCodePlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={localidadEnvio}
+          onChange={(e) => setLocalidadEnvio(e.target.value)}
+          placeholder={t("shippingCityPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={provinciaEnvio}
+          onChange={(e) => setProvinciaEnvio(e.target.value)}
+          placeholder={t("shippingProvincePlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+        <input
+          value={paisEnvio}
+          onChange={(e) => setPaisEnvio(e.target.value)}
+          placeholder={t("shippingCountryPlaceholder")}
+          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+        />
+      </div>
+      <textarea
+        value={notas}
+        onChange={(e) => setNotas(e.target.value)}
+        placeholder={t("notesPlaceholder")}
+        rows={3}
+        className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+      />
       <p className="text-xs font-medium text-neutral-500">{t("firstUserTitle")}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <input
@@ -367,12 +518,14 @@ function EditarPartnerForm({ partner, onDone }: { partner: Partner; onDone: () =
       <p className="text-xs font-medium text-neutral-500">{t("fichaClienteTitle")}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <input
+          type="tel"
           value={telefono1}
           onChange={(e) => setTelefono1(e.target.value)}
           placeholder={t("phone1Placeholder")}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
+          type="tel"
           value={telefono2}
           onChange={(e) => setTelefono2(e.target.value)}
           placeholder={t("phone2Placeholder")}
@@ -397,18 +550,21 @@ function EditarPartnerForm({ partner, onDone }: { partner: Partner; onDone: () =
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
+          type="email"
           value={correoContacto1}
           onChange={(e) => setCorreoContacto1(e.target.value)}
           placeholder={t("contactEmail1Placeholder")}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
+          type="email"
           value={correoContacto2}
           onChange={(e) => setCorreoContacto2(e.target.value)}
           placeholder={t("contactEmail2Placeholder")}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
+          type="email"
           value={correoFacturacion}
           onChange={(e) => setCorreoFacturacion(e.target.value)}
           placeholder={t("billingEmailPlaceholder")}
