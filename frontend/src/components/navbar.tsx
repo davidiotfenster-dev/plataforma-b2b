@@ -30,7 +30,7 @@ export function Navbar() {
 
         {!isLoading && perfil && (
           <nav className="flex items-center gap-6 text-sm">
-            {perfil.rol !== "ADMIN_FENSTER" && (
+            {perfil.rol !== "ADMIN_FENSTER" && perfil.rol !== "COMERCIAL" && (
               <>
                 <Link href="/catalogo" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
                   <LayoutGrid className="size-4" /> {t("catalogo")}
@@ -43,20 +43,24 @@ export function Navbar() {
                 </Link>
               </>
             )}
-            {perfil.rol === "ADMIN_FENSTER" && (
+            {(perfil.rol === "ADMIN_FENSTER" || perfil.rol === "COMERCIAL") && (
               <>
                 <Link href="/admin/partners" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
                   <ShieldCheck className="size-4" /> {t("partners")}
                 </Link>
-                <Link href="/admin/catalogo" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
-                  <Boxes className="size-4" /> {t("catalogoBase")}
-                </Link>
+                {perfil.rol === "ADMIN_FENSTER" && (
+                  <Link href="/admin/catalogo" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
+                    <Boxes className="size-4" /> {t("catalogoBase")}
+                  </Link>
+                )}
                 <Link href="/admin/pedidos" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
                   <Package className="size-4" /> {t("pedidos")}
                 </Link>
-                <Link href="/admin/dashboard" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
-                  <BarChart3 className="size-4" /> {t("dashboard")}
-                </Link>
+                {perfil.rol === "ADMIN_FENSTER" && (
+                  <Link href="/admin/dashboard" className="flex items-center gap-1.5 text-neutral-600 hover:text-neutral-900">
+                    <BarChart3 className="size-4" /> {t("dashboard")}
+                  </Link>
+                )}
               </>
             )}
             <span className="text-neutral-400">|</span>

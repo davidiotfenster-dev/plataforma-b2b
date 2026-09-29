@@ -14,7 +14,13 @@ export default function HomePage() {
   useEffect(() => {
     if (isLoading) return;
     if (!perfil) return;
-    router.replace(perfil.rol === "ADMIN_FENSTER" ? "/admin/pedidos" : "/catalogo");
+    if (perfil.rol === "ADMIN_FENSTER") {
+      router.replace("/admin/pedidos");
+    } else if (perfil.rol === "COMERCIAL") {
+      router.replace("/admin/partners");
+    } else {
+      router.replace("/catalogo");
+    }
   }, [perfil, isLoading, router]);
 
   if (isLoading) {

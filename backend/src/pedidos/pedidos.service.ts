@@ -201,10 +201,16 @@ export class PedidosService {
   /// pedidos de todos los partners de golpe. Los pedidos de cada partner se
   /// cargan aparte (`listarPorPartnerAdmin`) solo cuando se despliega esa
   /// tarjeta en el frontend.
-  async resumenPorPartner(query: ListarPedidosAdminQueryDto) {
+  async resumenPorPartner(query: ListarPedidosAdminQueryDto, restringirCreadoPorId?: string) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
     const busqueda = query.busqueda?.trim() || null;
+    const condicionBusqueda =
+      busqueda === null ? Prisma.sql`TRUE` : Prisma.sql`p."razonSocial" ILIKE ${'%' + busqueda + '%'}`;
+    const condicionPropietario =
+      restringirCreadoPorId === undefined
+        ? Prisma.sql`TRUE`
+        : Prisma.sql`p."creadoPorUsuarioId" = ${restringirCreadoPorId}::uuid`;
 
     const [filas, [{ total }]] = await Promise.all([
       this.prisma.$queryRaw<{ partnerId: string; razonSocial: string; total: bigint; pendientes: bigint }[]>`
@@ -213,7 +219,7 @@ export class PedidosService {
           COUNT(o.id) FILTER (WHERE o.estado = 'RECIBIDO')::bigint AS pendientes
         FROM "Order" o
         JOIN "Partner" p ON p.id = o."partnerId"
-        WHERE ${busqueda === null ? Prisma.sql`TRUE` : Prisma.sql`p."razonSocial" ILIKE ${'%' + busqueda + '%'}`}
+        WHERE ${condicionBusqueda} AND ${condicionPropietario}
         GROUP BY p.id, p."razonSocial"
         ORDER BY pendientes DESC, p."razonSocial" ASC
         LIMIT ${limit} OFFSET ${(page - 1) * limit}
@@ -222,7 +228,7 @@ export class PedidosService {
         SELECT COUNT(DISTINCT o."partnerId")::bigint AS total
         FROM "Order" o
         JOIN "Partner" p ON p.id = o."partnerId"
-        WHERE ${busqueda === null ? Prisma.sql`TRUE` : Prisma.sql`p."razonSocial" ILIKE ${'%' + busqueda + '%'}`}
+        WHERE ${condicionBusqueda} AND ${condicionPropietario}
       `,
     ]);
 
@@ -242,7 +248,14 @@ export class PedidosService {
   /// Pedidos de un único partner, vista admin (todos los estados, sin
   /// scopear por sesión ya que la llama ADMIN_FENSTER). Pensada para carga
   /// diferida al desplegar la tarjeta de ese partner en el panel.
-  async listarPorPartnerAdmin(partnerId: string) {
+  async listarPorPartnerAdmin(partnerId: string, restringirCreadoPorId?: string) {
+    if (restringirCreadoPorId !== undefined) {
+      const partner = await this.prisma.partner.findUnique({ where: { id: partnerId } });
+      if (!partner || partner.creadoPorUsuarioId !== restringirCreadoPorId) {
+        throw NO_ENCONTRADO();
+      }
+    }
+
     return this.prisma.order.findMany({
       where: { partnerId },
       orderBy: { createdAt: 'desc' },
@@ -314,13 +327,16 @@ export class PedidosService {
     return resultado;
   }
 
-  async obtenerAdmin(id: string) {
+  async obtenerAdmin(id: string, restringirCreadoPorId?: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { items: true, partner: { select: { razonSocial: true } } },
+      include: { items: true, partner: { select: { razonSocial: true, creadoPorUsuarioId: true } } },
     });
 
-    if (!order) {
+    if (
+      !order ||
+      (restringirCreadoPorId !== undefined && order.partner.creadoPorUsuarioId !== restringirCreadoPorId)
+    ) {
       throw new NotFoundException('Pedido no encontrado');
     }
 

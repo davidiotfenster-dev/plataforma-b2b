@@ -144,7 +144,12 @@ repo, se hizo con un script temporal que se descartó tras usarlo).
 | Rol | Email | Contraseña |
 |---|---|---|
 | `ADMIN_FENSTER` | `admin@fenster.test` | `Fenster2026!` |
+| `COMERCIAL` | `comercial@fenster.test` | `Fenster2026!` |
 | `PARTNER_ADMIN` (partner ya `ACTIVO`, 10% descuento) | `partner@fenster.test` | `Fenster2026!` |
+
+> El usuario `COMERCIAL` se crea con `npm run seed:comercial` (variables
+> `COMERCIAL_EMAIL`/`COMERCIAL_PASSWORD`/`COMERCIAL_NOMBRE`, mismo patrón que
+> `seed:admin`). Si se resetea la base de datos, hay que volver a ejecutarlo.
 
 El partner de prueba se llama "Partner Ficticio S.L." (CIF `B00000001`) y
 tiene un producto de catálogo de prueba: SKU comercial `FEN-VC-120150`

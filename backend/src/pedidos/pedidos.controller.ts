@@ -47,25 +47,34 @@ export class PedidosController {
   /// Panel de fulfillment escalable: un partner por fila (paginado,
   /// buscable), en vez de traer todos los pedidos de todos los partners de
   /// golpe (ver `listarTodos` más abajo, que se mantiene por compatibilidad).
+  /// Un COMERCIAL solo ve pedidos de los partners que él mismo ha dado de
+  /// alta (sin dashboard de estadísticas, eso sigue siendo solo admin).
+  private restriccion(usuario: UsuarioAutenticado): string | undefined {
+    return usuario.rol === RolUsuario.COMERCIAL ? usuario.userId : undefined;
+  }
+
   @Get('admin/resumen-por-partner')
   @UseGuards(RolesGuard)
-  @Roles(RolUsuario.ADMIN_FENSTER)
-  async resumenPorPartner(@Query() query: ListarPedidosAdminQueryDto) {
-    return this.pedidosService.resumenPorPartner(query);
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async resumenPorPartner(@CurrentUser() usuario: UsuarioAutenticado, @Query() query: ListarPedidosAdminQueryDto) {
+    return this.pedidosService.resumenPorPartner(query, this.restriccion(usuario));
   }
 
   @Get('admin/por-partner/:partnerId')
   @UseGuards(RolesGuard)
-  @Roles(RolUsuario.ADMIN_FENSTER)
-  async porPartnerAdmin(@Param('partnerId', ParseUUIDPipe) partnerId: string) {
-    return this.pedidosService.listarPorPartnerAdmin(partnerId);
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async porPartnerAdmin(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('partnerId', ParseUUIDPipe) partnerId: string,
+  ) {
+    return this.pedidosService.listarPorPartnerAdmin(partnerId, this.restriccion(usuario));
   }
 
   @Get('admin/:id')
   @UseGuards(RolesGuard)
-  @Roles(RolUsuario.ADMIN_FENSTER)
-  async obtenerAdmin(@Param('id', ParseUUIDPipe) id: string) {
-    return this.pedidosService.obtenerAdmin(id);
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async obtenerAdmin(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.pedidosService.obtenerAdmin(id, this.restriccion(usuario));
   }
 
   @Get(':id')

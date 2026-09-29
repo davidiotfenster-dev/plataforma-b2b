@@ -252,7 +252,11 @@ export class AuthService {
       throw credencialesInvalidas();
     }
 
-    if (user.rol !== RolUsuario.ADMIN_FENSTER) {
+    /// ADMIN_FENSTER y COMERCIAL son personal interno de IoT FENSTER, sin
+    /// partner asociado: solo los roles PARTNER_* exigen partner ACTIVO y
+    /// email verificado.
+    const esPersonalInterno = user.rol === RolUsuario.ADMIN_FENSTER || user.rol === RolUsuario.COMERCIAL;
+    if (!esPersonalInterno) {
       if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO) {
         throw credencialesInvalidas();
       }

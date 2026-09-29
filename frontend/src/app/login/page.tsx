@@ -31,7 +31,9 @@ export default function LoginPage() {
       /// usuario (útil si inicia sesión desde un navegador/dispositivo nuevo
       /// sin la cookie de idioma ya puesta).
       document.cookie = `${localeCookieName}=${perfil.idioma.toLowerCase()}; path=/; max-age=31536000; SameSite=Lax`;
-      router.push(perfil.rol === "ADMIN_FENSTER" ? "/admin/pedidos" : "/catalogo");
+      const destino =
+        perfil.rol === "ADMIN_FENSTER" ? "/admin/pedidos" : perfil.rol === "COMERCIAL" ? "/admin/partners" : "/catalogo";
+      router.push(destino);
       router.refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : tCommon("unexpectedError"));

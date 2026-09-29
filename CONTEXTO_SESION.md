@@ -90,65 +90,45 @@ exporta `cookieSameSite()`, que lee `COOKIE_SAME_SITE` y por defecto (si no
 está la variable, o vale otra cosa) devuelve `'strict'` — o sea que en
 producción, si nunca se pone esta variable, el comportamiento no cambia.
 
-## 4. Trabajo a medias (sin terminar todavía)
+## 4. Ficha cliente + rol Comercial — YA IMPLEMENTADO
 
-**Campos de la "FICHA CLIENTE" en el modelo Partner** — David compartió el
-documento `FICHA CLIENTE (1).docx` con los campos reales que usa el ERP
-interno (algunos que el sistema aún no tiene): `TELEFONO1/2`, dirección
-desglosada (`C.POSTAL`, `LOCALIDAD`, `PROVINCIA`), una dirección de envío
-secundaria opcional, `CORREO CONTACTO1/2`, `CORREO FACTURACION`,
-`FORMA DE PAGO`, `DIVISA`, `IVA`.
+Ambos quedaron completados y verificados en esta sesión (backend + frontend +
+navegador vía túnel, tests backend en verde):
 
-Estado exacto en el que se quedó:
+**Campos de la "FICHA CLIENTE"**: añadidos al modelo `Partner` (teléfonos,
+dirección desglosada, dirección de envío por defecto, correos de contacto,
+forma de pago, divisa, IVA), migración `20260929100519_ficha_cliente_y_rol_comercial`
+aplicada, DTO/servicio/formulario de edición (`admin/partners`) y traducciones
+(5 idiomas) actualizados.
 
-- ✅ `backend/prisma/schema.prisma` ya tiene los campos nuevos añadidos al
-  modelo `Partner` (ver el modelo, sección "Campos de la FICHA CLIENTE").
-- ✅ Se generó el SQL de la migración con
-  `npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --script`
-  (workaround habitual en esta máquina porque `prisma migrate dev` falla en
-  shell no interactivo — ver `DECISIONES.md`).
-- ❌ **Falta crear la carpeta de migración** (`backend/prisma/migrations/<timestamp>_ficha_cliente_campos/migration.sql`
-  con ese SQL) y aplicarla con `npx prisma migrate deploy`.
-- ❌ Falta `npx prisma generate` después de aplicar la migración.
-- ❌ Falta actualizar: `backend/src/partners/dto/actualizar-partner.dto.ts`,
-  `backend/src/partners/partners.service.ts` (método `actualizar`),
-  `frontend/src/lib/types.ts` (interfaz `Partner`), el formulario
-  `EditarPartnerForm` en `frontend/src/app/admin/partners/page.tsx`, y las
-  traducciones nuevas en los 5 `frontend/messages/*.json`.
+**Rol `COMERCIAL`**: alcance decidido y confirmado —
+- Solo ve/gestiona los partners que él mismo ha dado de alta
+  (`Partner.creadoPorUsuarioId`, comprobado en cada endpoint; un partner ajeno
+  responde 404 opaco, igual que el resto del sistema Zero-Trust).
+- Puede asignar catálogo y descuentos a sus partners (igual que admin).
+- Ve pedidos solo de sus partners (`GET /pedidos/admin/resumen-por-partner`,
+  `.../por-partner/:id`, `.../:id`), **sin** dashboard de estadísticas.
+- **No** puede aprobar/rechazar altas por registro público (solo admin), ni
+  gestionar cuentas de usuario de un partner (activar/desactivar, forzar
+  logout, reset de contraseña — sigue siendo solo `ADMIN_FENSTER`).
+- Nuevo endpoint `POST /partners` (alta directa, ACTIVO de inmediato, crea
+  también el primer usuario `PARTNER_ADMIN`) — usable por `ADMIN_FENSTER` y
+  `COMERCIAL`. Botón "Nuevo partner" en `admin/partners`.
+- Usuario de prueba: `comercial@fenster.test` / `Fenster2026!` (creado con
+  `npm run seed:comercial`, documentado en `SETUP.md`).
+- **Bug encontrado y corregido de paso**: `AuthService.validarCredenciales`
+  asumía que solo `ADMIN_FENSTER` no tiene partner asociado y bloqueaba el
+  login de cualquier otro rol sin partner — bloqueaba a COMERCIAL con
+  "Credenciales inválidas". Corregido para tratar `ADMIN_FENSTER` y
+  `COMERCIAL` igual (personal interno, sin partner).
 
-El SQL generado (guardado también en el log de la sesión, por si se pierde):
+## 5. Ideas pendientes de valorar (no pedidas todavía)
 
-```sql
-ALTER TABLE "Partner" ADD COLUMN     "codigoPostal" TEXT,
-ADD COLUMN     "codigoPostalEnvio" TEXT,
-ADD COLUMN     "correoContacto1" TEXT,
-ADD COLUMN     "correoContacto2" TEXT,
-ADD COLUMN     "correoFacturacion" TEXT,
-ADD COLUMN     "direccionEnvioDefecto" TEXT,
-ADD COLUMN     "divisa" TEXT,
-ADD COLUMN     "formaPago" TEXT,
-ADD COLUMN     "iva" DECIMAL(5,2),
-ADD COLUMN     "localidad" TEXT,
-ADD COLUMN     "localidadEnvio" TEXT,
-ADD COLUMN     "paisEnvio" TEXT,
-ADD COLUMN     "provincia" TEXT,
-ADD COLUMN     "provinciaEnvio" TEXT,
-ADD COLUMN     "telefono1" TEXT,
-ADD COLUMN     "telefono2" TEXT;
-```
-
-## 5. Pendiente de definir contigo (todavía no implementado)
-
-**Nuevo rol "COMERCIAL"**: pediste un usuario de tipo comercial que también
-pueda crear partners, pero con permisos limitados respecto a `ADMIN_FENSTER`.
-Antes de tocar código hay que decidir contigo el alcance exacto (te preguntaré
-en cuanto retomemos esto), por ejemplo:
-
-- ¿Puede aprobar/rechazar altas de partners, o solo darlos de alta ya
-  aprobados (como hace hoy el admin al pre-registrar uno)?
-- ¿Ve/edita todos los partners, o solo los que él mismo ha creado?
-- ¿Puede asignar catálogo y descuentos, o eso sigue siendo solo del admin?
-- ¿Ve pedidos y el dashboard de estadísticas, o nada de eso?
+Nada bloqueante ahora mismo. Cosas que podrían surgir más adelante y que no
+se han tocado: rellenar CIF/dirección/email reales de los 12 partners que
+aún tienen datos `PENDIENTE-*` (ya se puede hacer desde el propio "Editar"),
+y decidir si el `COMERCIAL` debería también poder cambiar el estado de un
+pedido (hoy solo puede verlos, no tocarlos).
 
 ## 6. Cómo arrancar todo desde cero
 

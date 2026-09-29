@@ -18,6 +18,11 @@ datasource db {
 /// los roles PARTNER_* operan siempre dentro del partner_id asociado al usuario.
 enum RolUsuario {
   ADMIN_FENSTER
+  /// Comercial interno de IoT FENSTER: puede dar de alta partners y
+  /// gestionar (catálogo, descuentos, ver pedidos de) únicamente los que él
+  /// mismo ha creado. No aprueba/rechaza altas por registro público, no ve
+  /// el dashboard de estadísticas ni partners de otros comerciales/admin.
+  COMERCIAL
   PARTNER_ADMIN
   PARTNER_COMPRADOR
   PARTNER_CONSULTA
@@ -67,7 +72,8 @@ model User {
   rol      RolUsuario
   idioma   Idioma @default(ES)
 
-  /// Nulo únicamente para ADMIN_FENSTER; obligatorio para roles PARTNER_*.
+  /// Nulo para ADMIN_FENSTER y COMERCIAL (personal interno de IoT FENSTER,
+  /// no ligado a un único partner); obligatorio para roles PARTNER_*.
   partnerId String?  @db.Uuid
   partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
@@ -93,6 +99,10 @@ model User {
   carts       Cart[]
   ordenes     Order[]
   auditLogs   AuditLog[]
+
+  /// Partners dados de alta directamente por este usuario (típicamente un
+  /// COMERCIAL). Sirve para acotarle la visibilidad a "sus" partners.
+  partnersCreados Partner[] @relation("PartnerCreadoPor")
 
   @@index([partnerId])
 }
@@ -145,6 +155,12 @@ model Partner {
 
   estado EstadoPartner @default(PENDIENTE_VERIFICACION_EMAIL)
 
+  /// Quién dio de alta este partner manualmente (admin o comercial). Nulo si
+  /// vino de registro público. Un COMERCIAL solo puede ver/gestionar los
+  /// partners donde este campo coincide con su propio usuario.
+  creadoPorUsuarioId String? @db.Uuid
+  creadoPor          User?   @relation("PartnerCreadoPor", fields: [creadoPorUsuarioId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -155,6 +171,7 @@ model Partner {
   auditLogs        AuditLog[]
 
   @@index([estado])
+  @@index([creadoPorUsuarioId])
 }
 
 // ---------------------------------------------------------------------------

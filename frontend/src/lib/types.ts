@@ -1,4 +1,4 @@
-export type RolUsuario = "ADMIN_FENSTER" | "PARTNER_ADMIN" | "PARTNER_COMPRADOR" | "PARTNER_CONSULTA";
+export type RolUsuario = "ADMIN_FENSTER" | "COMERCIAL" | "PARTNER_ADMIN" | "PARTNER_COMPRADOR" | "PARTNER_CONSULTA";
 
 export type Idioma = "ES" | "EN" | "DE" | "IT" | "PT";
 
@@ -151,7 +151,40 @@ export interface Partner {
   marcaComercial: string | null;
   tarifa: string | null;
   descuentoPorcentaje: string;
+  telefono1: string | null;
+  telefono2: string | null;
+  codigoPostal: string | null;
+  localidad: string | null;
+  provincia: string | null;
+  direccionEnvioDefecto: string | null;
+  codigoPostalEnvio: string | null;
+  localidadEnvio: string | null;
+  provinciaEnvio: string | null;
+  paisEnvio: string | null;
+  correoContacto1: string | null;
+  correoContacto2: string | null;
+  correoFacturacion: string | null;
+  formaPago: string | null;
+  divisa: string | null;
+  iva: string | null;
   notas: string | null;
   estado: EstadoPartner;
+  creadoPorUsuarioId: string | null;
   createdAt: string;
+}
+
+export interface CrearPartnerInput {
+  razonSocial: string;
+  cif: string;
+  direccionFiscal: string;
+  pais: string;
+  dominioWeb: string;
+  codigoCliente?: string;
+  marcaComercial?: string;
+  tarifa?: string;
+  descuentoPorcentaje?: number;
+  notas?: string;
+  nombreUsuario: string;
+  emailUsuario: string;
+  passwordUsuario: string;
 }
