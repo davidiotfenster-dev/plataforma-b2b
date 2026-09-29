@@ -160,6 +160,37 @@ tiene un producto de catálogo de prueba: SKU comercial `FEN-VC-120150`
 > suspendido no puede hacer login, es el comportamiento esperado — ver
 > `PROGRESO.md`, entrada del 2026-09-28).
 
+## 9. Envío de emails (Resend)
+
+Sin esto configurado, el sistema sigue funcionando con normalidad pero no
+envía correos de verdad (confirmación de pedido, cambio de estado,
+verificación de registro): se queda anotado en el log del backend
+(`[DEV] Email no enviado (falta RESEND_API_KEY)...`).
+
+Proveedor elegido: **[Resend](https://resend.com)** (ya integrado en
+`backend/src/common/email/email.service.ts`, no hace falta tocar código).
+Plan gratuito: 3.000 emails/mes — de sobra para el volumen de este proyecto.
+
+Pasos:
+
+1. Crear cuenta en [resend.com](https://resend.com).
+2. **Domains → Add Domain** → añadir `iotfenster.com` (dominio real de la
+   empresa).
+3. Añadir los registros DNS (TXT/CNAME) que Resend indique, en el proveedor
+   donde esté contratado el dominio. Esperar a que el dominio quede
+   `Verified`.
+4. **API Keys → Create API Key** → copiar la clave (empieza por `re_`).
+5. Ponerla en `backend/.env`:
+   ```
+   RESEND_API_KEY="re_xxxxxxxxxxxx"
+   ```
+6. `EMAIL_FROM` ya está puesto a `pedidos@iotfenster.com` — no hace falta
+   cambiarlo, solo confirmar que esa dirección existe bajo el dominio
+   verificado (o cambiarla por otra del mismo dominio si se prefiere, p. ej.
+   `no-reply@iotfenster.com`).
+7. Reiniciar el backend (`npm run start:dev`) para que recoja la variable
+   nueva.
+
 ## Referencia rápida de comandos
 
 | Acción | Comando |
