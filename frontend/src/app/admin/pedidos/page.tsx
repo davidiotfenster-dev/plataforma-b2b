@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
@@ -88,10 +88,6 @@ export default function AdminPedidosPage() {
   const [page, setPage] = useState(1);
   const busquedaDebounced = useDebouncedValue(busqueda);
 
-  useEffect(() => {
-    setPage(1);
-  }, [busquedaDebounced]);
-
   const { data: respuesta, isLoading } = useQuery<Paginado<ResumenPartner>>({
     queryKey: ["admin-pedidos-resumen", page, busquedaDebounced],
     queryFn: () => {
@@ -110,7 +106,11 @@ export default function AdminPedidosPage() {
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
           <input
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              // Al cambiar la búsqueda se vuelve a la página 1 (la del resultado anterior puede no existir).
+              setPage(1);
+            }}
             placeholder={t("searchPlaceholder")}
             className="w-56 rounded-md border border-neutral-200 py-1.5 pl-8 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
           />

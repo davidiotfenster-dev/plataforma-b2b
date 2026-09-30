@@ -13,6 +13,8 @@ export default function CarritoPage() {
   const { data: carrito, isLoading } = useQuery<ResumenCarrito>({
     queryKey: ["carrito"],
     queryFn: () => api.get<ResumenCarrito>("/carrito/resumen"),
+    // Los precios pueden cambiar mientras la página está abierta: se vuelven a leer solos.
+    refetchInterval: 30_000,
   });
 
   const actualizarCantidad = useMutation({

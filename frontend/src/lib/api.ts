@@ -4,6 +4,8 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /// Código de negocio opcional (p. ej. PRECIOS_CAMBIADOS) para mostrar un aviso traducido.
+    public code?: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -22,7 +24,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ message: res.statusText }));
-    throw new ApiError(res.status, body.message ?? "Error de red");
+    // Nest devuelve una lista de textos cuando falla la validación de varios campos.
+    const mensaje = Array.isArray(body.message) ? body.message.join(" · ") : body.message;
+    throw new ApiError(res.status, mensaje ?? "Error de red", body.codigo);
   }
 
   if (res.status === 204) {

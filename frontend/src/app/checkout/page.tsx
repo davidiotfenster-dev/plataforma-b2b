@@ -14,6 +14,8 @@ export default function CheckoutPage() {
   const { data: carrito, isLoading } = useQuery<ResumenCarrito>({
     queryKey: ["carrito"],
     queryFn: () => api.get<ResumenCarrito>("/carrito/resumen"),
+    // Los precios pueden cambiar mientras la página está abierta: se vuelven a leer solos.
+    refetchInterval: 30_000,
   });
 
   const [direccionEnvio, setDireccionEnvio] = useState("");
@@ -22,13 +24,28 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
 
   const confirmar = useMutation({
-    mutationFn: () => api.post<Order>("/pedidos/confirmar", { direccionEnvio, poNumber, notas: notas || undefined }),
+    mutationFn: () =>
+      api.post<Order>("/pedidos/confirmar", {
+        direccionEnvio,
+        poNumber,
+        notas: notas || undefined,
+        // El total que el cliente está viendo: si cambió, el servidor no confirma en silencio.
+        totalEsperado: carrito?.totalPedido,
+      }),
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ["carrito"] });
       queryClient.invalidateQueries({ queryKey: ["pedidos"] });
       router.push(`/pedidos/${order.id}`);
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("confirmError")),
+    onError: (err) => {
+      if (err instanceof ApiError && err.code === "PRECIOS_CAMBIADOS") {
+        // Se trae el carrito con los precios nuevos para que revise el total antes de volver a confirmar.
+        queryClient.invalidateQueries({ queryKey: ["carrito"] });
+        setError(t("pricesChanged"));
+        return;
+      }
+      setError(err instanceof ApiError ? err.message : t("confirmError"));
+    },
   });
 
   function onSubmit(e: FormEvent) {

@@ -28,9 +28,7 @@ export interface Producto {
 
 export interface ProductoDetalle extends Producto {
   productoBase: {
-    skuIndustrial: string;
-    nombreTecnico: string;
-    especificacionesJson: Record<string, unknown> | null;
+    especificacionesJson: Record<string, string | number | boolean> | null;
   } | null;
 }
 
@@ -127,6 +125,42 @@ export interface ProductoBaseAdmin {
   nombreTecnico: string;
   activo: boolean;
   createdAt: string;
+  especificacionesJson?: EspecificacionesDispositivo | null;
+  /// PVP de la tarifa oficial (igual para todos los partners); null = sin precio en tarifa.
+  pvpTarifa?: string | null;
+  _count?: { representaciones: number };
+}
+
+/// Ficha que carga `npm run import:dispositivos` en `especificacionesJson`.
+export interface EspecificacionesDispositivo {
+  grupo?: string;
+  color?: string | null;
+  pendiente?: string;
+  /// 'todos' = se asigna a cualquier partner aunque no tenga nombre en su marca.
+  ambito?: string;
+  referencias?: ReferenciaMarca[];
+  /// Lo único que ve el partner en la ficha del producto (lista blanca del backend).
+  publicas?: Record<string, string | number | boolean>;
+}
+
+/// Cómo se llama (y qué códigos tiene) un mismo aparato en una marca concreta.
+export interface ReferenciaMarca {
+  marca: string;
+  nombre: string;
+  refInterna: string;
+  gtin: string | null;
+}
+
+/// Asignación de un producto base a un partner, vista desde el producto.
+export interface RepresentacionDeBase {
+  id: string;
+  partnerId: string;
+  skuComercial: string;
+  nombreComercial: string;
+  pvpBase: string;
+  descuentoOverride: string | null;
+  activo: boolean;
+  partner: { id: string; razonSocial: string; marcaComercial: string | null; estado: EstadoPartner };
 }
 
 export interface RepresentacionAdmin {
@@ -171,6 +205,16 @@ export interface Partner {
   estado: EstadoPartner;
   creadoPorUsuarioId: string | null;
   createdAt: string;
+  /// Cuántos usuarios, productos de catálogo y pedidos tiene (el listado y la ficha los traen ya contados).
+  _count?: { usuarios: number; representaciones: number; ordenes: number };
+}
+
+/// Cifras de las pestañas del panel de partners (`GET /partners/resumen`).
+export interface ResumenPartners {
+  total: number;
+  porEstado: Record<EstadoPartner, number>;
+  /// Partners con datos provisionales (CIF, dominio o dirección "PENDIENTE").
+  datosPorCompletar: number;
 }
 
 export interface CrearPartnerInput {

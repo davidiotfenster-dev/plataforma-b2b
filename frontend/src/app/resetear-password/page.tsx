@@ -8,7 +8,6 @@ import { api, ApiError } from "@/lib/api";
 
 function ResetearPasswordForm() {
   const t = useTranslations("resetearPassword");
-  const tCommon = useTranslations("common");
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [passwordNueva, setPasswordNueva] = useState("");
