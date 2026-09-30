@@ -112,7 +112,17 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 ### 0.7 Pendientes
 1. Respuestas del jefe (documento de 0.1), sobre todo la pregunta 1.
 2. Datos reales de MySmartWindow (CIF, dirección, dominio, usuario).
-3. Precios y GTIN reales para sustituir los de prueba (0.3).
+3. Precios y GTIN reales para sustituir los de prueba (0.3). Revisado con la tarifa
+   "Septiembre 2026" (`Downloads/TARIFA 2026 IoT FENSTER (2).pdf`): sus 11 referencias
+   (C-WALL 82, EVO Shutter 108 / Security 114 / Plus 138, cable datos EVO 12, Pulsar 98,
+   botón Pulsar 20, cables Pulsar 1 m 12 y 2 m 24, White Box 90, mando bluConnect 30) ya
+   coincidían con el catálogo. **Siguen sin precio real (50 € de prueba) 23 referencias**:
+   Connect-1 / 1+ / 2 / 2+ / 2S / 2S+ (2 colores cada uno = 12), tapas ICON1 e ICON2
+   (blanco y negro = 4), Pulsar+ (inox y negro = 2) y Pulsar+ cable 1,6 m (2), y Wave3
+   Air (3). **Siguen sin GTIN real** 19 productos (22 códigos `TEST…`): EVO ×12, C-WALL
+   Flex, White Box, botón Pulsar, cables Pulsar 1 m y 2 m, cable datos EVO y mando
+   Witooth. La tarifa no trae GTIN. Fuera de la tarifa pero con precio sin marcar como
+   de prueba: Wave3 de pared (82), mando Connect estándar (30) y Pulsar cable 1,6 m (98).
 4. Confirmar si el Pulsar con cable 1,6 m es el mismo aparato que el Pulsar.
 5. Fotos de tapas ICON, cables y Connect Smart White Box (se suben desde
    Admin → Productos).
