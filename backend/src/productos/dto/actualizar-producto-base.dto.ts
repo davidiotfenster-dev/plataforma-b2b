@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class ActualizarProductoBaseDto {
   @IsOptional()
@@ -9,4 +9,9 @@ export class ActualizarProductoBaseDto {
   @IsOptional()
   @IsBoolean()
   activo?: boolean;
+
+  /// Sustituye la ficha completa (el frontend envía la versión ya fusionada).
+  @IsOptional()
+  @IsObject()
+  especificacionesJson?: Record<string, unknown>;
 }

@@ -185,6 +185,11 @@ model ProductoBase {
   especificacionesJson Json?
   activo               Boolean @default(true)
 
+  /// PVP de la tarifa oficial de IoT FENSTER. Es el mismo para todos los
+  /// partners (lo que cambia es el descuento): se usa como precio inicial al
+  /// asignar el producto a un partner. `null` = todavía sin precio en tarifa.
+  pvpTarifa Decimal? @db.Decimal(12, 2)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

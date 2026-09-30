@@ -135,7 +135,9 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie(JWT_COOKIE_NAME);
+    /// Mismos atributos que al crearla: con `SameSite=None` (demo por túnel) el
+    /// navegador puede ignorar un borrado que no los repita.
+    res.clearCookie(JWT_COOKIE_NAME, { httpOnly: true, secure: true, sameSite: cookieSameSite() });
     return { mensaje: 'Sesión cerrada' };
   }
 }

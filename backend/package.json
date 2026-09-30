@@ -24,7 +24,8 @@
     "seed:comercial": "tsx scripts/seed-comercial.ts",
     "seed:demo": "tsx scripts/seed-demo.ts",
     "seed:demo:cleanup": "tsx scripts/seed-demo-cleanup.ts",
-    "import:partners-reales": "tsx scripts/import-partners-reales.ts"
+    "import:partners-reales": "tsx scripts/import-partners-reales.ts",
+    "import:dispositivos": "tsx scripts/import-dispositivos.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",

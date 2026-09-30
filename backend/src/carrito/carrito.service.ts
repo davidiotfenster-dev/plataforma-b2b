@@ -1,13 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { RedisService } from '../common/redis/redis.service.js';
 import { Prisma } from '../generated/prisma/client.js';
+import { CANTIDAD_MAXIMA_POR_LINEA } from './dto/agregar-item.dto.js';
 
 /// Mensaje opaco: idéntico exista o no el recurso, o pertenezca a otro
 /// partner/carrito. Nunca debe distinguirse una cosa de otra (Zero Data Leak).
 const NO_ENCONTRADO = () => new NotFoundException('Recurso no encontrado');
-
-const CACHE_TTL_SEGUNDOS = 300;
 
 export interface LineaCarrito {
   id: string;
@@ -30,18 +28,12 @@ export interface ResumenCarrito {
 
 @Injectable()
 export class CarritoService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
-  ) {}
-
-  private claveCache(partnerId: string, userId: string): string {
-    return `carrito:${partnerId}:${userId}`;
-  }
-
-  private async invalidarCache(partnerId: string, userId: string): Promise<void> {
-    await this.redis.del(this.claveCache(partnerId, userId));
-  }
+  /// El carrito NO se cachea: los precios y descuentos se leen de la base de
+  /// datos en cada consulta. Así, si un admin cambia un PVP o un descuento
+  /// mientras el cliente tiene el carrito abierto, lo que ve (y lo que se
+  /// factura al confirmar) es siempre el precio vigente. Una caché de precios
+  /// solo podía enseñar un total y cobrar otro.
+  constructor(private readonly prisma: PrismaService) {}
 
   /// Calcula el precio neto en servidor: nunca se confía en un precio
   /// enviado por el cliente. Redondeo a 2 decimales (moneda).
@@ -96,16 +88,8 @@ export class CarritoService {
   }
 
   async obtenerResumen(partnerId: string, userId: string): Promise<ResumenCarrito> {
-    const clave = this.claveCache(partnerId, userId);
-    const cacheado = await this.redis.get(clave);
-    if (cacheado) {
-      return JSON.parse(cacheado) as ResumenCarrito;
-    }
-
     const cart = await this.obtenerOCrearCart(partnerId, userId);
-    const resumen = await this.construirResumen(cart.id, partnerId);
-    await this.redis.setEx(clave, CACHE_TTL_SEGUNDOS, JSON.stringify(resumen));
-    return resumen;
+    return this.construirResumen(cart.id, partnerId);
   }
 
   async agregarItem(
@@ -114,11 +98,14 @@ export class CarritoService {
     representacionPartnerId: string,
     cantidad: number,
   ): Promise<ResumenCarrito> {
-    const representacion = await this.prisma.representacionPartner.findUnique({
-      where: { id: representacionPartnerId },
+    /// Filtro por partner dentro de la propia consulta, y solo productos que
+    /// siguen a la venta (ni la asignación ni el producto base desactivados).
+    const representacion = await this.prisma.representacionPartner.findFirst({
+      where: { id: representacionPartnerId, partnerId, activo: true, productoBase: { activo: true } },
+      select: { id: true },
     });
 
-    if (!representacion || representacion.partnerId !== partnerId || !representacion.activo) {
+    if (!representacion) {
       throw NO_ENCONTRADO();
     }
 
@@ -129,9 +116,13 @@ export class CarritoService {
     });
 
     if (existente) {
+      const nuevaCantidad = existente.cantidad + cantidad;
+      if (nuevaCantidad > CANTIDAD_MAXIMA_POR_LINEA) {
+        throw new BadRequestException(`La cantidad máxima por producto es ${CANTIDAD_MAXIMA_POR_LINEA}.`);
+      }
       await this.prisma.cartItem.update({
         where: { id: existente.id },
-        data: { cantidad: existente.cantidad + cantidad },
+        data: { cantidad: nuevaCantidad },
       });
     } else {
       await this.prisma.cartItem.create({
@@ -139,7 +130,6 @@ export class CarritoService {
       });
     }
 
-    await this.invalidarCache(partnerId, userId);
     return this.obtenerResumen(partnerId, userId);
   }
 
@@ -169,7 +159,6 @@ export class CarritoService {
       data: { cantidad },
     });
 
-    await this.invalidarCache(partnerId, userId);
     return this.obtenerResumen(partnerId, userId);
   }
 
@@ -178,7 +167,6 @@ export class CarritoService {
 
     await this.prisma.cartItem.delete({ where: { id: item.id } });
 
-    await this.invalidarCache(partnerId, userId);
     return this.obtenerResumen(partnerId, userId);
   }
 }

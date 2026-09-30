@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser, type UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
+import { exigirPuedeComprar } from '../common/permisos-partner.js';
 import { CarritoService } from './carrito.service.js';
 import { AgregarItemDto } from './dto/agregar-item.dto.js';
 import { ActualizarCantidadDto } from './dto/actualizar-cantidad.dto.js';
@@ -33,7 +34,7 @@ export class CarritoController {
 
   @Post('items')
   async agregar(@CurrentUser() usuario: UsuarioAutenticado, @Body() dto: AgregarItemDto) {
-    const [partnerId, userId] = this.identificar(usuario);
+    const [partnerId, userId] = this.identificarComprador(usuario);
     return this.carritoService.agregarItem(partnerId, userId, dto.representacionPartnerId, dto.cantidad);
   }
 
@@ -43,13 +44,13 @@ export class CarritoController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ActualizarCantidadDto,
   ) {
-    const [partnerId, userId] = this.identificar(usuario);
+    const [partnerId, userId] = this.identificarComprador(usuario);
     return this.carritoService.actualizarCantidad(partnerId, userId, id, dto.cantidad);
   }
 
   @Delete('items/:id')
   async eliminar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
-    const [partnerId, userId] = this.identificar(usuario);
+    const [partnerId, userId] = this.identificarComprador(usuario);
     return this.carritoService.eliminarItem(partnerId, userId, id);
   }
 
@@ -60,5 +61,13 @@ export class CarritoController {
       throw new NotFoundException('Recurso no encontrado');
     }
     return [usuario.partnerId, usuario.userId];
+  }
+
+  /// Igual que `identificar`, pero además exige un rol que pueda comprar
+  /// (no `PARTNER_CONSULTA`). Para las operaciones que modifican el carrito.
+  private identificarComprador(usuario: UsuarioAutenticado): [string, string] {
+    const ids = this.identificar(usuario);
+    exigirPuedeComprar(usuario);
+    return ids;
   }
 }

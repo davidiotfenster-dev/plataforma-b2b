@@ -4,6 +4,7 @@ import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { CurrentUser, type UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
 import { RolUsuario } from '../generated/prisma/enums.js';
+import { exigirPuedeComprar } from '../common/permisos-partner.js';
 import { PedidosService } from './pedidos.service.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
@@ -17,6 +18,7 @@ export class PedidosController {
   @Post('confirmar')
   async confirmar(@CurrentUser() usuario: UsuarioAutenticado, @Body() dto: ConfirmarPedidoDto) {
     const [partnerId, userId] = this.identificar(usuario);
+    exigirPuedeComprar(usuario);
     return this.pedidosService.confirmar(partnerId, userId, dto);
   }
 

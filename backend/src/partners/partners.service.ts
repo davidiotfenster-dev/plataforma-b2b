@@ -11,6 +11,22 @@ import type { ListarPartnersQueryDto } from './dto/listar-partners-query.dto.js'
 
 const SALT_ROUNDS = 12;
 
+/// Partners dados de alta a partir de un listado (ver `import-partners-reales.ts`)
+/// llevan datos provisionales ("PENDIENTE-...") hasta que se completa su ficha.
+/// Sirve para avisar en el panel de cuáles faltan y poder filtrarlos.
+const DATOS_POR_COMPLETAR: Prisma.PartnerWhereInput = {
+  OR: [
+    { cif: { startsWith: 'PENDIENTE' } },
+    { dominioWeb: { endsWith: '.pendiente.test' } },
+    { direccionFiscal: 'Pendiente de completar' },
+  ],
+};
+
+/// Conteos que se muestran junto a cada partner en el panel (sin traer las filas).
+const CONTADORES_PARTNER = {
+  _count: { select: { usuarios: true, representaciones: true, ordenes: true } },
+} satisfies Prisma.PartnerInclude;
+
 @Injectable()
 export class PartnersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -84,23 +100,26 @@ export class PartnersService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
 
-    const where: Prisma.PartnerWhereInput = {
-      ...(restringirCreadoPorId ? { creadoPorUsuarioId: restringirCreadoPorId } : {}),
-      ...(query.estado ? { estado: query.estado } : {}),
-      ...(query.busqueda
-        ? {
-            OR: [
-              { razonSocial: { contains: query.busqueda, mode: 'insensitive' } },
-              { cif: { contains: query.busqueda, mode: 'insensitive' } },
-              { dominioWeb: { contains: query.busqueda, mode: 'insensitive' } },
-            ],
-          }
-        : {}),
-    };
+    const filtros: Prisma.PartnerWhereInput[] = [];
+    if (restringirCreadoPorId) filtros.push({ creadoPorUsuarioId: restringirCreadoPorId });
+    if (query.estado) filtros.push({ estado: query.estado });
+    if (query.busqueda) {
+      filtros.push({
+        OR: [
+          { razonSocial: { contains: query.busqueda, mode: 'insensitive' } },
+          { cif: { contains: query.busqueda, mode: 'insensitive' } },
+          { dominioWeb: { contains: query.busqueda, mode: 'insensitive' } },
+          { codigoCliente: { contains: query.busqueda, mode: 'insensitive' } },
+        ],
+      });
+    }
+    if (query.datosPorCompletar) filtros.push(DATOS_POR_COMPLETAR);
+    const where: Prisma.PartnerWhereInput = filtros.length > 0 ? { AND: filtros } : {};
 
     const [data, total] = await Promise.all([
       this.prisma.partner.findMany({
         where,
+        include: CONTADORES_PARTNER,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
@@ -111,11 +130,28 @@ export class PartnersService {
     return { data, total, page, limit };
   }
 
+  /// Cifras para las pestañas del panel: cuántos partners hay en cada estado y
+  /// cuántos siguen con datos provisionales. Respeta el alcance de un COMERCIAL.
+  async resumen(restringirCreadoPorId?: string) {
+    const acotado: Prisma.PartnerWhereInput = restringirCreadoPorId ? { creadoPorUsuarioId: restringirCreadoPorId } : {};
+
+    const [porEstadoBruto, datosPorCompletar] = await Promise.all([
+      this.prisma.partner.groupBy({ by: ['estado'], where: acotado, _count: { _all: true } }),
+      this.prisma.partner.count({ where: { AND: [acotado, DATOS_POR_COMPLETAR] } }),
+    ]);
+
+    const porEstado = Object.fromEntries(Object.values(EstadoPartner).map((estado) => [estado, 0])) as Record<EstadoPartner, number>;
+    for (const grupo of porEstadoBruto) porEstado[grupo.estado] = grupo._count._all;
+
+    const total = Object.values(porEstado).reduce((suma, n) => suma + n, 0);
+    return { total, porEstado, datosPorCompletar };
+  }
+
   /// `restringirCreadoPorId` acota el acceso a un COMERCIAL: si el partner
   /// existe pero pertenece a otro comercial/admin, se responde igual que si
   /// no existiera (404 opaco), nunca un 403 que confirme su existencia.
   private async obtenerOFallar(id: string, restringirCreadoPorId?: string) {
-    const partner = await this.prisma.partner.findUnique({ where: { id } });
+    const partner = await this.prisma.partner.findUnique({ where: { id }, include: CONTADORES_PARTNER });
     if (!partner || (restringirCreadoPorId && partner.creadoPorUsuarioId !== restringirCreadoPorId)) {
       throw new NotFoundException('Partner no encontrado');
     }
@@ -234,6 +270,16 @@ export class PartnersService {
       throw new NotFoundException('Producto no encontrado en el catálogo de este partner');
     }
     return representacion;
+  }
+
+  /// Quita un producto del catálogo del partner. Desaparece de sus carritos
+  /// (cascade); las líneas de pedidos ya hechos conservan su "fotografía"
+  /// comercial y solo pierden el enlace (SetNull).
+  async eliminarRepresentacion(partnerId: string, repId: string, restringirCreadoPorId?: string) {
+    await this.obtenerOFallar(partnerId, restringirCreadoPorId);
+    await this.obtenerRepresentacionOFallar(partnerId, repId);
+    await this.prisma.representacionPartner.delete({ where: { id: repId } });
+    return { eliminado: true };
   }
 
   async actualizarRepresentacion(

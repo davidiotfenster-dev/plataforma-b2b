@@ -1,6 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPartner } from '../generated/prisma/enums.js';
+import { especificacionesParaPartner } from './especificaciones-partner.js';
 import type { CrearProductoBaseDto } from './dto/crear-producto-base.dto.js';
 import type { ActualizarProductoBaseDto } from './dto/actualizar-producto-base.dto.js';
 import type { AsignarMasivoDto } from './dto/asignar-masivo.dto.js';
@@ -16,7 +18,10 @@ export class ProductosService {
   /// Gestión del catálogo global de ADMIN_FENSTER (productos base, sin
   /// datos comerciales de ningún partner en concreto).
   async listarBase() {
-    return this.prisma.productoBase.findMany({ orderBy: { nombreTecnico: 'asc' } });
+    return this.prisma.productoBase.findMany({
+      orderBy: { nombreTecnico: 'asc' },
+      include: { _count: { select: { representaciones: true } } },
+    });
   }
 
   async crearBase(dto: CrearProductoBaseDto) {
@@ -24,7 +29,9 @@ export class ProductosService {
     if (existente) {
       throw new ConflictException(`Ya existe un producto base con SKU industrial "${dto.skuIndustrial}"`);
     }
-    return this.prisma.productoBase.create({ data: dto });
+    return this.prisma.productoBase.create({
+      data: { ...dto, especificacionesJson: dto.especificacionesJson as Prisma.InputJsonValue | undefined },
+    });
   }
 
   async actualizarBase(id: string, dto: ActualizarProductoBaseDto) {
@@ -32,7 +39,24 @@ export class ProductosService {
     if (!producto) {
       throw new NotFoundException('Producto base no encontrado');
     }
-    return this.prisma.productoBase.update({ where: { id }, data: dto });
+    return this.prisma.productoBase.update({
+      where: { id },
+      data: { ...dto, especificacionesJson: dto.especificacionesJson as Prisma.InputJsonValue | undefined },
+    });
+  }
+
+  /// Qué partners tienen asignado este producto base y con qué nombre/precio,
+  /// para el panel de detalle del admin.
+  async listarRepresentacionesDeBase(id: string) {
+    const producto = await this.prisma.productoBase.findUnique({ where: { id }, select: { id: true } });
+    if (!producto) {
+      throw new NotFoundException('Producto base no encontrado');
+    }
+    return this.prisma.representacionPartner.findMany({
+      where: { productoBaseId: id },
+      orderBy: { partner: { razonSocial: 'asc' } },
+      include: { partner: { select: { id: true, razonSocial: true, marcaComercial: true, estado: true } } },
+    });
   }
 
   /// Asigna un producto base a varios/todos los partners activos de una
@@ -81,27 +105,47 @@ export class ProductosService {
     return { asignados: pendientes.length, omitidos: partnersObjetivo.length - pendientes.length };
   }
 
+  /// Lo que ve un partner de un producto de SU catálogo. Lista explícita de
+  /// campos: nunca se devuelve la fila entera, porque `productoBaseId` es el
+  /// mismo en todos los partners y el nombre/SKU técnico puede nombrar a otras
+  /// marcas (Zero Data Leak).
+  private static readonly CAMPOS_CATALOGO_PARTNER = {
+    id: true,
+    skuComercial: true,
+    nombreComercial: true,
+    imagenUrl: true,
+    documentacionUrl: true,
+    pvpBase: true,
+    activo: true,
+  } as const;
+
   async listarCatalogo(partnerId: string) {
     return this.prisma.representacionPartner.findMany({
-      where: { partnerId, activo: true },
+      where: { partnerId, activo: true, productoBase: { activo: true } },
+      select: ProductosService.CAMPOS_CATALOGO_PARTNER,
       orderBy: { nombreComercial: 'asc' },
     });
   }
 
   async obtenerRepresentacion(partnerId: string, id: string) {
-    const representacion = await this.prisma.representacionPartner.findUnique({
-      where: { id },
-      include: {
-        productoBase: {
-          select: { skuIndustrial: true, nombreTecnico: true, especificacionesJson: true },
-        },
+    /// El filtro por `partnerId` va en la propia consulta: un producto de otro
+    /// partner y uno inexistente son indistinguibles (mismo 404).
+    const representacion = await this.prisma.representacionPartner.findFirst({
+      where: { id, partnerId, activo: true, productoBase: { activo: true } },
+      select: {
+        ...ProductosService.CAMPOS_CATALOGO_PARTNER,
+        productoBase: { select: { especificacionesJson: true } },
       },
     });
 
-    if (!representacion || representacion.partnerId !== partnerId || !representacion.activo) {
+    if (!representacion) {
       throw NO_ENCONTRADO();
     }
 
-    return representacion;
+    const { productoBase, ...producto } = representacion;
+    return {
+      ...producto,
+      productoBase: { especificacionesJson: especificacionesParaPartner(productoBase.especificacionesJson) },
+    };
   }
 }

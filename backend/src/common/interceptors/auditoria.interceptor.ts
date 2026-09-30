@@ -49,7 +49,8 @@ export class AuditoriaInterceptor implements NestInterceptor {
     const entrada = {
       level: statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info',
       eventType,
-      userId: usuario?.userId ?? null,
+      /// En el login `request.user` viene de LocalStrategy (`id`), no del JWT (`userId`).
+      userId: usuario?.userId ?? (usuario as { id?: string } | undefined)?.id ?? null,
       partnerId: usuario?.partnerId ?? null,
       ipAddress: request.ip ?? null,
       userAgent: request.get('user-agent') ?? null,

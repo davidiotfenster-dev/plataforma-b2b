@@ -15,6 +15,9 @@ import {
   cuerpoConfirmacionPedido,
 } from '../common/email/plantillas-email.js';
 
+/// Código que el frontend reconoce para traducir el aviso de "los precios han cambiado".
+export const CODIGO_PRECIOS_CAMBIADOS = 'PRECIOS_CAMBIADOS';
+
 /// Mensaje opaco: idéntico exista o no el recurso, o pertenezca a otro
 /// partner. Nunca debe distinguirse una cosa de otra (Zero Data Leak).
 const NO_ENCONTRADO = () => new NotFoundException('Recurso no encontrado');
@@ -55,11 +58,22 @@ export class PedidosService {
     const orden = await this.prisma.$transaction(async (tx) => {
       const cart = await tx.cart.findUnique({
         where: { partnerId_userId: { partnerId, userId } },
-        include: { items: { include: { representacionPartner: true } } },
+        include: {
+          items: { include: { representacionPartner: { include: { productoBase: { select: { activo: true } } } } } },
+        },
       });
 
       if (!cart || cart.items.length === 0) {
         throw new BadRequestException('El carrito está vacío');
+      }
+
+      /// Un producto retirado de la venta después de meterlo en el carrito no
+      /// se puede pedir: se avisa cuáles son para que el cliente los quite.
+      const retirados = cart.items
+        .filter((item) => item.representacionPartner.activo === false || item.representacionPartner.productoBase?.activo === false)
+        .map((item) => item.representacionPartner.nombreComercial);
+      if (retirados.length > 0) {
+        throw new ConflictException(`Estos productos ya no están disponibles, quítalos del carrito: ${retirados.join(', ')}.`);
       }
 
       const partner = await tx.partner.findUniqueOrThrow({ where: { id: partnerId } });
@@ -86,6 +100,27 @@ export class PedidosService {
         };
       });
 
+      /// El carrito siempre enseña el precio vigente; si un admin cambió un precio
+      /// o un descuento mientras el cliente miraba la pantalla, el total que vio
+      /// ya no es el de este pedido. En vez de cobrarle otro importe en silencio,
+      /// se le avisa (el carrito ya se refresca con los precios nuevos).
+      if (dto.totalEsperado !== undefined && !new Prisma.Decimal(dto.totalEsperado).equals(totalNeto)) {
+        throw new ConflictException({
+          message: 'Los precios de tu carrito han cambiado. Revisa el nuevo total y vuelve a confirmar.',
+          codigo: CODIGO_PRECIOS_CAMBIADOS,
+        });
+      }
+
+      /// Se reclama el contenido del carrito ANTES de crear el pedido: si otra
+      /// confirmación simultánea (doble clic, dos pestañas, reintento) ya lo
+      /// ha vaciado, este `deleteMany` espera a que esa transacción termine y
+      /// borra 0 filas, así que se aborta y no se crea un pedido duplicado.
+      const idsLineas = cart.items.map((item) => item.id);
+      const reclamadas = await tx.cartItem.deleteMany({ where: { id: { in: idsLineas } } });
+      if (reclamadas.count !== idsLineas.length) {
+        throw new ConflictException('Este carrito ya se ha confirmado o ha cambiado. Revisa tus pedidos antes de repetir.');
+      }
+
       const [{ nextval }] = await tx.$queryRaw<{ nextval: bigint }[]>`SELECT nextval('pedido_codigo_seq')`;
       const codigoPed = `PED-${nextval.toString().padStart(6, '0')}`;
 
@@ -103,8 +138,6 @@ export class PedidosService {
         include: { items: true, usuario: { select: { email: true, idioma: true } } },
       });
 
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
-
       await tx.auditLog.create({
         data: {
           level: 'info',
@@ -117,8 +150,6 @@ export class PedidosService {
 
       return { order, razonSocialPartner: partner.razonSocial };
     });
-
-    await this.redis.del(`carrito:${partnerId}:${userId}`);
 
     await this.notificarConfirmacion(orden.order, orden.razonSocialPartner);
 
@@ -279,12 +310,16 @@ export class PedidosService {
       }),
       this.prisma.order.groupBy({
         by: ['partnerId'],
+        where: { estado: { not: EstadoPedido.CANCELADO } },
         _count: { _all: true },
         _sum: { totalNeto: true },
         orderBy: { _sum: { totalNeto: 'desc' } },
         take: 10,
       }),
+      /// Un pedido cancelado no es facturación: se cuenta en `totalPedidos` y en
+      /// `porEstado`, pero no suma en `totalFacturado` ni en el ranking.
       this.prisma.order.aggregate({
+        where: { estado: { not: EstadoPedido.CANCELADO } },
         _count: { _all: true },
         _sum: { totalNeto: true },
       }),
@@ -304,7 +339,7 @@ export class PedidosService {
     const nombrePartner = new Map(partners.map((p) => [p.id, p.razonSocial]));
 
     const resultado = {
-      totalPedidos: totalGeneral._count._all,
+      totalPedidos: porEstado.reduce((acc, e) => acc + e._count._all, 0),
       totalFacturado: totalGeneral._sum.totalNeto?.toString() ?? '0',
       porEstado: porEstado.map((e) => ({
         estado: e.estado,
@@ -392,27 +427,47 @@ export class PedidosService {
           ? { motivoCancelacion: dto.motivoCancelacion }
           : {};
 
-    const [actualizado] = await this.prisma.$transaction([
-      this.prisma.order.update({
-        where: { id },
-        data: { estado: dto.estado, ...datosExpedicion },
-      }),
-      this.prisma.auditLog.create({
-        data: {
-          level: 'info',
-          eventType: 'PEDIDO_ESTADO_ACTUALIZADO',
-          userId: adminUserId,
-          partnerId: order.partnerId,
-          payload: {
-            codigoPed: order.codigoPed,
-            estadoAnterior: order.estado,
-            estadoNuevo: dto.estado,
-            forzado: dto.forzar ?? false,
-            ...datosExpedicion,
+    /// Al salir de CANCELADO o de ENVIADO se borran los datos que ya no
+    /// aplican (motivo de cancelación, transportista...), para que el partner
+    /// no vea restos de un estado anterior.
+    const limpieza = {
+      ...(veniaCancelado && !esCancelacion ? { motivoCancelacion: null } : {}),
+      ...(order.estado === EstadoPedido.ENVIADO && dto.estado !== EstadoPedido.ENVIADO
+        ? { transportista: null, numeroExpedicion: null, trackingUrl: null }
+        : {}),
+    };
+
+    let actualizado;
+    try {
+      [actualizado] = await this.prisma.$transaction([
+        /// El `estado` en el `where` hace que la escritura falle si otro admin
+        /// cambió el pedido entre la lectura y este momento.
+        this.prisma.order.update({
+          where: { id, estado: order.estado },
+          data: { estado: dto.estado, ...limpieza, ...datosExpedicion },
+        }),
+        this.prisma.auditLog.create({
+          data: {
+            level: 'info',
+            eventType: 'PEDIDO_ESTADO_ACTUALIZADO',
+            userId: adminUserId,
+            partnerId: order.partnerId,
+            payload: {
+              codigoPed: order.codigoPed,
+              estadoAnterior: order.estado,
+              estadoNuevo: dto.estado,
+              forzado: dto.forzar ?? false,
+              ...datosExpedicion,
+            },
           },
-        },
-      }),
-    ]);
+        }),
+      ]);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new ConflictException('El pedido ha cambiado de estado mientras lo editabas. Recarga y vuelve a intentarlo.');
+      }
+      throw error;
+    }
 
     await this.notificarCambioEstado(order.usuario.email, order.usuario.idioma, actualizado);
 

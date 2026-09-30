@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CarritoService } from './carrito.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
-import type { RedisService } from '../common/redis/redis.service.js';
 
 /// Cobertura del cálculo de precio/descuento del carrito: mismo motor que
 /// `PedidosService.confirmar` (ver pedidos.service.spec.ts), pero antes de
@@ -14,7 +13,6 @@ describe('CarritoService.obtenerResumen — cálculo de precio y descuento', () 
     cartItem: { findMany: ReturnType<typeof vi.fn> };
     partner: { findUniqueOrThrow: ReturnType<typeof vi.fn> };
   };
-  let redis: { get: ReturnType<typeof vi.fn>; setEx: ReturnType<typeof vi.fn> };
   let service: CarritoService;
 
   const PARTNER_ID = 'partner-1';
@@ -40,8 +38,7 @@ describe('CarritoService.obtenerResumen — cálculo de precio y descuento', () 
       cartItem: { findMany: vi.fn() },
       partner: { findUniqueOrThrow: vi.fn() },
     };
-    redis = { get: vi.fn().mockResolvedValue(null), setEx: vi.fn().mockResolvedValue(undefined) };
-    service = new CarritoService(prisma as unknown as PrismaService, redis as unknown as RedisService);
+    service = new CarritoService(prisma as unknown as PrismaService);
   });
 
   it('aplica el descuento general del partner cuando el producto no tiene descuento propio', async () => {
@@ -83,13 +80,30 @@ describe('CarritoService.obtenerResumen — cálculo de precio y descuento', () 
     expect(resumen.totalPedido).toBe('390');
   });
 
-  it('usa el resumen cacheado en Redis sin volver a consultar la base de datos', async () => {
-    const cacheado = { cartId: 'cart-1', items: [], totalPedido: '0' };
-    redis.get.mockResolvedValue(JSON.stringify(cacheado));
+  it('refleja al instante un cambio de precio o de descuento mientras el carrito sigue abierto', async () => {
+    // Primera lectura: PVP 100 con el 10 % general -> 90 por unidad, 2 unidades.
+    prisma.cartItem.findMany.mockResolvedValueOnce([
+      { id: 'item-1', cantidad: 2, representacionPartner: representacion({ pvpBase: 100, descuentoOverride: null }) },
+    ]);
+    prisma.partner.findUniqueOrThrow.mockResolvedValueOnce({ descuentoPorcentaje: new Prisma.Decimal(10) });
+    const antes = await service.obtenerResumen(PARTNER_ID, USER_ID);
+    expect(antes.totalPedido).toBe('180');
 
-    const resumen = await service.obtenerResumen(PARTNER_ID, USER_ID);
+    // Un admin sube el PVP a 120: la siguiente lectura, sin esperar ni invalidar nada, ya lo enseña.
+    prisma.cartItem.findMany.mockResolvedValueOnce([
+      { id: 'item-1', cantidad: 2, representacionPartner: representacion({ pvpBase: 120, descuentoOverride: null }) },
+    ]);
+    prisma.partner.findUniqueOrThrow.mockResolvedValueOnce({ descuentoPorcentaje: new Prisma.Decimal(10) });
+    const despues = await service.obtenerResumen(PARTNER_ID, USER_ID);
+    expect(despues.items[0].precioNetoUnitario).toBe('108');
+    expect(despues.totalPedido).toBe('216');
 
-    expect(resumen).toEqual(cacheado);
-    expect(prisma.cartItem.findMany).not.toHaveBeenCalled();
+    // Y si cambia el descuento del partner (sin tocar el PVP), pasa lo mismo.
+    prisma.cartItem.findMany.mockResolvedValueOnce([
+      { id: 'item-1', cantidad: 2, representacionPartner: representacion({ pvpBase: 120, descuentoOverride: null }) },
+    ]);
+    prisma.partner.findUniqueOrThrow.mockResolvedValueOnce({ descuentoPorcentaje: new Prisma.Decimal(20) });
+    const conNuevoDescuento = await service.obtenerResumen(PARTNER_ID, USER_ID);
+    expect(conNuevoDescuento.totalPedido).toBe('192');
   });
 });

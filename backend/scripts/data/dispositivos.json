@@ -1,0 +1,1105 @@
+[
+  {
+    "skuIndustrial": "W1-BLANCO",
+    "nombreTecnico": "Connect-1 / Wave-1 / Icon1 Blanco",
+    "grupo": "Connect-1 / Wave-1 / Icon1",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Pulsador Wave1 blanco",
+        "refInterna": "W1B",
+        "gtin": "8437025278008"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON1",
+        "refInterna": "ICON1B",
+        "gtin": "8437025278169"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 1 BLANCO",
+        "refInterna": "Connect1BL",
+        "gtin": "8437025278503"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W1-NEGRO",
+    "nombreTecnico": "Connect-1 / Wave-1 / Icon1 Negro",
+    "grupo": "Connect-1 / Wave-1 / Icon1",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Pulsador Wave1 negro",
+        "refInterna": "W1N",
+        "gtin": "8437025278015"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON1",
+        "refInterna": "ICON1N",
+        "gtin": "8437025278176"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 1  NEGRO",
+        "refInterna": "Connect1N",
+        "gtin": "8437025278510"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W1P-BLANCO",
+    "nombreTecnico": "Connect-1+ / Wave-1+ / Icon1+ Blanco",
+    "grupo": "Connect-1+ / Wave-1+ / Icon1+",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Pulsador Wave1+  blanco",
+        "refInterna": "W1+B",
+        "gtin": "8437025278022"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON1+",
+        "refInterna": "ICON1+B",
+        "gtin": "8437025278183"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 1 + BLANCO",
+        "refInterna": "Connect1PBL",
+        "gtin": "8437025278527"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W1P-NEGRO",
+    "nombreTecnico": "Connect-1+ / Wave-1+ / Icon1+ Negro",
+    "grupo": "Connect-1+ / Wave-1+ / Icon1+",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Pulsador Wave1+  negro",
+        "refInterna": "W1+N",
+        "gtin": "8437025278039"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON1+",
+        "refInterna": "ICON1+N",
+        "gtin": "8437025278190"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 1 + NEGRO",
+        "refInterna": "Connect1PN",
+        "gtin": "8437025278534"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2-BLANCO",
+    "nombreTecnico": "Connect-2 / Wave-2 / Icon2 Blanco",
+    "grupo": "Connect-2 / Wave-2 / Icon2",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Dispositivo Wave2 blanco",
+        "refInterna": "W2B",
+        "gtin": "8437025278046"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON2",
+        "refInterna": "ICON2B",
+        "gtin": "8437025278206"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2 BLANCO",
+        "refInterna": "Connect2BL",
+        "gtin": "8437025278541"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2-NEGRO",
+    "nombreTecnico": "Connect-2 / Wave-2 / Icon2 Negro",
+    "grupo": "Connect-2 / Wave-2 / Icon2",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Dispositivo Wave2 negro",
+        "refInterna": "W2N",
+        "gtin": "8437025278053"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON2",
+        "refInterna": "ICON2N",
+        "gtin": "8437025278213"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2  NEGRO",
+        "refInterna": "Connect2N",
+        "gtin": "8437025278558"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2P-BLANCO",
+    "nombreTecnico": "Connect-2+ / Wave-2+ / Icon2+ Blanco",
+    "grupo": "Connect-2+ / Wave-2+ / Icon2+",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Dispositivo Wave2+  blanco",
+        "refInterna": "W2+B",
+        "gtin": "8437025278060"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON2+",
+        "refInterna": "ICON2+B",
+        "gtin": "8437025278220"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2  + BLANCO",
+        "refInterna": "Connect2PBL",
+        "gtin": "8437025278565"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2P-NEGRO",
+    "nombreTecnico": "Connect-2+ / Wave-2+ / Icon2+ Negro",
+    "grupo": "Connect-2+ / Wave-2+ / Icon2+",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "Dispositivo Wave2+  negro",
+        "refInterna": "W2+N",
+        "gtin": "8437025278077"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON2+",
+        "refInterna": "ICON2+N",
+        "gtin": "8437025278237"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2 + NEGRO",
+        "refInterna": "Connect2PN",
+        "gtin": "8437025278572"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2S-BLANCO",
+    "nombreTecnico": "Connect-2 Security / Wave2S Blanco",
+    "grupo": "Connect-2 Security / Wave2S",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 2S BLANCO",
+        "refInterna": "WAVE2SBL",
+        "gtin": "8437025278305"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2 SECURITY BLANCO",
+        "refInterna": "Connect2SBL",
+        "gtin": "8437025278589"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2S-NEGRO",
+    "nombreTecnico": "Connect-2 Security / Wave2S Negro",
+    "grupo": "Connect-2 Security / Wave2S",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 2S NEGRO",
+        "refInterna": "WAVE2SN",
+        "gtin": "8437025278312"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "CONNECT 2  SECURITY NEGRO",
+        "refInterna": "Connect2SN",
+        "gtin": "8437025278596"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2SP-BLANCO",
+    "nombreTecnico": "Wave2S+ Blanco",
+    "grupo": "Wave2S+",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 2S+ BLANCO",
+        "refInterna": "WAVE2S+BL",
+        "gtin": "8437025278282"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "W2SP-NEGRO",
+    "nombreTecnico": "Wave2S+ Negro",
+    "grupo": "Wave2S+",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 2S+ NEGRO",
+        "refInterna": "WAVE2S+N",
+        "gtin": "8437025278299"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "CABLE-2M-MINI",
+    "nombreTecnico": "Cable Pulsar 2 m",
+    "grupo": "Accesorios",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Cable 2 metros",
+        "refInterna": "CABLE-2M-MINI",
+        "gtin": null
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Cable Pulsar 2 m",
+        "refInterna": "CABLE_2M_PL",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 24 EUR",
+    "pvpTarifa": 24,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "TAPAICON2B",
+    "nombreTecnico": "Tapa ICON2 Blanco",
+    "grupo": "Accesorios",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Tapa ICON2",
+        "refInterna": "TAPAICON2B",
+        "gtin": "8437025278268"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "TAPAICON1B",
+    "nombreTecnico": "Tapa ICON1 Blanco",
+    "grupo": "Accesorios",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Tapa ICON1",
+        "refInterna": "TAPAICON1B",
+        "gtin": "8437025278244"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "TAPAICON1N",
+    "nombreTecnico": "Tapa ICON1 Negro",
+    "grupo": "Accesorios",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Tapa ICON1",
+        "refInterna": "TAPAICON1N",
+        "gtin": "8437025278251"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "TAPAICON2N",
+    "nombreTecnico": "Tapa ICON2 Negro",
+    "grupo": "Accesorios",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Tapa ICON2",
+        "refInterna": "TAPAICON2N",
+        "gtin": "8437025278275"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "PULSAR-INOX",
+    "nombreTecnico": "Pulsar / Wave-4 / Icon Mini Inox/Plata",
+    "grupo": "Pulsar (Pulsar / Wave-4 / Icon Mini)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "ICON",
+        "nombre": "ICON MINI PLATA",
+        "refInterna": "ICONMINIP",
+        "gtin": "8437025278602"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON4 Inox",
+        "refInterna": "ICON4I",
+        "gtin": "8437025278381"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo WAVE4 Inox",
+        "refInterna": "WAVE4I",
+        "gtin": "8437025278428"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo PULSAR Inox",
+        "refInterna": "PULSARI",
+        "gtin": "8437025278466"
+      }
+    ],
+    "pvpTarifa": 98
+  },
+  {
+    "skuIndustrial": "PULSAR-NEGRO",
+    "nombreTecnico": "Pulsar / Wave-4 / Icon Mini Negro",
+    "grupo": "Pulsar (Pulsar / Wave-4 / Icon Mini)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "ICON",
+        "nombre": "ICON MINI NEGRO",
+        "refInterna": "ICONMININ",
+        "gtin": "8437025278619"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON4 Negro",
+        "refInterna": "ICON4N",
+        "gtin": "8437025278398"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo WAVE4 Negro",
+        "refInterna": "WAVE4N",
+        "gtin": "8437025278435"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo PULSAR Negro",
+        "refInterna": "PULSARN",
+        "gtin": "8437025278473"
+      }
+    ],
+    "pvpTarifa": 98
+  },
+  {
+    "skuIndustrial": "PULSARP-INOX",
+    "nombreTecnico": "Pulsar+ / Wave-4+ / Icon Mini+ Inox/Plata",
+    "grupo": "Pulsar+ (Pulsar+ / Wave-4+ / Icon Mini+)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "ICON",
+        "nombre": "ICON MINI + PLATA",
+        "refInterna": "ICONMINIPP",
+        "gtin": "8437025278626"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON4+ Inox",
+        "refInterna": "ICON4+I",
+        "gtin": "8437025278404"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo WAVE4+ Inox",
+        "refInterna": "WAVE4+I",
+        "gtin": "8437025278442"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo PULSAR+ Inox",
+        "refInterna": "PULSAR+I",
+        "gtin": "8437025278480"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "PULSARP-NEGRO",
+    "nombreTecnico": "Pulsar+ / Wave-4+ / Icon Mini+ Negro",
+    "grupo": "Pulsar+ (Pulsar+ / Wave-4+ / Icon Mini+)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "ICON",
+        "nombre": "ICON MINI + NEGRO",
+        "refInterna": "ICONMINIPN",
+        "gtin": "8437025278633"
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "Dispositivo ICON4+ Negro",
+        "refInterna": "ICON4+N",
+        "gtin": "8437025278411"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo WAVE4+ Negro",
+        "refInterna": "WAVE4+N",
+        "gtin": "8437025278459"
+      },
+      {
+        "marca": "VBH",
+        "nombre": "Dispositivo PULSAR+ Negro",
+        "refInterna": "PULSAR+N",
+        "gtin": "8437025278497"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "WALL-SKY-BLANCO",
+    "nombreTecnico": "Pulsador de pared SKY Blanco",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSKYB",
+        "gtin": "8437025278138"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SHUTTER-BLANCO",
+    "nombreTecnico": "Pulsador de pared SHUTTER Blanco",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSHUTTERB",
+        "gtin": "8437025278091"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-WAVE3-BLANCO",
+    "nombreTecnico": "Pulsador de pared Wave3 Blanco",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 BLANCO",
+        "refInterna": "WAVE3BL",
+        "gtin": "8437025278329"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SHUTTER-ESPECIAL",
+    "nombreTecnico": "Pulsador de pared SHUTTER Especial",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Especial",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSHUTTERE",
+        "gtin": "8437025278114"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SKY-ESPECIAL",
+    "nombreTecnico": "Pulsador de pared SKY Especial",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Especial",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSKYE",
+        "gtin": "8437025278152"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SKY-INOX",
+    "nombreTecnico": "Pulsador de pared SKY Inox/Plata",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSKYP",
+        "gtin": "8437025278145"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SHUTTER-INOX",
+    "nombreTecnico": "Pulsador de pared SHUTTER Inox/Plata",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSHUTTERP",
+        "gtin": "8437025278107"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-WAVE3-INOX",
+    "nombreTecnico": "Pulsador de pared Wave3 Inox/Plata",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 PLATA",
+        "refInterna": "WAVE3P",
+        "gtin": "8437025278374"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SHUTTER-NEGRO",
+    "nombreTecnico": "Pulsador de pared SHUTTER Negro",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSHUTTERN",
+        "gtin": "8437025278084"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-SKY-NEGRO",
+    "nombreTecnico": "Pulsador de pared SKY Negro",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "C-WALL",
+        "nombre": "Pulsador empotrable en pared",
+        "refInterna": "C-WALLSKYN",
+        "gtin": "8437025278121"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALL-WAVE3-NEGRO",
+    "nombreTecnico": "Pulsador de pared Wave3 Negro",
+    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 NEGRO",
+        "refInterna": "WAVE3N",
+        "gtin": "8437025278336"
+      }
+    ],
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "WALLAIR-BLANCO",
+    "nombreTecnico": "Wave3 Air Blanco",
+    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 AIR BLANCO",
+        "refInterna": "WAVEAIR3BL",
+        "gtin": "8437025278343"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "WALLAIR-INOX",
+    "nombreTecnico": "Wave3 Air Inox/Plata",
+    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 AIR PLATA",
+        "refInterna": "WAVEAIR3P",
+        "gtin": "8437025278367"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "WALLAIR-NEGRO",
+    "nombreTecnico": "Wave3 Air Negro",
+    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 AIR NEGRO",
+        "refInterna": "WAVEAIR3N",
+        "gtin": "8437025278350"
+      }
+    ],
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "MANDO-CONNECT-ESTANDAR",
+    "nombreTecnico": "Mando Connect (estándar)",
+    "grupo": "Mando Connect (todos los partners)",
+    "color": null,
+    "referencias": [],
+    "pvpTarifa": 30,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "MANDO-CONNECT-MASTER",
+    "nombreTecnico": "Mando Witooth (bluConnect / ICON BLUE / WAVE BLUE)",
+    "grupo": "Mando Witooth",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "bluConnect",
+        "refInterna": "BLUECTN",
+        "gtin": null
+      },
+      {
+        "marca": "PROCOMSA",
+        "nombre": "ICON BLUE",
+        "refInterna": null,
+        "gtin": null
+      },
+      {
+        "marca": "VBH",
+        "nombre": "WAVE BLUE",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 2026: BLUECTN 30 EUR (bluConnect); mismo precio supuesto para ICON BLUE y WAVE BLUE",
+    "pvpTarifa": 30,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SHUTTER-BLANCO",
+    "nombreTecnico": "Connect EVO Shutter Blanco",
+    "grupo": "Connect EVO Shutter",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Shutter",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 108,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SHUTTER-ANTRACITA",
+    "nombreTecnico": "Connect EVO Shutter Antracita",
+    "grupo": "Connect EVO Shutter",
+    "color": "Antracita",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Shutter",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 108,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SHUTTER-NEGRO",
+    "nombreTecnico": "Connect EVO Shutter Negro",
+    "grupo": "Connect EVO Shutter",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Shutter",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 108,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SHUTTER-MARRON",
+    "nombreTecnico": "Connect EVO Shutter Marrón",
+    "grupo": "Connect EVO Shutter",
+    "color": "Marrón",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Shutter",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 108,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SECURITY-BLANCO",
+    "nombreTecnico": "Connect EVO Security Blanco",
+    "grupo": "Connect EVO Security",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Security",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 114,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SECURITY-ANTRACITA",
+    "nombreTecnico": "Connect EVO Security Antracita",
+    "grupo": "Connect EVO Security",
+    "color": "Antracita",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Security",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 114,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SECURITY-NEGRO",
+    "nombreTecnico": "Connect EVO Security Negro",
+    "grupo": "Connect EVO Security",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Security",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 114,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-SECURITY-MARRON",
+    "nombreTecnico": "Connect EVO Security Marrón",
+    "grupo": "Connect EVO Security",
+    "color": "Marrón",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Security",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 114,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-PLUS-BLANCO",
+    "nombreTecnico": "Connect EVO Plus Blanco",
+    "grupo": "Connect EVO Plus",
+    "color": "Blanco",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Plus",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 138,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-PLUS-ANTRACITA",
+    "nombreTecnico": "Connect EVO Plus Antracita",
+    "grupo": "Connect EVO Plus",
+    "color": "Antracita",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Plus",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 138,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-PLUS-NEGRO",
+    "nombreTecnico": "Connect EVO Plus Negro",
+    "grupo": "Connect EVO Plus",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Plus",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 138,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "EVO-PLUS-MARRON",
+    "nombreTecnico": "Connect EVO Plus Marrón",
+    "grupo": "Connect EVO Plus",
+    "color": "Marrón",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "EVO Plus",
+        "refInterna": null,
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
+    "pvpTarifa": 138,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "WALL-FLEX",
+    "nombreTecnico": "C-WALL Flex (persiana orientable)",
+    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL)",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "C-WALL Flex",
+        "refInterna": "C-WALL_FLEX",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN ni colores definidos. Tarifa 82 EUR",
+    "pvpTarifa": 82
+  },
+  {
+    "skuIndustrial": "CONNECT-SMART-WHITEBOX",
+    "nombreTecnico": "Connect Smart · dispositivo de potencia White Box",
+    "grupo": "Connect Smart",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Connect Smart White Box",
+        "refInterna": "WHITE_BOX",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 90 EUR",
+    "pvpTarifa": 90,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "PULSAR-BOTON",
+    "nombreTecnico": "Botón suelto Pulsar",
+    "grupo": "Accesorios",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Botón suelto Pulsar",
+        "refInterna": "BOTON_PULSAR",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 20 EUR",
+    "pvpTarifa": 20,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "CABLE-PULSAR-1M",
+    "nombreTecnico": "Cable Pulsar 1 m",
+    "grupo": "Accesorios",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Cable Pulsar 1 m",
+        "refInterna": "CABLE_1M_PL",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 12 EUR",
+    "pvpTarifa": 12,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "CABLE-EVO-DATOS",
+    "nombreTecnico": "Cable datos EVO 1,5 m (EVO a Smart)",
+    "grupo": "Accesorios",
+    "color": null,
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Cable datos EVO 1,5 m",
+        "refInterna": "CABLE_DATOS_EVO",
+        "gtin": null
+      }
+    ],
+    "pendiente": "Sin GTIN. Tarifa 12 EUR",
+    "pvpTarifa": 12,
+    "ambito": "todos"
+  },
+  {
+    "skuIndustrial": "PULSAR-C16-INOX",
+    "nombreTecnico": "Pulsar Inox/Plata · cable 1,6 m",
+    "grupo": "Pulsar (Wave4 / ICON4 / ICON MINI)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR Inox cable 1.6m",
+        "refInterna": "PULSARI16",
+        "gtin": "8437025278664"
+      }
+    ],
+    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
+    "pvpTarifa": 98
+  },
+  {
+    "skuIndustrial": "PULSAR-C16-NEGRO",
+    "nombreTecnico": "Pulsar Negro · cable 1,6 m",
+    "grupo": "Pulsar (Wave4 / ICON4 / ICON MINI)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR Negro cable 1.6m",
+        "refInterna": "PULSARN16",
+        "gtin": "8437025278657"
+      }
+    ],
+    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
+    "pvpTarifa": 98
+  },
+  {
+    "skuIndustrial": "PULSARP-C16-INOX",
+    "nombreTecnico": "Pulsar+ Inox/Plata · cable 1,6 m",
+    "grupo": "Pulsar+ (Wave4+ / ICON4+ / ICON MINI+)",
+    "color": "Inox/Plata",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR+ Inox cable 1.6m",
+        "refInterna": "PULSAR+I16",
+        "gtin": "8437025278640"
+      }
+    ],
+    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
+    "pvpTarifa": null
+  },
+  {
+    "skuIndustrial": "PULSARP-C16-NEGRO",
+    "nombreTecnico": "Pulsar+ Negro · cable 1,6 m",
+    "grupo": "Pulsar+ (Wave4+ / ICON4+ / ICON MINI+)",
+    "color": "Negro",
+    "referencias": [
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR+ Negro cable 1.6m",
+        "refInterna": "PULSAR+N16",
+        "gtin": "8437025278671"
+      }
+    ],
+    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
+    "pvpTarifa": null
+  }
+]

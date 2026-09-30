@@ -5,6 +5,7 @@ import { Strategy, type StrategyOptions } from 'passport-jwt';
 import type { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { UsuarioAutenticado } from '../../common/decorators/current-user.decorator.js';
+import { EstadoPartner } from '../../generated/prisma/enums.js';
 
 export const JWT_COOKIE_NAME = 'fenster_session';
 
@@ -56,12 +57,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     /// Verificación en BD en cada request (no solo firma/expiración): permite
-    /// que desactivar un usuario o forzar su cierre de sesión desde el panel
-    /// admin tenga efecto inmediato, sin esperar a que expire el JWT (hasta
-    /// 8h por defecto).
+    /// que desactivar un usuario, forzar su cierre de sesión, cambiarle el rol
+    /// o suspender a su partner desde el panel admin tenga efecto inmediato,
+    /// sin esperar a que expire el JWT (hasta 8h por defecto). Por eso el rol
+    /// y el partner se leen de la BD y NO de lo que diga el token.
     const usuario = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { activo: true, sesionInvalidadaEn: true },
+      select: {
+        activo: true,
+        sesionInvalidadaEn: true,
+        rol: true,
+        partnerId: true,
+        partner: { select: { estado: true } },
+      },
     });
 
     if (!usuario || !usuario.activo) {
@@ -72,10 +80,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
+    /// Un usuario de partner deja de poder operar en cuanto su partner deja de
+    /// estar ACTIVO (suspendido, rechazado...), aunque su cookie siga viva.
+    if (usuario.partnerId && usuario.partner?.estado !== EstadoPartner.ACTIVO) {
+      throw new UnauthorizedException();
+    }
+
     return {
       userId: payload.sub,
-      partnerId: payload.partnerId,
-      rol: payload.rol,
+      partnerId: usuario.partnerId,
+      rol: usuario.rol,
     };
   }
 }

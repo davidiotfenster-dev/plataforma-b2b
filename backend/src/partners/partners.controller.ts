@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards, Delete } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
@@ -39,6 +39,13 @@ export class PartnersController {
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   async listar(@CurrentUser() usuario: UsuarioAutenticado, @Query() query: ListarPartnersQueryDto) {
     return this.partnersService.listar(query, this.restriccion(usuario));
+  }
+
+  /// Debe declararse ANTES de `:id`: si no, "resumen" se interpretaría como un id.
+  @Get('resumen')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async resumen(@CurrentUser() usuario: UsuarioAutenticado) {
+    return this.partnersService.resumen(this.restriccion(usuario));
   }
 
   @Get(':id')
@@ -104,5 +111,15 @@ export class PartnersController {
     @Body() dto: ActualizarRepresentacionDto,
   ) {
     return this.partnersService.actualizarRepresentacion(id, repId, dto, this.restriccion(usuario));
+  }
+
+  @Delete(':id/catalogo/:repId')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async eliminarRepresentacion(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('repId', ParseUUIDPipe) repId: string,
+  ) {
+    return this.partnersService.eliminarRepresentacion(id, repId, this.restriccion(usuario));
   }
 }

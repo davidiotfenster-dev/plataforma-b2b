@@ -17,7 +17,10 @@ import { AsignarMasivoDto } from './dto/asignar-masivo.dto.js';
 export class ProductosBaseController {
   constructor(private readonly productosService: ProductosService) {}
 
+  /// Lectura también para COMERCIAL: necesita ver los productos disponibles
+  /// para asignarlos al catálogo de sus partners.
   @Get()
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   async listar() {
     return this.productosService.listarBase();
   }
@@ -25,6 +28,11 @@ export class ProductosBaseController {
   @Post()
   async crear(@Body() dto: CrearProductoBaseDto) {
     return this.productosService.crearBase(dto);
+  }
+
+  @Get(':id/representaciones')
+  async representaciones(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productosService.listarRepresentacionesDeBase(id);
   }
 
   @Patch(':id')

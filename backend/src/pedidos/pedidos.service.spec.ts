@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PedidosService } from './pedidos.service.js';
 import { Prisma } from '../generated/prisma/client.js';
@@ -44,7 +45,7 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
   }
 
   function cartConLinea(cantidad: number, rep: ReturnType<typeof representacion>) {
-    return { id: 'cart-1', items: [{ cantidad, representacionPartner: rep }] };
+    return { id: 'cart-1', items: [{ id: 'item-1', cantidad, representacionPartner: rep }] };
   }
 
   beforeEach(() => {
@@ -65,7 +66,9 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
           };
         }),
       },
-      cartItem: { deleteMany: vi.fn().mockResolvedValue({ count: 1 }) },
+      /// Como la BD real: devuelve cuántas líneas ha borrado (las pedidas, salvo que
+      /// otra transacción ya las hubiera borrado).
+      cartItem: { deleteMany: vi.fn(async ({ where }: { where: { id: { in: string[] } } }) => ({ count: where.id.in.length })) },
       auditLog: { create: vi.fn().mockResolvedValue({}) },
     };
 
@@ -138,8 +141,8 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
     tx.cart.findUnique.mockResolvedValue({
       id: 'cart-1',
       items: [
-        { cantidad: 1, representacionPartner: repGeneral },
-        { cantidad: 3, representacionPartner: repOverride },
+        { id: 'item-1', cantidad: 1, representacionPartner: repGeneral },
+        { id: 'item-2', cantidad: 3, representacionPartner: repOverride },
       ],
     });
     tx.partner.findUniqueOrThrow.mockResolvedValue({
@@ -160,5 +163,79 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
     await expect(
       service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never),
     ).rejects.toThrow('El carrito está vacío');
+  });
+
+  it('solo reclama las líneas que ha leído del carrito, no el carrito entero', async () => {
+    tx.cart.findUnique.mockResolvedValue(cartConLinea(1, representacion()));
+    tx.partner.findUniqueOrThrow.mockResolvedValue({ id: PARTNER_ID, razonSocial: 'P', descuentoPorcentaje: new Prisma.Decimal(0) });
+
+    await service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never);
+
+    expect(tx.cartItem.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ['item-1'] } } });
+  });
+
+  it('no crea un pedido duplicado si otra confirmación simultánea ya vació el carrito', async () => {
+    tx.cart.findUnique.mockResolvedValue(cartConLinea(1, representacion()));
+    tx.partner.findUniqueOrThrow.mockResolvedValue({ id: PARTNER_ID, razonSocial: 'P', descuentoPorcentaje: new Prisma.Decimal(0) });
+    // La otra transacción ya borró la línea: aquí no queda nada que reclamar.
+    tx.cartItem.deleteMany.mockResolvedValue({ count: 0 });
+
+    await expect(
+      service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    expect(tx.order.create).not.toHaveBeenCalled();
+    expect(tx.auditLog.create).not.toHaveBeenCalled();
+    expect(pdfService.generar).not.toHaveBeenCalled();
+    expect(emailService.enviar).not.toHaveBeenCalled();
+  });
+
+  it('no deja confirmar si hay un producto retirado de la venta en el carrito', async () => {
+    const repRetirada = { ...representacion(), nombreComercial: 'Producto retirado', activo: false };
+    tx.cart.findUnique.mockResolvedValue(cartConLinea(1, repRetirada));
+
+    await expect(
+      service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never),
+    ).rejects.toThrow('Producto retirado');
+
+    expect(tx.cartItem.deleteMany).not.toHaveBeenCalled();
+    expect(tx.order.create).not.toHaveBeenCalled();
+  });
+
+  describe('totalEsperado (aviso de cambio de precio)', () => {
+    beforeEach(() => {
+      tx.cart.findUnique.mockResolvedValue(cartConLinea(2, representacion({ pvpBase: 100, descuentoOverride: null })));
+      tx.partner.findUniqueOrThrow.mockResolvedValue({ id: PARTNER_ID, razonSocial: 'P', descuentoPorcentaje: new Prisma.Decimal(10) });
+    });
+
+    it('confirma sin problemas cuando el total que vio el cliente coincide con el vigente', async () => {
+      // 100 con el 10 % -> 90 x 2 = 180
+      const orden = await service.confirmar(PARTNER_ID, USER_ID, {
+        direccionEnvio: 'Calle 1',
+        poNumber: 'PO-1',
+        totalEsperado: '180',
+      } as never);
+
+      expect((orden.totalNeto as Prisma.Decimal).toString()).toBe('180');
+    });
+
+    it('no confirma si los precios cambiaron mientras el cliente miraba la pantalla, y avisa con un código reconocible', async () => {
+      const error = await service
+        .confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1', totalEsperado: '150' } as never)
+        .catch((e: unknown) => e);
+
+      expect(error).toBeInstanceOf(ConflictException);
+      expect((error as ConflictException).getResponse()).toMatchObject({ codigo: 'PRECIOS_CAMBIADOS' });
+      // Nada se toca: el carrito queda intacto para que el cliente revise el total nuevo.
+      expect(tx.cartItem.deleteMany).not.toHaveBeenCalled();
+      expect(tx.order.create).not.toHaveBeenCalled();
+      expect(emailService.enviar).not.toHaveBeenCalled();
+    });
+
+    it('sin totalEsperado (clientes antiguos) se comporta como siempre', async () => {
+      await expect(
+        service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never),
+      ).resolves.toBeDefined();
+    });
   });
 });

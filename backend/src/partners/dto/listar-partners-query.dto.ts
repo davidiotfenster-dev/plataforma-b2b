@@ -1,4 +1,5 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsIn, IsOptional, IsString } from 'class-validator';
 import { PaginacionQueryDto } from '../../common/dto/paginacion.dto.js';
 
 const ESTADOS_PARTNER = ['PENDIENTE_VERIFICACION_EMAIL', 'PENDIENTE_APROBACION', 'ACTIVO', 'SUSPENDIDO', 'RECHAZADO'] as const;
@@ -12,4 +13,11 @@ export class ListarPartnersQueryDto extends PaginacionQueryDto {
   @IsOptional()
   @IsIn(ESTADOS_PARTNER)
   estado?: (typeof ESTADOS_PARTNER)[number];
+
+  /// Solo los partners dados de alta con datos provisionales (CIF, dominio o
+  /// dirección "PENDIENTE"), que todavía hay que completar.
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  datosPorCompletar?: boolean;
 }
