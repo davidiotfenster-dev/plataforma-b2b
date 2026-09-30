@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RedisService } from '../common/redis/redis.service.js';
-import { PedidoPdfService } from '../common/pdf/pedido-pdf.service.js';
+import { PedidoPdfService, type DatosPedidoPdf } from '../common/pdf/pedido-pdf.service.js';
 import { EmailService } from '../common/email/email.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPedido, Idioma } from '../generated/prisma/enums.js';
@@ -9,6 +9,7 @@ import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
+import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import {
   asuntoCambioEstado,
   asuntoConfirmacionPedido,
@@ -38,6 +39,20 @@ const SECUENCIA_ESTADOS: EstadoPedido[] = [
   EstadoPedido.PREPARADO,
   EstadoPedido.ENVIADO,
 ];
+
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
+
+/// Productos que se enseñan resumidos en cada fila de "Mis pedidos".
+const PRODUCTOS_EN_LISTA = 3;
+
+/// Medianoche UTC de una fecha AAAA-MM-DD; rechaza fechas imposibles como 2026-13-45.
+function inicioDelDia(fecha: string): Date {
+  const dia = new Date(`${fecha}T00:00:00.000Z`);
+  if (Number.isNaN(dia.getTime())) {
+    throw new BadRequestException(`Fecha no válida: ${fecha}`);
+  }
+  return dia;
+}
 
 @Injectable()
 export class PedidosService {
@@ -145,6 +160,7 @@ export class PedidosService {
           notas: dto.notas,
           totalNeto,
           items: { createMany: { data: lineas } },
+          historial: { create: { estado: EstadoPedido.RECIBIDO } },
         },
         include: { items: true, usuario: { select: { email: true, idioma: true } } },
       });
@@ -179,22 +195,7 @@ export class PedidosService {
     razonSocialPartner: string,
   ): Promise<void> {
     try {
-      const pdfBuffer = await this.pedidoPdfService.generar({
-        codigoPed: order.codigoPed,
-        razonSocialPartner,
-        direccionEnvio: order.direccionEnvio,
-        poNumber: order.poNumber,
-        notas: order.notas,
-        totalNeto: order.totalNeto.toString(),
-        createdAt: order.createdAt,
-        items: order.items.map((item) => ({
-          skuComercial: item.skuComercial,
-          nombreProducto: item.nombreProducto,
-          cantidad: item.cantidad,
-          precioNetoUnitario: item.precioNetoUnitario.toString(),
-          totalLinea: item.totalLinea.toString(),
-        })),
-      });
+      const pdfBuffer = await this.pedidoPdfService.generar(this.datosPdf(order, razonSocialPartner));
 
       await this.emailService.enviar(
         order.usuario.email,
@@ -207,24 +208,134 @@ export class PedidosService {
     }
   }
 
-  async listar(partnerId: string) {
-    return this.prisma.order.findMany({
-      where: { partnerId },
-      orderBy: { createdAt: 'desc' },
-    });
+  private datosPdf(
+    order: Prisma.OrderGetPayload<{ include: { items: true } }>,
+    razonSocialPartner: string,
+  ): DatosPedidoPdf {
+    return {
+      codigoPed: order.codigoPed,
+      razonSocialPartner,
+      direccionEnvio: order.direccionEnvio,
+      poNumber: order.poNumber,
+      notas: order.notas,
+      totalNeto: order.totalNeto.toString(),
+      createdAt: order.createdAt,
+      items: order.items.map((item) => ({
+        skuComercial: item.skuComercial,
+        nombreProducto: item.nombreProducto,
+        cantidad: item.cantidad,
+        precioNetoUnitario: item.precioNetoUnitario.toString(),
+        totalLinea: item.totalLinea.toString(),
+      })),
+    };
+  }
+
+  /// "Mis pedidos" del cliente: siempre acotado a su partner. Además de la
+  /// página pedida devuelve un resumen del conjunto completo (no filtrado)
+  /// para los contadores de la pantalla.
+  async listar(partnerId: string, query: ListarPedidosQueryDto = {}) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const where: Prisma.OrderWhereInput = { partnerId };
+
+    if (query.estado) {
+      where.estado = query.estado;
+    }
+
+    if (query.desde || query.hasta) {
+      where.createdAt = {
+        ...(query.desde ? { gte: inicioDelDia(query.desde) } : {}),
+        ...(query.hasta ? { lt: new Date(inicioDelDia(query.hasta).getTime() + MS_POR_DIA) } : {}),
+      };
+    }
+
+    const busqueda = query.busqueda?.trim();
+    if (busqueda) {
+      const contiene = { contains: busqueda, mode: 'insensitive' as const };
+      where.OR = [
+        { codigoPed: contiene },
+        { poNumber: contiene },
+        { items: { some: { OR: [{ nombreProducto: contiene }, { skuComercial: contiene }] } } },
+      ];
+    }
+
+    const campo = query.orden === 'total' ? 'totalNeto' : 'createdAt';
+    const desdeSemana = new Date(Date.now() - 7 * MS_POR_DIA);
+
+    const [total, filas, porEstado, enviadosUltimos7Dias] = await Promise.all([
+      this.prisma.order.count({ where }),
+      this.prisma.order.findMany({
+        where,
+        orderBy: [{ [campo]: query.sentido ?? 'desc' }, { id: 'asc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { items: { select: { nombreProducto: true, cantidad: true }, orderBy: { createdAt: 'asc' } } },
+      }),
+      this.prisma.order.groupBy({ by: ['estado'], where: { partnerId }, _count: { _all: true } }),
+      this.prisma.pedidoEstadoHistorial.count({
+        where: { estado: EstadoPedido.ENVIADO, createdAt: { gte: desdeSemana }, order: { partnerId } },
+      }),
+    ]);
+
+    const data = filas.map(({ items, partnerId: _partnerId, userId: _userId, ...order }) => ({
+      ...order,
+      articulos: items.reduce((suma, item) => suma + item.cantidad, 0),
+      productos: items.slice(0, PRODUCTOS_EN_LISTA).map((item) => ({ nombre: item.nombreProducto, cantidad: item.cantidad })),
+      productosRestantes: Math.max(0, items.length - PRODUCTOS_EN_LISTA),
+    }));
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      resumen: {
+        porEstado: Object.fromEntries(porEstado.map((fila) => [fila.estado, fila._count._all])),
+        enviadosUltimos7Dias,
+      },
+    };
   }
 
   async obtener(partnerId: string, id: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            representacionPartner: { select: { imagenUrl: true, productoBase: { select: { imagenUrl: true } } } },
+          },
+        },
+        historial: { select: { estado: true, createdAt: true }, orderBy: { createdAt: 'asc' } },
+      },
     });
 
     if (!order || order.partnerId !== partnerId) {
       throw NO_ENCONTRADO();
     }
 
-    return order;
+    /// La foto se lee del catálogo actual (no forma parte de la "fotografía"
+    /// del pedido); si el producto se retiró del catálogo, la línea queda sin foto.
+    const items = order.items.map(({ representacionPartner, ...linea }) => ({
+      ...linea,
+      imagenUrl: representacionPartner?.imagenUrl ?? representacionPartner?.productoBase.imagenUrl ?? null,
+    }));
+
+    return { ...order, items };
+  }
+
+  /// PDF del resumen de un pedido propio, el mismo que se envía por email al confirmarlo.
+  async generarPdf(partnerId: string, id: string): Promise<{ codigoPed: string; contenido: Buffer }> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: { items: true, partner: { select: { razonSocial: true } } },
+    });
+
+    if (!order || order.partnerId !== partnerId) {
+      throw NO_ENCONTRADO();
+    }
+
+    const contenido = await this.pedidoPdfService.generar(this.datosPdf(order, order.partner.razonSocial));
+    return { codigoPed: order.codigoPed, contenido };
   }
 
   /// Gestión interna de fulfillment (ADMIN_FENSTER): no está scopeada por
@@ -457,6 +568,7 @@ export class PedidosService {
           where: { id, estado: order.estado },
           data: { estado: dto.estado, ...limpieza, ...datosExpedicion },
         }),
+        this.prisma.pedidoEstadoHistorial.create({ data: { orderId: id, estado: dto.estado } }),
         this.prisma.auditLog.create({
           data: {
             level: 'info',

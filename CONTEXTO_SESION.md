@@ -6,8 +6,8 @@
 MySmartWindow, con submarca propia) y **clientes** (el resto, que ven los
 dispositivos de la marca de un partner; MySmartWindow por defecto). Hay un
 **catálogo único por marca** que se aplica solo a todas sus empresas. Todo
-probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
-árbol de trabajo (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
+probado con los 3 roles. Lo de "Mis pedidos" (0.8) está sin commitear; lo
+anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
 
 ### 0.1 Modelo de negocio (decidido por David)
 - **Partner** = empresa que compra volumen y tiene submarca propia: VBH → Wave,
@@ -27,7 +27,7 @@ probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
   el partner NO ve nada de los clientes de su marca.
 
 ### 0.2 Qué hay implementado hoy (backend + frontend)
-- **Base de datos** (4 migraciones nuevas, ya aplicadas en local):
+- **Base de datos** (5 migraciones nuevas, ya aplicadas en local; la 5ª, `historial_estados_pedido`, es de 0.8):
   `imagen_producto_base` (`ProductoBase.imagenUrl`),
   `tipo_empresa_y_marca_catalogo` (`Partner.tipo` PARTNER/CLIENTE y
   `Partner.marcaCatalogo` VBH/PROCOMSA/MYSMARTWINDOW),
@@ -57,8 +57,10 @@ probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
   círculos de color para elegir variante; imagen del aparato.
 - **Barra superior**: "Salir" como botón con borde (rojo al pasar el ratón),
   siempre arriba a la derecha. Escritorio ≥1280 px: una fila; tablet: marca +
-  idioma + Salir arriba y secciones debajo; móvil: marca + Salir arriba. El
-  email del usuario está en el tooltip de "Salir".
+  idioma + Salir arriba y secciones debajo; móvil: marca + Salir arriba. Encima
+  de la barra hay una franja fina con "Sesión iniciada como <email> · <empresa
+  o rol>" (para saber con qué cuenta se ha entrado); el email sigue también en
+  el tooltip de "Salir".
 - Accesibilidad: etiquetas enlazadas a sus campos en checkout, registro,
   recuperar y restablecer contraseña.
 
@@ -99,11 +101,11 @@ probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
   `.next/dev` y no pisa el build del 3004). Ahora están parados.
 
 ### 0.6 Git
-- Último commit: `6b1912b`. **Todo lo de hoy está sin commitear** (unos 45
-  archivos modificados + 4 migraciones + `backend/src/catalogo-marca/`,
-  `backend/src/imagenes/`, `backend/uploads/`, `frontend/src/app/admin/marcas/`,
-  `frontend/src/lib/marcas.tsx`, `frontend/src/components/solo-admin.tsx`,
-  scripts nuevos). Pídelo cuando quieras y se hace en varios commits por tema.
+- Último commit: `523913b`, ya en `origin/master`. Lo de antes de 0.8 se
+  commiteó en 5 commits (imágenes, numeración de pedidos, barra superior,
+  documentación y el grande de partners/clientes/catálogo por marca). Por
+  compartir archivos, solo el último compila por separado.
+- **Sin commitear**: todo lo de 0.8 ("Mis pedidos"). Pídelo y se hace.
 - `backend/scripts/data/dispositivos.backup-antes-paso2.json` sigue sin
   guardar en git (copia temporal, se puede borrar).
 - Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git`.
@@ -117,11 +119,39 @@ probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
    Admin → Productos).
 6. Al aprobar un registro público, el diálogo no pide marca ni tipo: queda
    cliente MySmartWindow y se cambia luego en la ficha (valorar añadirlo).
-7. Commitear y subir a GitHub (0.6). Al terminar la demo: devolver los `.env`
+7. Commitear lo de 0.8. Al terminar la demo: devolver los `.env`
    a local y cambiar la contraseña del admin de prueba.
 8. Cuidado: si se cambia un cliente de marca y se devuelve, los extras que
    coincidían con productos de la otra marca desaparecen (así pasó con 12
    productos Wave del Partner Ficticio).
+
+### 0.8 "Mis pedidos" del cliente (mejorado el 2026-09-30, sin commitear)
+- **Historial de estados**: tabla `PedidoEstadoHistorial` (migración
+  `20260930160000_historial_estados_pedido`). Se escribe al confirmar (RECIBIDO)
+  y en cada cambio de estado. Los pedidos que ya existían se rellenaron desde
+  el registro de auditoría. En la línea de tiempo cada paso enseña la PRIMERA
+  vez que se alcanzó (un cambio forzado hacia atrás no desordena las fechas).
+- **Lista** (`/pedidos`): contadores (en curso, enviados 7 días, total),
+  buscador (PED, PO Number, producto o SKU), filtro por estado con contador,
+  fechas desde/hasta, orden (fecha o total), paginación de 10, resumen de
+  productos y enlace de seguimiento en cada fila; tarjetas en móvil.
+  `GET /pedidos` ahora devuelve `{data,total,page,limit,resumen}` (antes un
+  array) y no expone `partnerId` ni `userId`.
+- **Detalle** (`/pedidos/[id]`): línea de tiempo (vertical en móvil), aviso de
+  cancelación con fecha y motivo, PVP y descuento por línea, "Descargar PDF"
+  (`GET /pedidos/:id/pdf`, 404 opaco si es ajeno) y "Repetir pedido"
+  (`POST /carrito/repetir/:pedidoId`: mete las líneas en el carrito con el
+  precio de HOY y avisa de los productos que ya no están y de los precios que
+  han cambiado; oculto para PARTNER_CONSULTA).
+- Los emails de cambio de estado ya existían (no hay que hacer nada).
+- Probado con el cliente de pruebas: lista, filtros, búsqueda, detalle, PDF,
+  repetir, cancelación y móvil. Datos de prueba borrados; 55 tests backend en
+  verde. Servidores 3010/3004 reiniciados con el código nuevo.
+- Foto del producto en cada línea del detalle (la del catálogo actual; sin foto
+  si el producto ya no está).
+- No hecho (ideas): IVA/base imponible en el detalle (el pedido no guarda el
+  IVA vigente al confirmar, habría que congelarlo primero) y filtro por varios
+  estados a la vez.
 
 ---
 

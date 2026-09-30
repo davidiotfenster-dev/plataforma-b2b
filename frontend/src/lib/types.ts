@@ -67,6 +67,8 @@ export interface OrderItem {
   precioNetoUnitario: string;
   cantidad: number;
   totalLinea: string;
+  /// Solo en el detalle del cliente; nulo si el producto ya no está en el catálogo.
+  imagenUrl?: string | null;
 }
 
 export const ESTADOS_PEDIDO: EstadoPedido[] = ["RECIBIDO", "CONFIRMADO", "EN_PREPARACION", "PREPARADO", "ENVIADO"];
@@ -89,6 +91,36 @@ export interface Order {
   updatedAt: string;
   items?: OrderItem[];
   partner?: { razonSocial: string };
+  /// Solo en el detalle del cliente: cuándo entró el pedido en cada estado.
+  historial?: HistorialEstado[];
+}
+
+export interface HistorialEstado {
+  estado: EstadoPedido;
+  createdAt: string;
+}
+
+/// Fila de "Mis pedidos": el pedido sin sus líneas, con un resumen de lo que lleva.
+export type PedidoResumen = Omit<Order, "partnerId" | "userId" | "items" | "partner" | "historial"> & {
+  articulos: number;
+  productos: { nombre: string; cantidad: number }[];
+  productosRestantes: number;
+};
+
+export interface PedidosPagina {
+  data: PedidoResumen[];
+  total: number;
+  page: number;
+  limit: number;
+  /// Del conjunto completo de pedidos del cliente, sin los filtros de la búsqueda.
+  resumen: { porEstado: Partial<Record<EstadoPedido, number>>; enviadosUltimos7Dias: number };
+}
+
+export interface ResultadoRepetirPedido {
+  carrito: ResumenCarrito;
+  agregadas: number;
+  noDisponibles: string[];
+  preciosCambiados: { nombre: string; anterior: string; actual: string }[];
 }
 
 export interface AuditLogEntry {

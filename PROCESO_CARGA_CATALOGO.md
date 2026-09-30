@@ -158,5 +158,5 @@ Para poder probar el panel de un partner con todo el catálogo, se rellenó lo q
 ## Barra superior (2026-09-30)
 - "Salir" es un botón con borde (rojo al pasar el ratón o con el teclado) y queda siempre arriba a la derecha.
 - Escritorio (≥1280 px): una fila → marca | secciones | idioma + Salir. Tablet (768–1279 px): fila 1 marca … idioma + Salir, fila 2 secciones. Móvil: fila 1 marca … Salir, debajo secciones e idioma.
-- El email del usuario ya no se escribe en la barra (no cabía): está en el tooltip de "Salir" y en su etiqueta para lectores de pantalla.
+- El email del usuario no cabía en la barra principal: se muestra en una franja fina encima ("Sesión iniciada como <email> · <empresa o rol>", a la derecha, visible en escritorio, tablet y móvil) y además queda en el tooltip de "Salir" y en su etiqueta para lectores de pantalla.
 - Medido con admin en 1440, 1280, 1024, 768 y 375 px: sin scroll horizontal y cada bloque en su fila.

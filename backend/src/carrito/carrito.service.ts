@@ -27,6 +27,16 @@ export interface ResumenCarrito {
   totalPedido: string;
 }
 
+export interface ResultadoRepetirPedido {
+  carrito: ResumenCarrito;
+  /// Líneas del pedido que se han vuelto a meter en el carrito.
+  agregadas: number;
+  /// Productos del pedido que ya no se pueden pedir (retirados o sin asignar).
+  noDisponibles: string[];
+  /// Productos cuyo precio neto actual es distinto del que se pagó en el pedido.
+  preciosCambiados: { nombre: string; anterior: string; actual: string }[];
+}
+
 @Injectable()
 export class CarritoService {
   /// El carrito NO se cachea: los precios y descuentos se leen de la base de
@@ -132,6 +142,62 @@ export class CarritoService {
     }
 
     return this.obtenerResumen(partnerId, userId);
+  }
+
+  /// "Repetir pedido": cada línea del pedido se suma al carrito con el precio
+  /// VIGENTE (nunca el histórico). Lo que ya no se puede pedir se salta y se
+  /// devuelve aparte, junto con los productos cuyo precio ha cambiado, para
+  /// que el cliente lo vea antes de confirmar.
+  async repetirPedido(partnerId: string, userId: string, pedidoId: string): Promise<ResultadoRepetirPedido> {
+    const pedido = await this.prisma.order.findUnique({ where: { id: pedidoId }, include: { items: true } });
+
+    if (!pedido || pedido.partnerId !== partnerId) {
+      throw NO_ENCONTRADO();
+    }
+
+    const cart = await this.obtenerOCrearCart(partnerId, userId);
+    const vigentes = await this.prisma.representacionPartner.findMany({
+      where: {
+        partnerId,
+        ...REPRESENTACION_VISIBLE,
+        id: { in: pedido.items.flatMap((item) => (item.representacionPartnerId ? [item.representacionPartnerId] : [])) },
+      },
+      select: { id: true },
+    });
+    const idsVigentes = new Set(vigentes.map((rep) => rep.id));
+
+    const noDisponibles: string[] = [];
+    const agregadas: { representacionPartnerId: string; nombre: string; precioPagado: Prisma.Decimal }[] = [];
+
+    for (const linea of pedido.items) {
+      const repId = linea.representacionPartnerId;
+      if (!repId || !idsVigentes.has(repId)) {
+        noDisponibles.push(linea.nombreProducto);
+        continue;
+      }
+
+      const existente = await this.prisma.cartItem.findUnique({
+        where: { cartId_representacionPartnerId: { cartId: cart.id, representacionPartnerId: repId } },
+      });
+      const cantidad = Math.min((existente?.cantidad ?? 0) + linea.cantidad, CANTIDAD_MAXIMA_POR_LINEA);
+
+      if (existente) {
+        await this.prisma.cartItem.update({ where: { id: existente.id }, data: { cantidad } });
+      } else {
+        await this.prisma.cartItem.create({ data: { cartId: cart.id, representacionPartnerId: repId, cantidad } });
+      }
+      agregadas.push({ representacionPartnerId: repId, nombre: linea.nombreProducto, precioPagado: linea.precioNetoUnitario });
+    }
+
+    const carrito = await this.construirResumen(cart.id, partnerId);
+    const preciosCambiados = agregadas.flatMap((agregada) => {
+      const actual = carrito.items.find((item) => item.representacionPartnerId === agregada.representacionPartnerId);
+      return actual && !new Prisma.Decimal(actual.precioNetoUnitario).equals(agregada.precioPagado)
+        ? [{ nombre: agregada.nombre, anterior: agregada.precioPagado.toString(), actual: actual.precioNetoUnitario }]
+        : [];
+    });
+
+    return { carrito, agregadas: agregadas.length, noDisponibles, preciosCambiados };
   }
 
   private async obtenerItemPropio(partnerId: string, userId: string, itemId: string) {

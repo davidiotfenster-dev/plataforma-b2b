@@ -64,22 +64,22 @@ enum Idioma {
 // ---------------------------------------------------------------------------
 
 model User {
-  id       String @id @default(uuid()) @db.Uuid
-  email    String @unique
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique
   /// Nunca se almacena la contraseña en claro: siempre hash bcrypt/argon2.
   passwordHash String
-  nombre   String
-  rol      RolUsuario
-  idioma   Idioma @default(ES)
+  nombre       String
+  rol          RolUsuario
+  idioma       Idioma     @default(ES)
 
   /// Nulo para ADMIN_FENSTER y COMERCIAL (personal interno de IoT FENSTER,
   /// no ligado a un único partner); obligatorio para roles PARTNER_*.
   partnerId String?  @db.Uuid
   partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 
-  activo               Boolean   @default(true)
-  emailVerificadoEn    DateTime?
-  tokenVerificacion    String?   @unique
+  activo                  Boolean   @default(true)
+  emailVerificadoEn       DateTime?
+  tokenVerificacion       String?   @unique
   tokenVerificacionExpira DateTime?
 
   /// Token de un solo uso para "olvidé mi contraseña" (mismo patrón que
@@ -96,9 +96,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  carts       Cart[]
-  ordenes     Order[]
-  auditLogs   AuditLog[]
+  carts     Cart[]
+  ordenes   Order[]
+  auditLogs AuditLog[]
 
   /// Partners dados de alta directamente por este usuario (típicamente un
   /// COMERCIAL). Sirve para acotarle la visibilidad a "sus" partners.
@@ -124,9 +124,9 @@ enum MarcaCatalogo {
 }
 
 model Partner {
-  id              String        @id @default(uuid()) @db.Uuid
+  id              String @id @default(uuid()) @db.Uuid
   razonSocial     String
-  cif             String        @unique
+  cif             String @unique
   direccionFiscal String
   pais            String
   dominioWeb      String
@@ -139,7 +139,7 @@ model Partner {
   /// Asignados por el Administrador IoT FENSTER en la aprobación manual.
   marcaComercial      String?
   tarifa              String?
-  descuentoPorcentaje Decimal   @default(0) @db.Decimal(5, 2)
+  descuentoPorcentaje Decimal @default(0) @db.Decimal(5, 2)
 
   // --- Campos de la "FICHA CLIENTE" (ficha interna del ERP) ---------------
   telefono1    String?
@@ -314,16 +314,16 @@ model Cart {
 }
 
 model CartItem {
-  id                       String @id @default(uuid()) @db.Uuid
-  cartId                   String @db.Uuid
-  representacionPartnerId  String @db.Uuid
-  cantidad                 Int    @default(1)
+  id                      String @id @default(uuid()) @db.Uuid
+  cartId                  String @db.Uuid
+  representacionPartnerId String @db.Uuid
+  cantidad                Int    @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cart                   Cart                   @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  representacionPartner  RepresentacionPartner  @relation(fields: [representacionPartnerId], references: [id], onDelete: Cascade)
+  cart                  Cart                  @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  representacionPartner RepresentacionPartner @relation(fields: [representacionPartnerId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, representacionPartnerId])
   @@index([representacionPartnerId])
@@ -360,19 +360,34 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  partner Partner     @relation(fields: [partnerId], references: [id], onDelete: Restrict)
-  usuario User        @relation(fields: [userId], references: [id], onDelete: Restrict)
-  items   OrderItem[]
+  partner   Partner                 @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  usuario   User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items     OrderItem[]
+  historial PedidoEstadoHistorial[]
 
   @@index([partnerId, estado])
   @@index([userId])
 }
 
+/// Cada vez que un pedido entra en un estado (incluido RECIBIDO al confirmarlo).
+/// Alimenta la línea de tiempo del cliente; el estado vigente sigue en `Order.estado`.
+model PedidoEstadoHistorial {
+  id      String       @id @default(uuid()) @db.Uuid
+  orderId String       @db.Uuid
+  estado  EstadoPedido
+
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
 /// "Fotografía comercial" congelada en la confirmación del pedido: los valores
 /// históricos aquí NUNCA se recalculan a partir de tarifas/descuentos vigentes.
 model OrderItem {
-  id      String  @id @default(uuid()) @db.Uuid
-  orderId String  @db.Uuid
+  id      String @id @default(uuid()) @db.Uuid
+  orderId String @db.Uuid
 
   /// Referencia de trazabilidad al origen del catálogo; no se usa para
   /// recalcular precios y puede quedar huérfana si el producto se retira.
@@ -388,8 +403,8 @@ model OrderItem {
 
   createdAt DateTime @default(now())
 
-  order                 Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  representacionPartner RepresentacionPartner?  @relation(fields: [representacionPartnerId], references: [id], onDelete: SetNull)
+  order                 Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  representacionPartner RepresentacionPartner? @relation(fields: [representacionPartnerId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
 }

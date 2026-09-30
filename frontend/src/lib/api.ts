@@ -48,6 +48,24 @@ export const api = {
   upload: <T>(path: string, formData: FormData) => request<T>(path, { method: "POST", body: formData }),
 };
 
+/// Descarga un archivo protegido por la sesión (un `<a href>` directo no siempre
+/// llevaría la cookie) y lo guarda con el nombre indicado.
+export async function descargarArchivo(path: string, nombre: string): Promise<void> {
+  const res = await fetch(`${API_URL}${path}`, { credentials: "include" });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ message: res.statusText }));
+    throw new ApiError(res.status, body.message ?? "Error de red", body.codigo);
+  }
+  const url = URL.createObjectURL(await res.blob());
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  URL.revokeObjectURL(url);
+}
+
 /// Las fotos las sirve el backend (`/imagenes/<archivo>`); la base guarda solo la ruta.
 export function urlImagen(ruta: string | null | undefined): string | null {
   if (!ruta) return null;
