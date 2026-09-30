@@ -121,7 +121,11 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
    cliente MySmartWindow y se cambia luego en la ficha (valorar añadirlo).
 7. Commitear lo de 0.8. Al terminar la demo: devolver los `.env`
    a local y cambiar la contraseña del admin de prueba.
-8. Cuidado: si se cambia un cliente de marca y se devuelve, los extras que
+8. Emails del registro (David lo hará pronto): hoy el token de verificación solo
+   se escribe en el log del servidor; falta la plantilla de email (5 idiomas), la
+   pantalla `/verificar-email`, los avisos de alta aprobada/rechazada y el aviso
+   al admin. No configurar `RESEND_API_KEY` hasta que lo pida.
+9. Cuidado: si se cambia un cliente de marca y se devuelve, los extras que
    coincidían con productos de la otra marca desaparecen (así pasó con 12
    productos Wave del Partner Ficticio).
 
