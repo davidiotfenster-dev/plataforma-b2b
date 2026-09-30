@@ -374,8 +374,8 @@ export class PedidosService {
       busqueda === null ? Prisma.sql`TRUE` : Prisma.sql`p."razonSocial" ILIKE ${'%' + busqueda + '%'}`;
     const condicionPropietario =
       restringirCreadoPorId === undefined
-        ? Prisma.sql`TRUE`
-        : Prisma.sql`p."creadoPorUsuarioId" = ${restringirCreadoPorId}::uuid`;
+        ? Prisma.sql`p."archivadoEn" IS NULL`
+        : Prisma.sql`p."archivadoEn" IS NULL AND p."creadoPorUsuarioId" = ${restringirCreadoPorId}::uuid`;
 
     const [filas, [{ total }]] = await Promise.all([
       this.prisma.$queryRaw<{ partnerId: string; razonSocial: string; total: bigint; pendientes: bigint }[]>`

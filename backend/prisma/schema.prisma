@@ -171,6 +171,10 @@ model Partner {
 
   estado EstadoPartner @default(PENDIENTE_VERIFICACION_EMAIL)
 
+  /// Archivada: desaparece de las listas y no puede entrar, pero conserva sus datos y
+  /// pedidos. Es reversible (a diferencia del borrado, que solo vale sin pedidos).
+  archivadoEn DateTime?
+
   /// Partner (submarca propia, fija) o cliente. Todo alta nueva es cliente.
   tipo TipoEmpresa @default(CLIENTE)
 

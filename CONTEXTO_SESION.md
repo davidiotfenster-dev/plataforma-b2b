@@ -6,8 +6,7 @@
 MySmartWindow, con submarca propia) y **clientes** (el resto, que ven los
 dispositivos de la marca de un partner; MySmartWindow por defecto). Hay un
 **catálogo único por marca** que se aplica solo a todas sus empresas. Todo
-probado con los 3 roles. Lo de "Mis pedidos" (0.8) está sin commitear; lo
-anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
+probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
 
 ### 0.1 Modelo de negocio (decidido por David)
 - **Partner** = empresa que compra volumen y tiene submarca propia: VBH → Wave,
@@ -101,11 +100,11 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
   `.next/dev` y no pisa el build del 3004). Ahora están parados.
 
 ### 0.6 Git
-- Último commit: `523913b`, ya en `origin/master`. Lo de antes de 0.8 se
-  commiteó en 5 commits (imágenes, numeración de pedidos, barra superior,
+- Ver si hay commits sin subir con `git status -sb`. Lo de antes de 0.8 se commiteó en 5 commits (imágenes, numeración de pedidos, barra superior,
   documentación y el grande de partners/clientes/catálogo por marca). Por
   compartir archivos, solo el último compila por separado.
-- **Sin commitear**: todo lo de 0.8 ("Mis pedidos"). Pídelo y se hace.
+- A Claude le deniegan el permiso de `git push`: subir los commits pendientes a mano
+  con `git push origin master`.
 - `backend/scripts/data/dispositivos.backup-antes-paso2.json` sigue sin
   guardar en git (copia temporal, se puede borrar).
 - Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git`.
@@ -119,7 +118,7 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
    Admin → Productos).
 6. Al aprobar un registro público, el diálogo no pide marca ni tipo: queda
    cliente MySmartWindow y se cambia luego en la ficha (valorar añadirlo).
-7. Commitear lo de 0.8. Al terminar la demo: devolver los `.env`
+7. Subir los commits a GitHub (0.6). Al terminar la demo: devolver los `.env`
    a local y cambiar la contraseña del admin de prueba.
 8. Emails del registro (David lo hará pronto): hoy el token de verificación solo
    se escribe en el log del servidor; falta la plantilla de email (5 idiomas), la
@@ -129,7 +128,7 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
    coincidían con productos de la otra marca desaparecen (así pasó con 12
    productos Wave del Partner Ficticio).
 
-### 0.8 "Mis pedidos" del cliente (mejorado el 2026-09-30, sin commitear)
+### 0.8 "Mis pedidos" del cliente (mejorado el 2026-09-30)
 - **Historial de estados**: tabla `PedidoEstadoHistorial` (migración
   `20260930160000_historial_estados_pedido`). Se escribe al confirmar (RECIBIDO)
   y en cada cambio de estado. Los pedidos que ya existían se rellenaron desde
@@ -173,6 +172,39 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
 - No hecho (ideas): IVA/base imponible en el detalle (el pedido no guarda el
   IVA vigente al confirmar, habría que congelarlo primero) y filtro por varios
   estados a la vez.
+
+### 0.9 Archivar y eliminar empresas (2026-09-30)
+- **Archivar** (reversible): `POST /partners/:id/archivar` y `/desarchivar` (ADMIN y
+  COMERCIAL con su alcance). Campo `Partner.archivadoEn` (migración
+  `empresa_archivada`). Una empresa archivada no sale en las listas ni en los
+  contadores, no puede entrar (comprobado en login y en cada petición) y no recibe
+  catálogo de marca ni productos nuevos. Conserva datos y pedidos. No se puede
+  archivar con pedidos sin enviar (RECIBIDO…PREPARADO). Sus pedidos ya no salen en
+  el panel de pedidos del admin (sí en su ficha).
+- **Eliminar definitivamente**: `DELETE /partners/:id` con `{confirmarRazonSocial}`,
+  solo ADMIN_FENSTER y solo si la empresa NO tiene pedidos (la base de datos lo
+  impide además, `onDelete: Restrict`). Borra usuarios, catálogo y carritos, deja
+  `PARTNER_ELIMINADO` en la auditoría y libera CIF y email (así una solicitud
+  rechazada puede volver a registrarse).
+- **Pantallas**: pestaña "Archivadas (n)" en Empresas (`?archivadas=1`), acciones
+  Archivar / Desarchivar / Eliminar… en el menú de cada empresa y en su ficha
+  (Eliminar solo aparece sin pedidos y pide escribir la razón social).
+- Probado con una empresa de prueba (borrada): archivar, sesión abierta cortada,
+  login bloqueado, desarchivar, nombre incorrecto (400), con pedidos (409).
+
+### 0.10 Pendientes de usuarios y roles (análisis del 2026-09-30, sin hacer)
+1. No se puede añadir un 2º usuario a una empresa (solo el primero, en el registro o
+   el alta directa). Los roles COMPRADOR y SOLO CONSULTA existen pero no se pueden
+   crear. Falta una pantalla "Mi equipo" para el PARTNER_ADMIN (crear usuarios,
+   roles, desactivar); depende de los emails para invitar (o contraseña temporal).
+2. `PARTNER_ADMIN` y `PARTNER_COMPRADOR` hacen lo mismo hoy (solo CONSULTA se distingue).
+3. No hay "cambiar mi contraseña" con la sesión abierta ni pantalla "Mi cuenta".
+4. Nada protege al último administrador de una empresa.
+5. El personal interno (admins y comerciales) se crea por script; el COMERCIAL no
+   puede restablecer la contraseña de sus clientes.
+6. Sin doble factor para ADMIN_FENSTER (imprescindible antes de producción, junto
+   con cambiar la contraseña de prueba).
+7. Esperar la respuesta del jefe sobre partner/cliente antes de tocar el alcance por marca.
 
 ---
 

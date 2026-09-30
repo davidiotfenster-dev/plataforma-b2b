@@ -74,10 +74,10 @@ export class ProductosService {
     const partnersObjetivo =
       dto.partnerIds && dto.partnerIds.length > 0
         ? await this.prisma.partner.findMany({
-            where: { id: { in: dto.partnerIds }, estado: EstadoPartner.ACTIVO },
+            where: { id: { in: dto.partnerIds }, estado: EstadoPartner.ACTIVO, archivadoEn: null },
             select: { id: true },
           })
-        : await this.prisma.partner.findMany({ where: { estado: EstadoPartner.ACTIVO }, select: { id: true } });
+        : await this.prisma.partner.findMany({ where: { estado: EstadoPartner.ACTIVO, archivadoEn: null }, select: { id: true } });
 
     if (partnersObjetivo.length === 0) {
       return { asignados: 0, omitidos: 0 };

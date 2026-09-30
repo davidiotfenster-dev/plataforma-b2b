@@ -277,6 +277,8 @@ export interface Partner {
   /// Marca cuyos dispositivos ve la empresa.
   marcaCatalogo: MarcaCatalogo;
   creadoPorUsuarioId: string | null;
+  /// Fecha en que se archivó; nulo si no lo está. Una empresa archivada no sale en las listas ni puede entrar.
+  archivadoEn: string | null;
   createdAt: string;
   /// Cuántos usuarios, productos de catálogo y pedidos tiene (el listado y la ficha los traen ya contados).
   _count?: { usuarios: number; representaciones: number; ordenes: number };
@@ -288,6 +290,8 @@ export interface ResumenPartners {
   porEstado: Record<EstadoPartner, number>;
   /// Partners con datos provisionales (CIF, dominio o dirección "PENDIENTE").
   datosPorCompletar: number;
+  /// Empresas archivadas (no cuentan en `total` ni en `porEstado`).
+  archivadas: number;
 }
 
 export interface CrearPartnerInput {

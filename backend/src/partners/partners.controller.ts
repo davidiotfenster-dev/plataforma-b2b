@@ -11,6 +11,7 @@ import { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
 import { AsignarProductosDto } from './dto/asignar-productos.dto.js';
 import { ActualizarRepresentacionDto } from './dto/actualizar-representacion.dto.js';
 import { ListarPartnersQueryDto } from './dto/listar-partners-query.dto.js';
+import { EliminarPartnerDto } from './dto/eliminar-partner.dto.js';
 
 @Controller('partners')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -76,6 +77,30 @@ export class PartnersController {
   @HttpCode(HttpStatus.OK)
   async reactivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
     return this.partnersService.reactivar(id, this.restriccion(usuario));
+  }
+
+  @Post(':id/archivar')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  @HttpCode(HttpStatus.OK)
+  async archivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.archivar(id, usuario.userId, this.restriccion(usuario));
+  }
+
+  @Post(':id/desarchivar')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  @HttpCode(HttpStatus.OK)
+  async desarchivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.desarchivar(id, usuario.userId, this.restriccion(usuario));
+  }
+
+  /// Borrado definitivo: solo ADMIN_FENSTER (el rol por defecto del controlador) y solo sin pedidos.
+  @Delete(':id')
+  async eliminar(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: EliminarPartnerDto,
+  ) {
+    return this.partnersService.eliminar(id, dto, usuario.userId);
   }
 
   /// Gestión de usuarios (activar/desactivar, forzar logout, reset de

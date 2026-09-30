@@ -261,7 +261,7 @@ export class AuthService {
     /// email verificado.
     const esPersonalInterno = user.rol === RolUsuario.ADMIN_FENSTER || user.rol === RolUsuario.COMERCIAL;
     if (!esPersonalInterno) {
-      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO) {
+      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
         throw credencialesInvalidas();
       }
     }

@@ -105,7 +105,7 @@ export class CatalogoMarcaService {
   }
 
   async sincronizarMarca(marca: MarcaCatalogo): Promise<ResultadoSincronizacion> {
-    const empresas = await this.prisma.partner.findMany({ where: { marcaCatalogo: marca }, select: { id: true } });
+    const empresas = await this.prisma.partner.findMany({ where: { marcaCatalogo: marca, archivadoEn: null }, select: { id: true } });
     const total: ResultadoSincronizacion = { creados: 0, actualizados: 0, retirados: 0, conflictos: [] };
     for (const { id } of empresas) {
       const r = await this.sincronizarEmpresa(id);

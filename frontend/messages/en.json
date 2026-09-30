@@ -271,7 +271,10 @@
     "done": {
       "rechazar": "{partner}'s request has been rejected.",
       "suspender": "{partner} suspended: they cannot sign in or order until you reactivate them.",
-      "reactivar": "{partner} reactivated."
+      "reactivar": "{partner} reactivated.",
+      "archivar": "{partner} archived.",
+      "desarchivar": "{partner} unarchived.",
+      "eliminar": "{partner} deleted."
     },
     "confirm": {
       "rechazar": {
@@ -288,6 +291,16 @@
         "title": "Reactivate {partner}?",
         "body": "Their users will be able to sign in and place orders again.",
         "button": "Reactivate"
+      },
+      "archivar": {
+        "title": "Archive {partner}?",
+        "body": "It will disappear from the lists and its users will not be able to sign in. Its data and orders are kept, and you can unarchive it at any time. A company with unshipped orders cannot be archived.",
+        "button": "Archive"
+      },
+      "desarchivar": {
+        "title": "Unarchive {partner}?",
+        "body": "It will appear in the lists again and, if it was active, its users will be able to sign in again.",
+        "button": "Unarchive"
       }
     },
     "approveTitle": "Approve {partner}",
@@ -396,7 +409,17 @@
     "typePartner": "Partner",
     "typeClient": "Client",
     "typePartnerLong": "Partner (own sub-brand)",
-    "typeClientLong": "Client"
+    "typeClientLong": "Client",
+    "tabArchived": "Archived",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "deleteAction": "Delete…",
+    "archivedBadge": "Archived",
+    "archivedBanner": "This company is archived: it does not appear in the lists and cannot sign in. Its data and orders are kept.",
+    "deleteTitle": "Delete {partner}",
+    "deleteBody": "The company, {usuarios, plural, one {its user} other {its # users}}, its catalog and its carts will be erased. This cannot be undone. It is only possible because it has no orders; if you prefer to keep its data, archive it.",
+    "deleteConfirmLabel": "Type “{partner}” to confirm",
+    "deleteButton": "Delete permanently"
   },
   "adminPedidos": {
     "title": "Order fulfillment",

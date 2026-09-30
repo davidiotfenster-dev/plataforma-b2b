@@ -26,4 +26,10 @@ export class ListarPartnersQueryDto extends PaginacionQueryDto {
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   datosPorCompletar?: boolean;
+
+  /// `true` lista solo las empresas archivadas; por defecto se ocultan.
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  archivadas?: boolean;
 }

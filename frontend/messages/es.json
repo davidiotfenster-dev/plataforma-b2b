@@ -271,7 +271,10 @@
     "done": {
       "rechazar": "Solicitud de {partner} rechazada.",
       "suspender": "{partner} suspendido: no podrá entrar ni pedir hasta que lo reactives.",
-      "reactivar": "{partner} reactivado."
+      "reactivar": "{partner} reactivado.",
+      "archivar": "{partner} archivada.",
+      "desarchivar": "{partner} desarchivada.",
+      "eliminar": "{partner} eliminada."
     },
     "confirm": {
       "rechazar": {
@@ -288,6 +291,16 @@
         "title": "¿Reactivar a {partner}?",
         "body": "Sus usuarios volverán a poder entrar y hacer pedidos.",
         "button": "Reactivar"
+      },
+      "archivar": {
+        "title": "¿Archivar a {partner}?",
+        "body": "Dejará de aparecer en las listas y sus usuarios no podrán entrar. Se conservan sus datos y pedidos, y puedes desarchivarla cuando quieras. No se puede archivar una empresa con pedidos sin enviar.",
+        "button": "Archivar"
+      },
+      "desarchivar": {
+        "title": "¿Desarchivar a {partner}?",
+        "body": "Volverá a aparecer en las listas y, si estaba activa, sus usuarios podrán entrar de nuevo.",
+        "button": "Desarchivar"
       }
     },
     "approveTitle": "Aprobar a {partner}",
@@ -396,7 +409,17 @@
     "typePartner": "Partner",
     "typeClient": "Cliente",
     "typePartnerLong": "Partner (submarca propia)",
-    "typeClientLong": "Cliente"
+    "typeClientLong": "Cliente",
+    "tabArchived": "Archivadas",
+    "archive": "Archivar",
+    "unarchive": "Desarchivar",
+    "deleteAction": "Eliminar…",
+    "archivedBadge": "Archivada",
+    "archivedBanner": "Esta empresa está archivada: no aparece en las listas ni puede entrar. Sus datos y pedidos se conservan.",
+    "deleteTitle": "Eliminar {partner}",
+    "deleteBody": "Se borrarán la empresa, {usuarios, plural, one {su usuario} other {sus # usuarios}}, su catálogo y sus carritos. No se puede deshacer. Solo es posible porque no tiene pedidos; si prefieres conservar sus datos, archívala.",
+    "deleteConfirmLabel": "Escribe «{partner}» para confirmar",
+    "deleteButton": "Eliminar definitivamente"
   },
   "adminPedidos": {
     "title": "Fulfillment de pedidos",

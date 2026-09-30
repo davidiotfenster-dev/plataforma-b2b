@@ -271,7 +271,10 @@
     "done": {
       "rechazar": "Die Anfrage von {partner} wurde abgelehnt.",
       "suspender": "{partner} gesperrt: Anmeldung und Bestellungen sind bis zur Reaktivierung nicht möglich.",
-      "reactivar": "{partner} wurde reaktiviert."
+      "reactivar": "{partner} wurde reaktiviert.",
+      "archivar": "{partner} archiviert.",
+      "desarchivar": "{partner} wiederhergestellt.",
+      "eliminar": "{partner} gelöscht."
     },
     "confirm": {
       "rechazar": {
@@ -288,6 +291,16 @@
         "title": "{partner} reaktivieren?",
         "body": "Seine Benutzer können sich wieder anmelden und bestellen.",
         "button": "Reaktivieren"
+      },
+      "archivar": {
+        "title": "{partner} archivieren?",
+        "body": "Das Unternehmen verschwindet aus den Listen und seine Benutzer können sich nicht mehr anmelden. Daten und Bestellungen bleiben erhalten; Sie können es jederzeit wiederherstellen. Ein Unternehmen mit unversandten Bestellungen kann nicht archiviert werden.",
+        "button": "Archivieren"
+      },
+      "desarchivar": {
+        "title": "{partner} wiederherstellen?",
+        "body": "Das Unternehmen erscheint wieder in den Listen und, falls es aktiv war, können sich seine Benutzer wieder anmelden.",
+        "button": "Wiederherstellen"
       }
     },
     "approveTitle": "{partner} freigeben",
@@ -396,7 +409,17 @@
     "typePartner": "Partner",
     "typeClient": "Kunde",
     "typePartnerLong": "Partner (eigene Untermarke)",
-    "typeClientLong": "Kunde"
+    "typeClientLong": "Kunde",
+    "tabArchived": "Archiviert",
+    "archive": "Archivieren",
+    "unarchive": "Wiederherstellen",
+    "deleteAction": "Löschen…",
+    "archivedBadge": "Archiviert",
+    "archivedBanner": "Dieses Unternehmen ist archiviert: Es erscheint nicht in den Listen und kann sich nicht anmelden. Daten und Bestellungen bleiben erhalten.",
+    "deleteTitle": "{partner} löschen",
+    "deleteBody": "Das Unternehmen, {usuarios, plural, one {sein Benutzer} other {seine # Benutzer}}, sein Katalog und seine Warenkörbe werden gelöscht. Dies kann nicht rückgängig gemacht werden. Es ist nur möglich, weil keine Bestellungen vorliegen; wenn Sie die Daten behalten möchten, archivieren Sie es.",
+    "deleteConfirmLabel": "Geben Sie „{partner}“ zur Bestätigung ein",
+    "deleteButton": "Endgültig löschen"
   },
   "adminPedidos": {
     "title": "Auftragsabwicklung",

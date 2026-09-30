@@ -68,7 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         sesionInvalidadaEn: true,
         rol: true,
         partnerId: true,
-        partner: { select: { estado: true } },
+        partner: { select: { estado: true, archivadoEn: true } },
       },
     });
 
@@ -82,7 +82,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     /// Un usuario de partner deja de poder operar en cuanto su partner deja de
     /// estar ACTIVO (suspendido, rechazado...), aunque su cookie siga viva.
-    if (usuario.partnerId && usuario.partner?.estado !== EstadoPartner.ACTIVO) {
+    if (usuario.partnerId && (usuario.partner?.estado !== EstadoPartner.ACTIVO || usuario.partner.archivadoEn)) {
       throw new UnauthorizedException();
     }
 

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, ArrowLeft, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, CheckCircle2, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { EstadoPartnerBadge, PartnerAvatar, tieneDatosPorCompletar } from "@/components/partner-ui";
 import { useMe } from "@/hooks/use-me";
@@ -22,7 +23,9 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
   const { data: perfil } = useMe();
   const esAdmin = perfil?.rol === "ADMIN_FENSTER";
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const acciones = usePartnerAcciones(setMensaje);
+  const router = useRouter();
+  // Al eliminar la empresa, su ficha deja de existir: se vuelve a la lista.
+  const acciones = usePartnerAcciones(setMensaje, () => router.push("/admin/partners"));
 
   const { data: partner, isError } = useQuery<Partner>({
     queryKey: ["admin-partner", partnerId],
@@ -63,6 +66,11 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 <div className="flex flex-wrap items-center gap-3">
                   <h1 className="text-2xl font-semibold text-neutral-900">{partner.razonSocial}</h1>
                   <EstadoPartnerBadge estado={partner.estado} />
+                  {partner.archivadoEn && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-700">
+                      <Archive size={11} /> {t("archivedBadge")}
+                    </span>
+                  )}
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${
                       partner.tipo === "PARTNER" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"
@@ -86,7 +94,7 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
 
         {partner && (
           <div className="flex flex-wrap gap-2">
-            {esAdmin && partner.estado === "PENDIENTE_APROBACION" && (
+            {!partner.archivadoEn && esAdmin && partner.estado === "PENDIENTE_APROBACION" && (
               <>
                 <button
                   onClick={() => acciones.pedirAprobar(partner)}
@@ -102,7 +110,7 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 </button>
               </>
             )}
-            {partner.estado === "ACTIVO" && (
+            {!partner.archivadoEn && partner.estado === "ACTIVO" && (
               <button
                 onClick={() => acciones.pedirSuspender(partner)}
                 className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600"
@@ -110,7 +118,7 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 {t("suspend")}
               </button>
             )}
-            {partner.estado === "SUSPENDIDO" && (
+            {!partner.archivadoEn && partner.estado === "SUSPENDIDO" && (
               <button
                 onClick={() => acciones.pedirReactivar(partner)}
                 className="rounded-md border border-green-300 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50"
@@ -118,9 +126,31 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 {t("reactivate")}
               </button>
             )}
+            <button
+              onClick={() => (partner.archivadoEn ? acciones.pedirDesarchivar(partner) : acciones.pedirArchivar(partner))}
+              className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            >
+              {partner.archivadoEn ? t("unarchive") : t("archive")}
+            </button>
+            {/* Solo sin pedidos: con pedidos se archiva (el servidor también lo exige). */}
+            {esAdmin && partner._count?.ordenes === 0 && (
+              <button
+                onClick={() => acciones.pedirEliminar(partner)}
+                className="rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              >
+                {t("deleteAction")}
+              </button>
+            )}
           </div>
         )}
       </div>
+
+      {partner?.archivadoEn && (
+        <p className="mt-4 flex items-center gap-2 rounded-md border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-700">
+          <Archive size={16} className="shrink-0" />
+          {t("archivedBanner")}
+        </p>
+      )}
 
       {mensaje && (
         <p role="status" className="mt-4 flex items-center justify-between gap-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">

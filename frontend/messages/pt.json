@@ -271,7 +271,10 @@
     "done": {
       "rechazar": "O pedido de {partner} foi rejeitado.",
       "suspender": "{partner} suspenso: não poderá entrar nem encomendar até o reativar.",
-      "reactivar": "{partner} reativado."
+      "reactivar": "{partner} reativado.",
+      "archivar": "{partner} arquivada.",
+      "desarchivar": "{partner} desarquivada.",
+      "eliminar": "{partner} eliminada."
     },
     "confirm": {
       "rechazar": {
@@ -288,6 +291,16 @@
         "title": "Reativar {partner}?",
         "body": "Os seus utilizadores voltarão a poder entrar e fazer encomendas.",
         "button": "Reativar"
+      },
+      "archivar": {
+        "title": "Arquivar {partner}?",
+        "body": "Deixará de aparecer nas listas e os seus utilizadores não poderão entrar. Os dados e as encomendas são conservados e pode desarquivá-la quando quiser. Não é possível arquivar uma empresa com encomendas por enviar.",
+        "button": "Arquivar"
+      },
+      "desarchivar": {
+        "title": "Desarquivar {partner}?",
+        "body": "Voltará a aparecer nas listas e, se estava ativa, os seus utilizadores poderão entrar novamente.",
+        "button": "Desarquivar"
       }
     },
     "approveTitle": "Aprovar {partner}",
@@ -396,7 +409,17 @@
     "typePartner": "Parceiro",
     "typeClient": "Cliente",
     "typePartnerLong": "Parceiro (submarca própria)",
-    "typeClientLong": "Cliente"
+    "typeClientLong": "Cliente",
+    "tabArchived": "Arquivadas",
+    "archive": "Arquivar",
+    "unarchive": "Desarquivar",
+    "deleteAction": "Eliminar…",
+    "archivedBadge": "Arquivada",
+    "archivedBanner": "Esta empresa está arquivada: não aparece nas listas nem pode entrar. Os seus dados e encomendas são conservados.",
+    "deleteTitle": "Eliminar {partner}",
+    "deleteBody": "Serão apagados a empresa, {usuarios, plural, one {# utilizador} other {# utilizadores}}, o catálogo e os carrinhos. Não é possível anular. Só é possível porque não tem encomendas; se preferir conservar os dados, arquive-a.",
+    "deleteConfirmLabel": "Escreva «{partner}» para confirmar",
+    "deleteButton": "Eliminar definitivamente"
   },
   "adminPedidos": {
     "title": "Processamento de encomendas",

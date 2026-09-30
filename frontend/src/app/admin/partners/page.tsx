@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Building2, CheckCircle2, Handshake, Plus, Search, X } from "lucide-react";
+import { AlertTriangle, Archive, Building2, CheckCircle2, Handshake, Plus, Search, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { MenuAcciones, type AccionMenu } from "@/components/menu-acciones";
 import { Paginacion } from "@/components/paginacion";
@@ -35,6 +35,7 @@ function ListaPartners() {
   // Filtros, búsqueda y página viven en la URL: al abrir una ficha y volver atrás, la lista sigue como estaba.
   const estado = params.get("estado") ?? "";
   const soloIncompletos = params.get("incompletos") === "1";
+  const archivadas = params.get("archivadas") === "1";
   const q = params.get("q") ?? "";
   const pagina = Math.max(1, Number(params.get("p")) || 1);
 
@@ -63,7 +64,8 @@ function ListaPartners() {
 
   function consultaEmpresas(tipo: "PARTNER" | "CLIENTE", page: number, limit: number) {
     const consulta = new URLSearchParams({ tipo, page: String(page), limit: String(limit) });
-    if (estado) consulta.set("estado", estado);
+    if (estado && !archivadas) consulta.set("estado", estado);
+    if (archivadas) consulta.set("archivadas", "true");
     if (soloIncompletos) consulta.set("datosPorCompletar", "true");
     if (q) consulta.set("busqueda", q);
     return api.get<Paginado<Partner>>(`/partners?${consulta}`);
@@ -71,41 +73,54 @@ function ListaPartners() {
 
   // Los partners son pocos (uno por submarca): se traen todos de una vez.
   const { data: respuestaPartners, isLoading: cargandoPartners } = useQuery<Paginado<Partner>>({
-    queryKey: ["admin-partners", { tipo: "PARTNER", estado, soloIncompletos, q }],
+    queryKey: ["admin-partners", { tipo: "PARTNER", estado, archivadas, soloIncompletos, q }],
     queryFn: () => consultaEmpresas("PARTNER", 1, 100),
     placeholderData: keepPreviousData,
   });
 
   const { data: respuesta, isLoading } = useQuery<Paginado<Partner>>({
-    queryKey: ["admin-partners", { tipo: "CLIENTE", estado, soloIncompletos, pagina, q }],
+    queryKey: ["admin-partners", { tipo: "CLIENTE", estado, archivadas, soloIncompletos, pagina, q }],
     queryFn: () => consultaEmpresas("CLIENTE", pagina, LIMITE_POR_PAGINA),
     placeholderData: keepPreviousData,
   });
 
   const socios = respuestaPartners?.data ?? [];
   const partners = respuesta?.data ?? [];
-  const hayFiltros = Boolean(estado || soloIncompletos || q);
+  const hayFiltros = Boolean(estado || archivadas || soloIncompletos || q);
   const pendientes = resumen?.porEstado.PENDIENTE_APROBACION ?? 0;
 
   const pestanas = [
-    { clave: "", etiqueta: t("tabAll"), cuenta: resumen?.total },
-    ...ESTADOS_PESTANA.filter((e) => (resumen?.porEstado[e] ?? 0) > 0 || estado === e).map((e) => ({
+    { clave: "", etiqueta: t("tabAll"), cuenta: resumen?.total, activa: !archivadas && estado === "", elegir: () => cambiarFiltros({ estado: null, archivadas: null, p: null }) },
+    ...ESTADOS_PESTANA.filter((e) => (resumen?.porEstado[e] ?? 0) > 0 || (!archivadas && estado === e)).map((e) => ({
       clave: e,
       etiqueta: tEstados(e),
       cuenta: resumen?.porEstado[e],
+      activa: !archivadas && estado === e,
+      elegir: () => cambiarFiltros({ estado: e, archivadas: null, p: null }),
     })),
+    ...((resumen?.archivadas ?? 0) > 0 || archivadas
+      ? [{ clave: "archivadas", etiqueta: t("tabArchived"), cuenta: resumen?.archivadas, activa: archivadas, elegir: () => cambiarFiltros({ estado: null, archivadas: "1", p: null }) }]
+      : []),
   ];
 
   function accionesDeFila(partner: Partner): AccionMenu[] {
+    const archivada = Boolean(partner.archivadoEn);
     return [
       { clave: "ficha", etiqueta: t("openFile"), href: `/admin/partners/${partner.id}` },
       ...(esAdmin ? [{ clave: "usuarios", etiqueta: t("tabs.usuarios"), href: `/admin/partners/${partner.id}/usuarios` }] : []),
       { clave: "catalogo", etiqueta: t("tabs.catalogo"), href: `/admin/partners/${partner.id}/catalogo` },
-      ...(partner.estado === "ACTIVO"
+      ...(!archivada && partner.estado === "ACTIVO"
         ? [{ clave: "suspender", etiqueta: t("suspend"), peligro: true, onSeleccionar: () => acciones.pedirSuspender(partner) }]
         : []),
-      ...(esAdmin && partner.estado === "PENDIENTE_APROBACION"
+      ...(!archivada && esAdmin && partner.estado === "PENDIENTE_APROBACION"
         ? [{ clave: "rechazar", etiqueta: t("reject"), peligro: true, onSeleccionar: () => acciones.pedirRechazar(partner) }]
+        : []),
+      archivada
+        ? { clave: "desarchivar", etiqueta: t("unarchive"), onSeleccionar: () => acciones.pedirDesarchivar(partner) }
+        : { clave: "archivar", etiqueta: t("archive"), onSeleccionar: () => acciones.pedirArchivar(partner) },
+      // Solo sin pedidos: con pedidos se archiva (el servidor también lo exige).
+      ...(esAdmin && partner._count?.ordenes === 0
+        ? [{ clave: "eliminar", etiqueta: t("deleteAction"), peligro: true, onSeleccionar: () => acciones.pedirEliminar(partner) }]
         : []),
     ];
   }
@@ -126,7 +141,7 @@ function ListaPartners() {
       <li
         key={partner.id}
         onClick={() => router.push(`/admin/partners/${partner.id}`)}
-        className={`flex min-w-0 cursor-pointer flex-col rounded-xl border border-t-4 border-neutral-200 bg-white p-4 shadow-sm transition hover:shadow-md ${info.borde}`}
+        className={`flex min-w-0 cursor-pointer flex-col rounded-xl border border-t-4 border-neutral-200 bg-white p-4 shadow-sm transition hover:shadow-md ${info.borde} ${partner.archivadoEn ? "opacity-70" : ""}`}
       >
         <div className="flex items-start gap-3">
           {esPartner ? (
@@ -157,6 +172,11 @@ function ListaPartners() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <EstadoPartnerBadge estado={partner.estado} />
+          {partner.archivadoEn && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-700">
+              <Archive size={11} /> {t("archivedBadge")}
+            </span>
+          )}
           {!esPartner && <InsigniaMarca marca={partner.marcaCatalogo} />}
           {tieneDatosPorCompletar(partner) && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700">
@@ -182,7 +202,7 @@ function ListaPartners() {
             </div>
           </dl>
         )}
-        {((esAdmin && partner.estado === "PENDIENTE_APROBACION") || partner.estado === "SUSPENDIDO") && (
+        {!partner.archivadoEn && ((esAdmin && partner.estado === "PENDIENTE_APROBACION") || partner.estado === "SUSPENDIDO") && (
           <div className="mt-3 flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
             {esAdmin && partner.estado === "PENDIENTE_APROBACION" && (
               <button
@@ -256,10 +276,10 @@ function ListaPartners() {
         {pestanas.map((p) => (
           <button
             key={p.clave || "todos"}
-            onClick={() => cambiarFiltros({ estado: p.clave, p: null })}
-            aria-current={estado === p.clave ? "page" : undefined}
+            onClick={p.elegir}
+            aria-current={p.activa ? "page" : undefined}
             className={`-mb-px border-b-2 px-3.5 py-2.5 text-sm ${
-              estado === p.clave
+              p.activa
                 ? "border-neutral-900 font-medium text-neutral-900"
                 : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-800"
             }`}

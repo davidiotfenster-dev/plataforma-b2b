@@ -3,12 +3,13 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { EstadoPartner, RolUsuario } from '../generated/prisma/enums.js';
+import { EstadoPartner, EstadoPedido, RolUsuario } from '../generated/prisma/enums.js';
 import type { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
 import type { CrearPartnerDto } from './dto/crear-partner.dto.js';
 import type { AsignarProductosDto } from './dto/asignar-productos.dto.js';
 import type { ActualizarRepresentacionDto } from './dto/actualizar-representacion.dto.js';
 import type { ListarPartnersQueryDto } from './dto/listar-partners-query.dto.js';
+import type { EliminarPartnerDto } from './dto/eliminar-partner.dto.js';
 
 const SALT_ROUNDS = 12;
 
@@ -111,6 +112,7 @@ export class PartnersService {
 
     const filtros: Prisma.PartnerWhereInput[] = [];
     if (restringirCreadoPorId) filtros.push({ creadoPorUsuarioId: restringirCreadoPorId });
+    filtros.push(query.archivadas ? { archivadoEn: { not: null } } : { archivadoEn: null });
     if (query.estado) filtros.push({ estado: query.estado });
     if (query.tipo) filtros.push({ tipo: query.tipo });
     if (query.busqueda) {
@@ -143,18 +145,21 @@ export class PartnersService {
   /// Cifras para las pestañas del panel: cuántos partners hay en cada estado y
   /// cuántos siguen con datos provisionales. Respeta el alcance de un COMERCIAL.
   async resumen(restringirCreadoPorId?: string) {
-    const acotado: Prisma.PartnerWhereInput = restringirCreadoPorId ? { creadoPorUsuarioId: restringirCreadoPorId } : {};
+    const propias: Prisma.PartnerWhereInput = restringirCreadoPorId ? { creadoPorUsuarioId: restringirCreadoPorId } : {};
+    /// Las pestañas y contadores cuentan solo las empresas no archivadas.
+    const acotado: Prisma.PartnerWhereInput = { AND: [propias, { archivadoEn: null }] };
 
-    const [porEstadoBruto, datosPorCompletar] = await Promise.all([
+    const [porEstadoBruto, datosPorCompletar, archivadas] = await Promise.all([
       this.prisma.partner.groupBy({ by: ['estado'], where: acotado, _count: { _all: true } }),
       this.prisma.partner.count({ where: { AND: [acotado, DATOS_POR_COMPLETAR] } }),
+      this.prisma.partner.count({ where: { AND: [propias, { archivadoEn: { not: null } }] } }),
     ]);
 
     const porEstado = Object.fromEntries(Object.values(EstadoPartner).map((estado) => [estado, 0])) as Record<EstadoPartner, number>;
     for (const grupo of porEstadoBruto) porEstado[grupo.estado] = grupo._count._all;
 
     const total = Object.values(porEstado).reduce((suma, n) => suma + n, 0);
-    return { total, porEstado, datosPorCompletar };
+    return { total, porEstado, datosPorCompletar, archivadas };
   }
 
   /// `restringirCreadoPorId` acota el acceso a un COMERCIAL: si el partner
@@ -236,6 +241,93 @@ export class PartnersService {
       throw new ConflictException(`Solo se puede reactivar un partner SUSPENDIDO (estado actual: ${partner.estado})`);
     }
     return this.prisma.partner.update({ where: { id }, data: { estado: EstadoPartner.ACTIVO } });
+  }
+
+  private async registrarAuditoria(userId: string, eventType: string, payload: Prisma.InputJsonValue, partnerId?: string) {
+    await this.prisma.auditLog.create({ data: { level: 'info', eventType, userId, partnerId, payload } });
+  }
+
+  /// Archivar oculta la empresa de las listas y le impide entrar, pero conserva
+  /// sus datos y pedidos. Es reversible. No se permite con pedidos aún sin enviar:
+  /// dejarían de verse en el panel de preparación.
+  async archivar(id: string, userId: string, restringirCreadoPorId?: string) {
+    const partner = await this.obtenerOFallar(id, restringirCreadoPorId);
+    if (partner.archivadoEn) {
+      throw new ConflictException('La empresa ya está archivada');
+    }
+
+    const enCurso = await this.prisma.order.count({
+      where: {
+        partnerId: id,
+        estado: { in: [EstadoPedido.RECIBIDO, EstadoPedido.CONFIRMADO, EstadoPedido.EN_PREPARACION, EstadoPedido.PREPARADO] },
+      },
+    });
+    if (enCurso > 0) {
+      throw new ConflictException(
+        `No se puede archivar: tiene ${enCurso} ${enCurso === 1 ? 'pedido' : 'pedidos'} sin enviar. Envíalos o cancélalos primero.`,
+      );
+    }
+
+    const archivada = await this.prisma.partner.update({ where: { id }, data: { archivadoEn: new Date() } });
+    await this.registrarAuditoria(userId, 'PARTNER_ARCHIVADO', { razonSocial: partner.razonSocial }, id);
+    return archivada;
+  }
+
+  async desarchivar(id: string, userId: string, restringirCreadoPorId?: string) {
+    const partner = await this.obtenerOFallar(id, restringirCreadoPorId);
+    if (!partner.archivadoEn) {
+      throw new ConflictException('La empresa no está archivada');
+    }
+
+    const activa = await this.prisma.partner.update({ where: { id }, data: { archivadoEn: null } });
+    /// Su catálogo pudo quedar desfasado mientras estuvo archivada.
+    await this.catalogoMarca.sincronizarEmpresa(id);
+    await this.registrarAuditoria(userId, 'PARTNER_DESARCHIVADO', { razonSocial: partner.razonSocial }, id);
+    return activa;
+  }
+
+  /// Borrado definitivo (solo ADMIN_FENSTER): únicamente si la empresa no tiene
+  /// pedidos, que son histórico comercial y se conservan (el enlace pedido-empresa
+  /// es de borrado restringido). Se lleva por delante sus usuarios, catálogo y
+  /// carritos; el registro de auditoría se conserva. Libera su CIF y su email.
+  async eliminar(id: string, dto: EliminarPartnerDto, adminUserId: string) {
+    const partner = await this.obtenerOFallar(id);
+
+    if (dto.confirmarRazonSocial.trim() !== partner.razonSocial) {
+      throw new BadRequestException('La razón social escrita no coincide con la de la empresa');
+    }
+    if (partner._count.ordenes > 0) {
+      throw new ConflictException(
+        `No se puede eliminar: tiene ${partner._count.ordenes} ${partner._count.ordenes === 1 ? 'pedido' : 'pedidos'}. Archívala para conservarlos.`,
+      );
+    }
+
+    try {
+      await this.prisma.$transaction([
+        this.prisma.auditLog.create({
+          data: {
+            level: 'warn',
+            eventType: 'PARTNER_ELIMINADO',
+            userId: adminUserId,
+            payload: {
+              partnerId: id,
+              razonSocial: partner.razonSocial,
+              cif: partner.cif,
+              usuariosEliminados: partner._count.usuarios,
+              productosAsignados: partner._count.representaciones,
+            },
+          },
+        }),
+        this.prisma.partner.delete({ where: { id } }),
+      ]);
+    } catch (error) {
+      /// Un pedido creado justo entre la comprobación y el borrado lo frena la propia base de datos.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        throw new ConflictException('No se puede eliminar: la empresa tiene datos que dependen de ella (pedidos).');
+      }
+      throw error;
+    }
+    return { eliminada: true };
   }
 
   /// Vista de administración del catálogo asignado a un partner (incluye

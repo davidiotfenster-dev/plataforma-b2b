@@ -271,7 +271,10 @@
     "done": {
       "rechazar": "La richiesta di {partner} è stata rifiutata.",
       "suspender": "{partner} sospeso: non potrà accedere né ordinare finché non lo riattivi.",
-      "reactivar": "{partner} riattivato."
+      "reactivar": "{partner} riattivato.",
+      "archivar": "{partner} archiviata.",
+      "desarchivar": "{partner} ripristinata.",
+      "eliminar": "{partner} eliminata."
     },
     "confirm": {
       "rechazar": {
@@ -288,6 +291,16 @@
         "title": "Riattivare {partner}?",
         "body": "I suoi utenti potranno di nuovo accedere e ordinare.",
         "button": "Riattiva"
+      },
+      "archivar": {
+        "title": "Archiviare {partner}?",
+        "body": "Scomparirà dagli elenchi e i suoi utenti non potranno accedere. Dati e ordini vengono conservati e puoi ripristinarla in qualsiasi momento. Le aziende con ordini non ancora spediti non possono essere archiviate.",
+        "button": "Archivia"
+      },
+      "desarchivar": {
+        "title": "Ripristinare {partner}?",
+        "body": "Tornerà a comparire negli elenchi e, se era attiva, i suoi utenti potranno accedere di nuovo.",
+        "button": "Ripristina"
       }
     },
     "approveTitle": "Approva {partner}",
@@ -396,7 +409,17 @@
     "typePartner": "Partner",
     "typeClient": "Cliente",
     "typePartnerLong": "Partner (sottomarchio proprio)",
-    "typeClientLong": "Cliente"
+    "typeClientLong": "Cliente",
+    "tabArchived": "Archiviate",
+    "archive": "Archivia",
+    "unarchive": "Ripristina",
+    "deleteAction": "Elimina…",
+    "archivedBadge": "Archiviata",
+    "archivedBanner": "Questa azienda è archiviata: non compare negli elenchi e non può accedere. Dati e ordini vengono conservati.",
+    "deleteTitle": "Elimina {partner}",
+    "deleteBody": "Verranno eliminati l''azienda, {usuarios, plural, one {# utente} other {# utenti}}, il catalogo e i carrelli. L''operazione non si può annullare. È possibile solo perché non ha ordini; se preferisci conservare i dati, archiviala.",
+    "deleteConfirmLabel": "Scrivi «{partner}» per confermare",
+    "deleteButton": "Elimina definitivamente"
   },
   "adminPedidos": {
     "title": "Evasione ordini",
