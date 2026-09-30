@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { BarChart3, Boxes, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, type LucideIcon } from "lucide-react";
+import { BarChart3, Boxes, CircleUser, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, type LucideIcon } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
 import { api } from "@/lib/api";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -65,6 +65,23 @@ export function Navbar() {
 
   return (
     <header className="border-b border-neutral-200 bg-white">
+      {/* Franja con la cuenta en uso: en la barra principal el correo no cabía. */}
+      {!isLoading && perfil && (
+        <div className="border-b border-neutral-100 bg-neutral-50">
+          <p className="mx-auto flex max-w-6xl items-center justify-end gap-1.5 px-4 py-1 text-xs text-neutral-500 sm:px-6">
+            <CircleUser className="size-3.5 shrink-0" aria-hidden />
+            <span className="min-w-0 truncate">
+              {t("signedInAs")} <span className="font-medium text-neutral-700">{perfil.email}</span>
+              {" · "}
+              {perfil.rol === "ADMIN_FENSTER"
+                ? t("roleAdmin")
+                : perfil.rol === "COMERCIAL"
+                  ? t("roleComercial")
+                  : (perfil.partner?.razonSocial ?? "")}
+            </span>
+          </p>
+        </div>
+      )}
       {/* Colocación por ancho (con `order`):
           - escritorio (xl): una fila → marca | secciones | idioma + Salir
           - tablet (md–xl): fila 1 → marca … idioma + Salir; fila 2 → secciones
