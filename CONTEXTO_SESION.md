@@ -1,4 +1,131 @@
-# Contexto de la sesión en curso (2026-09-29)
+# Contexto de la sesión en curso (actualizado 2026-09-30)
+
+## 0. ESTADO AL 2026-09-30 — leer primero
+
+**Resumen de una línea**: el portal distingue ya **partners** (VBH, Procomsa,
+MySmartWindow, con submarca propia) y **clientes** (el resto, que ven los
+dispositivos de la marca de un partner; MySmartWindow por defecto). Hay un
+**catálogo único por marca** que se aplica solo a todas sus empresas. Todo
+probado con los 3 roles. **Nada está commiteado**: todo lo de hoy está en el
+árbol de trabajo (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
+
+### 0.1 Modelo de negocio (decidido por David)
+- **Partner** = empresa que compra volumen y tiene submarca propia: VBH → Wave,
+  Procomsa → ICON, MySmartWindow → Connect. Su marca es fija.
+- **Cliente** = todos los demás distribuidores / clientes finales. Ven el
+  catálogo de UNA marca; por defecto MySmartWindow (Connect), el admin la puede
+  cambiar (p. ej. un cliente del norte a VBH).
+- Un mismo aparato se llama distinto según la marca (Connect-1 = Wave-1 =
+  Icon1): es UN `ProductoBase` con los nombres/GTIN por marca en
+  `especificacionesJson.referencias`. NO se separa (se probó y se deshizo).
+- Precio = PVP de tarifa − descuento de la empresa (con excepciones por
+  producto). Un catálogo por marca; por empresa solo descuento y ocultar.
+- **Pendiente de dirección** (documento para el jefe, con las preguntas):
+  https://claude.ai/code/artifact/7affca0c-a1a9-4d5d-a0e0-2ccddcbff17d
+  La clave es la pregunta 1: ¿el cliente compra a IoT FENSTER directamente o a
+  través del partner (el partner ve sus clientes/pedidos)? Hasta que responda,
+  el partner NO ve nada de los clientes de su marca.
+
+### 0.2 Qué hay implementado hoy (backend + frontend)
+- **Base de datos** (4 migraciones nuevas, ya aplicadas en local):
+  `imagen_producto_base` (`ProductoBase.imagenUrl`),
+  `tipo_empresa_y_marca_catalogo` (`Partner.tipo` PARTNER/CLIENTE y
+  `Partner.marcaCatalogo` VBH/PROCOMSA/MYSMARTWINDOW),
+  `catalogo_por_marca` (tabla `ProductoMarca` + `RepresentacionPartner.productoMarcaId`),
+  `numeracion_pedidos_sin_huecos` (borra la secuencia `pedido_codigo_seq`).
+- **Catálogo por marca**: módulo `backend/src/catalogo-marca/`. Cada cambio en
+  la marca se sincroniza al momento a todas sus empresas (`sincronizarEmpresa`),
+  también al crear, aprobar o cambiar de marca una empresa. En una empresa, los
+  productos de su marca solo admiten descuento y ocultar; los "extras" a mano
+  siguen como antes. Carga inicial: Wave 41, ICON 35, Connect 42 productos.
+- **Imágenes de producto** gestionables por el admin (subir/cambiar/quitar,
+  una o varias a la vez): `GET /imagenes/:archivo` (público, nombres UUID),
+  `POST|DELETE /productos-base/imagen`. Archivos en `backend/uploads/productos/`
+  (las 6 de serie `default-*.png` van en git, las subidas NO → incluir esa
+  carpeta en las copias de seguridad).
+- **Numeración de pedidos sin huecos**: `src/pedidos/codigo-pedido.ts` (último
+  PED + 1 con bloqueo de PostgreSQL). **El siguiente pedido será PED-000007.**
+- **Pantallas admin**: menú "Partners" → **"Empresas"** (tarjetas: partners
+  arriba, clientes debajo, borde del color de su marca); menú nuevo **"Marcas"**
+  (catálogo de cada submarca, editable, "Añadir lo que falta"); ficha de
+  empresa con tipo y marca en Datos → Comercial; catálogo de la empresa con
+  "Productos de su marca" + "Productos extra" + "Borrar extras"; catálogo
+  global (Productos) con miniaturas, subir imagen, grupos plegables cerrados
+  por defecto y vista "Aparato | Marca". Marcas, Productos y Estadísticas
+  muestran "solo para administradores" a un comercial.
+- **Pantallas del cliente**: catálogo en tarjetas grandes, una por modelo, con
+  círculos de color para elegir variante; imagen del aparato.
+- **Barra superior**: "Salir" como botón con borde (rojo al pasar el ratón),
+  siempre arriba a la derecha. Escritorio ≥1280 px: una fila; tablet: marca +
+  idioma + Salir arriba y secciones debajo; móvil: marca + Salir arriba. El
+  email del usuario está en el tooltip de "Salir".
+- Accesibilidad: etiquetas enlazadas a sus campos en checkout, registro,
+  recuperar y restablecer contraseña.
+
+### 0.3 Datos (base local)
+- 3 partners: VBH, Procomsa ("Procedimientos de construc. Moderna S.A.") y
+  **MySmartWindow** (creado hoy con datos PROVISIONALES:
+  `PENDIENTE-MYSMARTWINDOW`, sin usuario de acceso → completar su ficha).
+- 12 clientes, todos con marca MySmartWindow (incluido el "Partner Ficticio
+  S.L." de pruebas, cuyo login es `partner@fenster.test`).
+- **Datos de PRUEBA en el catálogo** (hay que sustituirlos por los reales):
+  PVP 50 € en 23 productos sin precio de tarifa y GTIN `TEST000000001`…`022`.
+  Marcados con `datosDePrueba` en `backend/scripts/data/dispositivos.json`.
+- 2 pedidos (PED-000004 y PED-000006) del Partner Ficticio.
+- Copia de seguridad de la base de antes del catálogo por marca:
+  `%TEMP%\backups\fenster-antes-catalogo-marca.dump` (formato `pg_dump -Fc`).
+
+### 0.4 Scripts nuevos (idempotentes)
+- `npx tsx scripts/migrar-partners-clientes.ts` — clasifica partners/clientes
+  y crea MySmartWindow (ya ejecutado).
+- `npx tsx scripts/poblar-catalogos-marca.ts` — rellena los catálogos de marca
+  y sincroniza todas las empresas (ya ejecutado).
+- `npm run import:dispositivos` — recarga `dispositivos.json` (solo pone la
+  foto de serie al CREAR un producto; nunca pisa lo cambiado por el admin).
+
+### 0.5 Servidores ahora mismo
+- Backend: `node dist/main` en **3010** (compilado, NO en modo watch: tras
+  cambiar backend → `npm run build` en `backend/` y reiniciar).
+- Frontend: `next start -p 3004` (producción, por el túnel: tras cambiar
+  frontend → `npm run build` en `frontend/` y reiniciar).
+- Los arranqué yo en segundo plano; si se reinicia el equipo hay que volver a
+  lanzarlos (sección 8) y recrear los túneles (sección 2).
+- Puertos ocupados por OTRO proyecto (no tocar): 3000 y 3005 (pm2
+  `panel-ventanas` / `panel-ventanas-dev`).
+- Para probar con login SIN pasar por el túnel se usó una copia local:
+  backend en 3011 (`PORT=3011 FRONTEND_URL=http://localhost:3006
+  COOKIE_SAME_SITE=strict node dist/main`) y frontend `next dev -p 3006` con
+  `NEXT_PUBLIC_API_URL=http://localhost:3011` (el modo dev compila en
+  `.next/dev` y no pisa el build del 3004). Ahora están parados.
+
+### 0.6 Git
+- Último commit: `6b1912b`. **Todo lo de hoy está sin commitear** (unos 45
+  archivos modificados + 4 migraciones + `backend/src/catalogo-marca/`,
+  `backend/src/imagenes/`, `backend/uploads/`, `frontend/src/app/admin/marcas/`,
+  `frontend/src/lib/marcas.tsx`, `frontend/src/components/solo-admin.tsx`,
+  scripts nuevos). Pídelo cuando quieras y se hace en varios commits por tema.
+- `backend/scripts/data/dispositivos.backup-antes-paso2.json` sigue sin
+  guardar en git (copia temporal, se puede borrar).
+- Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git`.
+
+### 0.7 Pendientes
+1. Respuestas del jefe (documento de 0.1), sobre todo la pregunta 1.
+2. Datos reales de MySmartWindow (CIF, dirección, dominio, usuario).
+3. Precios y GTIN reales para sustituir los de prueba (0.3).
+4. Confirmar si el Pulsar con cable 1,6 m es el mismo aparato que el Pulsar.
+5. Fotos de tapas ICON, cables y Connect Smart White Box (se suben desde
+   Admin → Productos).
+6. Al aprobar un registro público, el diálogo no pide marca ni tipo: queda
+   cliente MySmartWindow y se cambia luego en la ficha (valorar añadirlo).
+7. Commitear y subir a GitHub (0.6). Al terminar la demo: devolver los `.env`
+   a local y cambiar la contraseña del admin de prueba.
+8. Cuidado: si se cambia un cliente de marca y se devuelve, los extras que
+   coincidían con productos de la otra marca desaparecen (así pasó con 12
+   productos Wave del Partner Ficticio).
+
+---
+
+# Contexto anterior (2026-09-29)
 
 Este archivo es un "volcado" del estado exacto de esta sesión de trabajo con
 Claude Code, para poder retomarla igual tras un `/clear` o desde otra
