@@ -80,3 +80,33 @@ Nota de despliegue: el puerto 3004 (el del túnel de Cloudflare) sirve el fronte
 ## Botón "Borrar" en productos asignados (hecho)
 - Backend: `DELETE /partners/:id/catalogo/:repId` (ADMIN_FENSTER y COMERCIAL). Al borrar, el producto desaparece de los carritos del partner; los pedidos ya hechos conservan su "fotografía" (nombre, precio, descuento) y solo pierden el enlace al producto.
 - Panel: botón rojo "Borrar" junto a "Desactivar", con confirmación. Desactivar sigue existiendo (oculta el producto sin perder la asignación).
+
+## Mejoras de pantalla (hechas, 2026-09-29)
+- **Lista de asignados compacta** (Admin → Partners → Catálogo): una fila por producto en una sola tabla, buscador por nombre/SKU, "Guardar" solo activo si hay cambios, "Borrar" discreto con confirmación (se rellena de rojo al pasar el ratón), productos desactivados atenuados con etiqueta "Inactivo". Antes "Borrar" se salía de la tarjeta.
+- **Menú:** la sección activa se resalta (fondo gris claro, negrita y línea turquesa).
+- **Login rediseñado:** tarjeta con franja turquesa, iconos en los campos, ojo para ver la contraseña, aviso de error con icono, indicador de carga y enlace "Solicitar acceso" al registro.
+- **Componente `Marca`** (`frontend/src/components/marca.tsx`): el nombre "IoT FENSTER Portal Partner" con la misma tipografía en la barra superior y en un pie de página nuevo. Se probó también sobre la tarjeta del login y se quitó por repetido.
+- Textos nuevos en es/en/de/it/pt.
+
+## Comprobación de seguridad (hecha, 2026-09-30)
+24 pruebas contra el backend local (`localhost:3010`) con las cuentas de prueba de `SETUP.md`: **23 correctas, 1 fallo**.
+- Correcto: cookie `HttpOnly` y `Secure`; `DELETE` de asignaciones (401 sin sesión, 403 como partner, 404 con id inexistente o de otro partner, 400 con id mal formado o inyección SQL); el partner no puede entrar en `/productos-base` ni `/partners`; el catálogo del partner (22 productos revisados) no filtra `productoBaseId`, `skuIndustrial`, `nombreTecnico`, `pvpTarifa`, `referencias`, `gtin` ni `especificacionesJson`; un comercial no puede borrar en un partner ajeno; precio negativo y campo extra `partnerId` rechazados con 400.
+- Fallo: la cookie sale con `SameSite=None` porque `backend/.env` tiene `COOKIE_SAME_SITE="none"` para la demo por túnel. En producción debe ser `strict` (es el valor por defecto si la variable no existe).
+- No probado: pantallas con clics (asignar por marca, borrar), fuerza bruta en el login y revisión de cabeceras de Helmet.
+
+## Demo por túnel (2026-09-30)
+Tras reiniciarse el equipo, se recrearon los dos túneles de Cloudflare. URLs nuevas en `CONTEXTO_SESION.md`; `backend/.env` (`FRONTEND_URL`) y `frontend/.env.local` (`NEXT_PUBLIC_API_URL`) actualizados, frontend recompilado. Verificado desde fuera: frontend 200, backend 401 sin sesión y CORS correcto. **Al terminar la demo hay que devolver los `.env` a local** y cambiar la contraseña de la cuenta de administrador de prueba, que está escrita en `SETUP.md`.
+
+## Git y GitHub
+- Commits locales (rama `master`): `e2aaf9f` backend, `50b2d9e` frontend, `578eb8c` documentación, `868e0ba` README del proyecto.
+- Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git` (privado). Se cambió de SSH a HTTPS porque el equipo no tiene clave SSH registrada. `main` en GitHub está en `578eb8c`; falta subir el README: `git push origin master:main`.
+- No hace falta PR si se trabaja en solitario.
+- Queda sin guardar en git `backend/scripts/data/dispositivos.backup-antes-paso2.json` (copia temporal, se puede borrar).
+
+## Pendiente (resumen)
+1. Precio de tarifa de Connect-1/2 (Wave-1/2, Icon1/2), Pulsar+, Wave2S+, Wave3 Air y tapas ICON.
+2. GTIN de EVO, Connect Smart, C-WALL Flex, mandos y cables.
+3. Confirmar si el Pulsar con cable de 1,6 m de MySmartWindow es el mismo aparato que el Pulsar normal (ahora separado).
+4. Crear el partner MySmartWindow (necesita CIF y dirección) y guardar la marca en la ficha de cada partner.
+5. Asignación automática del catálogo al aprobar un partner nuevo.
+6. Probar en pantalla el botón "Asignar catálogo de una marca" y "Borrar".
