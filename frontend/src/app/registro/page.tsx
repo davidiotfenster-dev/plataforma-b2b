@@ -56,8 +56,11 @@ export default function RegistroPage() {
       <form onSubmit={onSubmit} className="space-y-4">
         {CAMPOS.map((campo) => (
           <div key={campo.name}>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">{campo.label}</label>
+            <label htmlFor={`registro-${campo.name}`} className="mb-1 block text-sm font-medium text-neutral-700">
+              {campo.label}
+            </label>
             <input
+              id={`registro-${campo.name}`}
               type={campo.type ?? "text"}
               placeholder={campo.placeholder}
               required
@@ -69,8 +72,11 @@ export default function RegistroPage() {
           </div>
         ))}
         <div>
-          <label className="mb-1 block text-sm font-medium text-neutral-700">{t("idioma")}</label>
+          <label htmlFor="registro-idioma" className="mb-1 block text-sm font-medium text-neutral-700">
+            {t("idioma")}
+          </label>
           <select
+            id="registro-idioma"
             value={idioma}
             onChange={(e) => setIdioma(e.target.value as Locale)}
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
@@ -82,7 +88,11 @@ export default function RegistroPage() {
             ))}
           </select>
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-red-600">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={cargando}

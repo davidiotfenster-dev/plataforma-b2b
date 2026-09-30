@@ -86,9 +86,13 @@ export default function CheckoutPage() {
         <h2 className="mb-4 text-lg font-semibold text-neutral-900">{t("deliveryTitle")}</h2>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">{t("shippingAddress")}</label>
+            <label htmlFor="checkout-direccion" className="mb-1 block text-sm font-medium text-neutral-700">
+              {t("shippingAddress")}
+            </label>
             <textarea
+              id="checkout-direccion"
               required
+              autoComplete="street-address"
               value={direccionEnvio}
               onChange={(e) => setDireccionEnvio(e.target.value)}
               rows={3}
@@ -96,25 +100,38 @@ export default function CheckoutPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">{t("poNumber")}</label>
+            <label htmlFor="checkout-po" className="mb-1 block text-sm font-medium text-neutral-700">
+              {t("poNumber")}
+            </label>
             <input
+              id="checkout-po"
               required
+              aria-describedby="checkout-po-ayuda"
               value={poNumber}
               onChange={(e) => setPoNumber(e.target.value)}
               className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
             />
-            <p className="mt-1 text-xs text-neutral-400">{t("poNumberHelp")}</p>
+            <p id="checkout-po-ayuda" className="mt-1 text-xs text-neutral-400">
+              {t("poNumberHelp")}
+            </p>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">{t("notes")}</label>
+            <label htmlFor="checkout-notas" className="mb-1 block text-sm font-medium text-neutral-700">
+              {t("notes")}
+            </label>
             <textarea
+              id="checkout-notas"
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
               rows={2}
               className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={confirmar.isPending}
