@@ -5,6 +5,7 @@ import { PedidoPdfService } from '../common/pdf/pedido-pdf.service.js';
 import { EmailService } from '../common/email/email.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPedido, Idioma } from '../generated/prisma/enums.js';
+import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
@@ -59,7 +60,13 @@ export class PedidosService {
       const cart = await tx.cart.findUnique({
         where: { partnerId_userId: { partnerId, userId } },
         include: {
-          items: { include: { representacionPartner: { include: { productoBase: { select: { activo: true } } } } } },
+          items: {
+            include: {
+              representacionPartner: {
+                include: { productoBase: { select: { activo: true } }, productoMarca: { select: { activo: true } } },
+              },
+            },
+          },
         },
       });
 
@@ -70,7 +77,12 @@ export class PedidosService {
       /// Un producto retirado de la venta después de meterlo en el carrito no
       /// se puede pedir: se avisa cuáles son para que el cliente los quite.
       const retirados = cart.items
-        .filter((item) => item.representacionPartner.activo === false || item.representacionPartner.productoBase?.activo === false)
+        .filter(
+          (item) =>
+            item.representacionPartner.activo === false ||
+            item.representacionPartner.productoBase?.activo === false ||
+            item.representacionPartner.productoMarca?.activo === false,
+        )
         .map((item) => item.representacionPartner.nombreComercial);
       if (retirados.length > 0) {
         throw new ConflictException(`Estos productos ya no están disponibles, quítalos del carrito: ${retirados.join(', ')}.`);
@@ -121,8 +133,7 @@ export class PedidosService {
         throw new ConflictException('Este carrito ya se ha confirmado o ha cambiado. Revisa tus pedidos antes de repetir.');
       }
 
-      const [{ nextval }] = await tx.$queryRaw<{ nextval: bigint }[]>`SELECT nextval('pedido_codigo_seq')`;
-      const codigoPed = `PED-${nextval.toString().padStart(6, '0')}`;
+      const codigoPed = await siguienteCodigoPedido(tx);
 
       const order = await tx.order.create({
         data: {

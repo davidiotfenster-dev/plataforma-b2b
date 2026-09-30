@@ -21,6 +21,7 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
   let tx: {
     cart: { findUnique: ReturnType<typeof vi.fn> };
     partner: { findUniqueOrThrow: ReturnType<typeof vi.fn> };
+    $executeRaw: ReturnType<typeof vi.fn>;
     $queryRaw: ReturnType<typeof vi.fn>;
     order: { create: ReturnType<typeof vi.fn> };
     cartItem: { deleteMany: ReturnType<typeof vi.fn> };
@@ -52,7 +53,8 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
     tx = {
       cart: { findUnique: vi.fn() },
       partner: { findUniqueOrThrow: vi.fn() },
-      $queryRaw: vi.fn().mockResolvedValue([{ nextval: 1n }]),
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      $queryRaw: vi.fn().mockResolvedValue([{ ultimo: 6 }]),
       order: {
         create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
           const items = (data.items as { createMany: { data: Record<string, unknown>[] } }).createMany.data;
