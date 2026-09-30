@@ -3,3 +3,7 @@ node_modules
 .env
 
 /src/generated/prisma
+
+# Imágenes subidas por el admin (las de serie default-* sí van en git)
+/uploads/productos/*
+!/uploads/productos/default-*

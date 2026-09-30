@@ -24,7 +24,11 @@
         "gtin": "8437025278503"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-1.png"
   },
   {
     "skuIndustrial": "W1-NEGRO",
@@ -51,7 +55,11 @@
         "gtin": "8437025278510"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-1.png"
   },
   {
     "skuIndustrial": "W1P-BLANCO",
@@ -78,7 +86,11 @@
         "gtin": "8437025278527"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-1.png"
   },
   {
     "skuIndustrial": "W1P-NEGRO",
@@ -105,7 +117,11 @@
         "gtin": "8437025278534"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-1.png"
   },
   {
     "skuIndustrial": "W2-BLANCO",
@@ -132,7 +148,11 @@
         "gtin": "8437025278541"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2-NEGRO",
@@ -159,7 +179,11 @@
         "gtin": "8437025278558"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2P-BLANCO",
@@ -186,7 +210,11 @@
         "gtin": "8437025278565"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2P-NEGRO",
@@ -213,7 +241,11 @@
         "gtin": "8437025278572"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2S-BLANCO",
@@ -234,7 +266,11 @@
         "gtin": "8437025278589"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2S-NEGRO",
@@ -255,7 +291,11 @@
         "gtin": "8437025278596"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2SP-BLANCO",
@@ -270,7 +310,11 @@
         "gtin": "8437025278282"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "W2SP-NEGRO",
@@ -285,7 +329,11 @@
         "gtin": "8437025278299"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-connect-2.png"
   },
   {
     "skuIndustrial": "CABLE-2M-MINI",
@@ -297,18 +345,21 @@
         "marca": "PROCOMSA",
         "nombre": "Cable 2 metros",
         "refInterna": "CABLE-2M-MINI",
-        "gtin": null
+        "gtin": "TEST000000001"
       },
       {
         "marca": "MySmartWindow",
         "nombre": "Cable Pulsar 2 m",
         "refInterna": "CABLE_2M_PL",
-        "gtin": null
+        "gtin": "TEST000000002"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 24 EUR",
     "pvpTarifa": 24,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ]
   },
   {
     "skuIndustrial": "TAPAICON2B",
@@ -323,7 +374,10 @@
         "gtin": "8437025278268"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ]
   },
   {
     "skuIndustrial": "TAPAICON1B",
@@ -338,7 +392,10 @@
         "gtin": "8437025278244"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ]
   },
   {
     "skuIndustrial": "TAPAICON1N",
@@ -353,7 +410,10 @@
         "gtin": "8437025278251"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ]
   },
   {
     "skuIndustrial": "TAPAICON2N",
@@ -368,7 +428,10 @@
         "gtin": "8437025278275"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ]
   },
   {
     "skuIndustrial": "PULSAR-INOX",
@@ -401,7 +464,8 @@
         "gtin": "8437025278466"
       }
     ],
-    "pvpTarifa": 98
+    "pvpTarifa": 98,
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSAR-NEGRO",
@@ -434,7 +498,8 @@
         "gtin": "8437025278473"
       }
     ],
-    "pvpTarifa": 98
+    "pvpTarifa": 98,
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSARP-INOX",
@@ -467,7 +532,11 @@
         "gtin": "8437025278480"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSARP-NEGRO",
@@ -500,7 +569,11 @@
         "gtin": "8437025278497"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "WALL-SKY-BLANCO",
@@ -510,12 +583,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYB",
         "gtin": "8437025278138"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-BLANCO",
@@ -525,12 +599,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERB",
         "gtin": "8437025278091"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-WAVE3-BLANCO",
@@ -545,7 +620,8 @@
         "gtin": "8437025278329"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-ESPECIAL",
@@ -555,12 +631,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERE",
         "gtin": "8437025278114"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SKY-ESPECIAL",
@@ -570,12 +647,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYE",
         "gtin": "8437025278152"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SKY-INOX",
@@ -585,12 +663,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYP",
         "gtin": "8437025278145"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-INOX",
@@ -600,12 +679,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERP",
         "gtin": "8437025278107"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-WAVE3-INOX",
@@ -620,7 +700,8 @@
         "gtin": "8437025278374"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-NEGRO",
@@ -630,12 +711,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERN",
         "gtin": "8437025278084"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SKY-NEGRO",
@@ -645,12 +727,13 @@
     "referencias": [
       {
         "marca": "C-WALL",
-        "nombre": "Pulsador empotrable en pared",
+        "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYN",
         "gtin": "8437025278121"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-WAVE3-NEGRO",
@@ -665,7 +748,8 @@
         "gtin": "8437025278336"
       }
     ],
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALLAIR-BLANCO",
@@ -680,7 +764,11 @@
         "gtin": "8437025278343"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALLAIR-INOX",
@@ -695,7 +783,11 @@
         "gtin": "8437025278367"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALLAIR-NEGRO",
@@ -710,7 +802,11 @@
         "gtin": "8437025278350"
       }
     ],
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "MANDO-CONNECT-ESTANDAR",
@@ -719,7 +815,8 @@
     "color": null,
     "referencias": [],
     "pvpTarifa": 30,
-    "ambito": "todos"
+    "ambito": "todos",
+    "imagen": "/imagenes/default-mando.png"
   },
   {
     "skuIndustrial": "MANDO-CONNECT-MASTER",
@@ -731,24 +828,28 @@
         "marca": "MySmartWindow",
         "nombre": "bluConnect",
         "refInterna": "BLUECTN",
-        "gtin": null
+        "gtin": "TEST000000003"
       },
       {
         "marca": "PROCOMSA",
         "nombre": "ICON BLUE",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000004"
       },
       {
         "marca": "VBH",
         "nombre": "WAVE BLUE",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000005"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 2026: BLUECTN 30 EUR (bluConnect); mismo precio supuesto para ICON BLUE y WAVE BLUE",
     "pvpTarifa": 30,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-mando.png"
   },
   {
     "skuIndustrial": "EVO-SHUTTER-BLANCO",
@@ -760,12 +861,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Shutter",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000006"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 108,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SHUTTER-ANTRACITA",
@@ -777,12 +882,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Shutter",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000007"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 108,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SHUTTER-NEGRO",
@@ -794,12 +903,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Shutter",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000008"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 108,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SHUTTER-MARRON",
@@ -811,12 +924,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Shutter",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000009"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 108,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SECURITY-BLANCO",
@@ -828,12 +945,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000010"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 114,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SECURITY-ANTRACITA",
@@ -845,12 +966,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000011"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 114,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SECURITY-NEGRO",
@@ -862,12 +987,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000012"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 114,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-SECURITY-MARRON",
@@ -879,12 +1008,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000013"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 114,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-PLUS-BLANCO",
@@ -896,12 +1029,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000014"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 138,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-PLUS-ANTRACITA",
@@ -913,12 +1050,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000015"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 138,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-PLUS-NEGRO",
@@ -930,12 +1071,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000016"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 138,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "EVO-PLUS-MARRON",
@@ -947,12 +1092,16 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": null
+        "gtin": "TEST000000017"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
     "pvpTarifa": 138,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-evo.png"
   },
   {
     "skuIndustrial": "WALL-FLEX",
@@ -964,11 +1113,15 @@
         "marca": "MySmartWindow",
         "nombre": "C-WALL Flex",
         "refInterna": "C-WALL_FLEX",
-        "gtin": null
+        "gtin": "TEST000000018"
       }
     ],
     "pendiente": "Sin GTIN ni colores definidos. Tarifa 82 EUR",
-    "pvpTarifa": 82
+    "pvpTarifa": 82,
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "CONNECT-SMART-WHITEBOX",
@@ -980,12 +1133,15 @@
         "marca": "MySmartWindow",
         "nombre": "Connect Smart White Box",
         "refInterna": "WHITE_BOX",
-        "gtin": null
+        "gtin": "TEST000000019"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 90 EUR",
     "pvpTarifa": 90,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ]
   },
   {
     "skuIndustrial": "PULSAR-BOTON",
@@ -997,12 +1153,16 @@
         "marca": "MySmartWindow",
         "nombre": "Botón suelto Pulsar",
         "refInterna": "BOTON_PULSAR",
-        "gtin": null
+        "gtin": "TEST000000020"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 20 EUR",
     "pvpTarifa": 20,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ],
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "CABLE-PULSAR-1M",
@@ -1014,12 +1174,15 @@
         "marca": "MySmartWindow",
         "nombre": "Cable Pulsar 1 m",
         "refInterna": "CABLE_1M_PL",
-        "gtin": null
+        "gtin": "TEST000000021"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 12 EUR",
     "pvpTarifa": 12,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ]
   },
   {
     "skuIndustrial": "CABLE-EVO-DATOS",
@@ -1031,12 +1194,15 @@
         "marca": "MySmartWindow",
         "nombre": "Cable datos EVO 1,5 m",
         "refInterna": "CABLE_DATOS_EVO",
-        "gtin": null
+        "gtin": "TEST000000022"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 12 EUR",
     "pvpTarifa": 12,
-    "ambito": "todos"
+    "ambito": "todos",
+    "datosDePrueba": [
+      "gtin"
+    ]
   },
   {
     "skuIndustrial": "PULSAR-C16-INOX",
@@ -1052,7 +1218,8 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 98
+    "pvpTarifa": 98,
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSAR-C16-NEGRO",
@@ -1068,7 +1235,8 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 98
+    "pvpTarifa": 98,
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSARP-C16-INOX",
@@ -1084,7 +1252,11 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-pulsar.png"
   },
   {
     "skuIndustrial": "PULSARP-C16-NEGRO",
@@ -1100,6 +1272,10 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": null
+    "pvpTarifa": 50,
+    "datosDePrueba": [
+      "precio"
+    ],
+    "imagen": "/imagenes/default-pulsar.png"
   }
 ]
