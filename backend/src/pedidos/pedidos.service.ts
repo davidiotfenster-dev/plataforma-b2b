@@ -224,6 +224,8 @@ export class PedidosService {
         skuComercial: item.skuComercial,
         nombreProducto: item.nombreProducto,
         cantidad: item.cantidad,
+        pvpHistorico: item.pvpHistorico.toString(),
+        descuentoAplicado: item.descuentoAplicado.toString(),
         precioNetoUnitario: item.precioNetoUnitario.toString(),
         totalLinea: item.totalLinea.toString(),
       })),

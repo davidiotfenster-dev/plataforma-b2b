@@ -147,6 +147,15 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
 - Probado con el cliente de pruebas: lista, filtros, búsqueda, detalle, PDF,
   repetir, cancelación y móvil. Datos de prueba borrados; 55 tests backend en
   verde. Servidores 3010/3004 reiniciados con el código nuevo.
+- **PDF del pedido rediseñado** (el que se envía por email al confirmar y el que
+  se descarga en "Descargar PDF"): banda azul marino con el logo, panel con
+  cliente / PO / fecha / dirección, notas, tabla con referencia, producto,
+  cantidad, PVP, descuento, neto y total, total destacado y pie con "Página x de
+  y"; varias páginas con cabecera repetida si hay muchas líneas. Código en
+  `backend/src/common/pdf/pedido-pdf.service.ts`. El logo es
+  `backend/assets/logo-iot-fenster.png` (recortado del PNG "AzulBlanco sin
+  fondo"; su "FENSTER" es blanco, por eso va sobre banda oscura). Si falta el
+  archivo, el PDF sale con el nombre en texto. Solo en español (como antes).
 - Foto del producto en cada línea del detalle (la del catálogo actual; sin foto
   si el producto ya no está).
 - No hecho (ideas): IVA/base imponible en el detalle (el pedido no guarda el
