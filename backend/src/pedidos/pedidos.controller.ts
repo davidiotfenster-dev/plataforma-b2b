@@ -24,6 +24,7 @@ import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
+import { DescargarPdfQueryDto } from './dto/descargar-pdf-query.dto.js';
 
 @Controller('pedidos')
 @UseGuards(JwtAuthGuard)
@@ -105,10 +106,11 @@ export class PedidosController {
   async descargarPdf(
     @CurrentUser() usuario: UsuarioAutenticado,
     @Param('id', ParseUUIDPipe) id: string,
+    @Query() query: DescargarPdfQueryDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const [partnerId] = this.identificar(usuario);
-    const { codigoPed, contenido } = await this.pedidosService.generarPdf(partnerId, id);
+    const [partnerId, userId] = this.identificar(usuario);
+    const { codigoPed, contenido } = await this.pedidosService.generarPdf(partnerId, userId, id, query.idioma);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="${codigoPed}.pdf"`,

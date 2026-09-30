@@ -46,7 +46,14 @@
   },
   "home": {
     "title": "Portale Partner IoT FENSTER",
-    "description": "Gestione ordini B2B con ordine di acquisto differito. Accedi con il tuo account partner oppure registra la tua azienda per richiedere l'accesso."
+    "description": "Gestione ordini B2B con ordine di acquisto differito. Accedi con il tuo account partner oppure registra la tua azienda per richiedere l'accesso.",
+    "badge": "Portale B2B per distributori e installatori",
+    "f1Title": "Il tuo catalogo, i tuoi prezzi",
+    "f1Text": "Prodotti autorizzati per la tua azienda con listino e sconto già applicati.",
+    "f2Title": "Ordine con il tuo numero di PO",
+    "f2Text": "Conferma l'ordine con il tuo ordine di acquisto. Nessun pagamento online: fatturazione differita.",
+    "f3Title": "Tracciamento fino alla consegna",
+    "f3Text": "Stato dell'ordine a ogni passo, PDF di riepilogo e link di tracciamento della spedizione."
   },
   "login": {
     "title": "Accedi",
@@ -220,7 +227,8 @@
     "cancelledOn": "Annullato il {fecha}",
     "cancelReason": "Motivo: {motivo}",
     "unitPrice": "{precio} € / pz.",
-    "pvpDiscount": "Prezzo di listino {pvp} € · −{descuento} %"
+    "pvpDiscount": "Prezzo di listino {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "Lingua del PDF"
   },
   "adminPartners": {
     "title": "Aziende",

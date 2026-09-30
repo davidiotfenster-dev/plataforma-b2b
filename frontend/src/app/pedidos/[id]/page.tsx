@@ -5,10 +5,12 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeft, Cpu, Download, RotateCw } from "lucide-react";
+import { ArrowLeft, Cpu, RotateCw } from "lucide-react";
 import { api, ApiError, descargarArchivo, urlImagen } from "@/lib/api";
 import type { Order, ResultadoRepetirPedido } from "@/lib/types";
 import { useMe } from "@/hooks/use-me";
+import type { Locale } from "@/i18n/locales";
+import { DescargarPdf } from "@/components/descargar-pdf";
 import { EstadoBadge } from "@/components/estado-badge";
 import { fechaHora, LineaTiempoPedido } from "@/components/linea-tiempo-pedido";
 
@@ -26,7 +28,8 @@ export default function PedidoDetallePage() {
   });
 
   const descargarPdf = useMutation({
-    mutationFn: () => descargarArchivo(`/pedidos/${params.id}/pdf`, `${order?.codigoPed ?? "pedido"}.pdf`),
+    mutationFn: (idioma: Locale) =>
+      descargarArchivo(`/pedidos/${params.id}/pdf?idioma=${idioma.toUpperCase()}`, `${order?.codigoPed ?? "pedido"}.pdf`),
     onMutate: () => setErrorPdf(false),
     onError: () => setErrorPdf(true),
   });
@@ -60,15 +63,7 @@ export default function PedidoDetallePage() {
           <p className="mt-1 text-sm text-neutral-500">{t("placedOn", { fecha: fechaHora(order.createdAt, locale) })}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => descargarPdf.mutate()}
-            disabled={descargarPdf.isPending}
-            className="inline-flex items-center gap-2 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
-          >
-            <Download className="h-4 w-4" aria-hidden />
-            {descargarPdf.isPending ? t("downloading") : t("downloadPdf")}
-          </button>
+          <DescargarPdf onElegir={(idioma) => descargarPdf.mutate(idioma)} descargando={descargarPdf.isPending} />
           {puedeComprar && (
             <button
               type="button"

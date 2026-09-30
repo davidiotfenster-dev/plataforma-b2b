@@ -46,7 +46,14 @@
   },
   "home": {
     "title": "Portal Partner IoT FENSTER",
-    "description": "Gestión de pedidos B2B por orden de compra diferida. Inicia sesión con tu cuenta de partner o registra tu empresa para solicitar acceso."
+    "description": "Gestión de pedidos B2B por orden de compra diferida. Inicia sesión con tu cuenta de partner o registra tu empresa para solicitar acceso.",
+    "badge": "Portal B2B para distribuidores e instaladores",
+    "f1Title": "Tu catálogo, tus precios",
+    "f1Text": "Productos autorizados para tu empresa con tu tarifa y descuento ya aplicados.",
+    "f2Title": "Pedido con tu nº de PO",
+    "f2Text": "Confirma el pedido con tu orden de compra. Sin pagos en línea: facturación diferida.",
+    "f3Title": "Seguimiento hasta la entrega",
+    "f3Text": "Estado del pedido en cada paso, PDF del resumen y enlace de seguimiento del envío."
   },
   "login": {
     "title": "Iniciar sesión",
@@ -220,7 +227,8 @@
     "cancelledOn": "Cancelado el {fecha}",
     "cancelReason": "Motivo: {motivo}",
     "unitPrice": "{precio} € / ud.",
-    "pvpDiscount": "PVP {pvp} € · −{descuento} %"
+    "pvpDiscount": "PVP {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "Idioma del PDF"
   },
   "adminPartners": {
     "title": "Empresas",

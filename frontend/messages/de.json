@@ -46,7 +46,14 @@
   },
   "home": {
     "title": "IoT FENSTER Partnerportal",
-    "description": "B2B-Bestellverwaltung per aufgeschobener Bestellung (Kaufauftrag). Melden Sie sich mit Ihrem Partnerkonto an oder registrieren Sie Ihr Unternehmen, um Zugang zu beantragen."
+    "description": "B2B-Bestellverwaltung per aufgeschobener Bestellung (Kaufauftrag). Melden Sie sich mit Ihrem Partnerkonto an oder registrieren Sie Ihr Unternehmen, um Zugang zu beantragen.",
+    "badge": "B2B-Portal für Händler und Installateure",
+    "f1Title": "Ihr Katalog, Ihre Preise",
+    "f1Text": "Für Ihr Unternehmen freigegebene Produkte mit Ihrer Preisliste und Ihrem Rabatt.",
+    "f2Title": "Bestellung mit Ihrer PO-Nummer",
+    "f2Text": "Bestätigen Sie Bestellungen mit Ihrem Kaufauftrag. Keine Online-Zahlung: nachträgliche Rechnung.",
+    "f3Title": "Verfolgung bis zur Lieferung",
+    "f3Text": "Bestellstatus in jedem Schritt, PDF-Zusammenfassung und Link zur Sendungsverfolgung."
   },
   "login": {
     "title": "Anmelden",
@@ -220,7 +227,8 @@
     "cancelledOn": "Storniert am {fecha}",
     "cancelReason": "Grund: {motivo}",
     "unitPrice": "{precio} € / Stk.",
-    "pvpDiscount": "UVP {pvp} € · −{descuento} %"
+    "pvpDiscount": "UVP {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "Sprache des PDFs"
   },
   "adminPartners": {
     "title": "Unternehmen",

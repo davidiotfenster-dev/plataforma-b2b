@@ -155,7 +155,15 @@ anterior ya está en git (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALO
   `backend/src/common/pdf/pedido-pdf.service.ts`. El logo es
   `backend/assets/logo-iot-fenster.png` (recortado del PNG "AzulBlanco sin
   fondo"; su "FENSTER" es blanco, por eso va sobre banda oscura). Si falta el
-  archivo, el PDF sale con el nombre en texto. Solo en español (como antes).
+  archivo, el PDF sale con el nombre en texto.
+- **PDF en 5 idiomas** (es/en/de/it/pt): rótulos, fechas e importes por idioma en
+  `backend/src/common/pdf/pedido-pdf.textos.ts` (en inglés `€1,234.50`, en el
+  resto `1.234,50 €`). `GET /pedidos/:id/pdf?idioma=DE` (400 si el valor no es
+  válido; sin parámetro usa el idioma guardado del usuario). En la pantalla,
+  "Descargar PDF" abre un menú "Idioma del PDF" con el idioma actual primero
+  (`frontend/src/components/descargar-pdf.tsx`). El email de confirmación
+  adjunta el PDF en el idioma del destinatario. Los nombres de producto y la
+  dirección no se traducen (son datos).
 - Foto del producto en cada línea del detalle (la del catálogo actual; sin foto
   si el producto ya no está).
 - No hecho (ideas): IVA/base imponible en el detalle (el pedido no guarda el

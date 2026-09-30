@@ -47,6 +47,14 @@ describe('PedidoPdfService', () => {
     expect(paginas(pdf)).toBeGreaterThan(1);
   });
 
+  it('genera el PDF en cada idioma', async () => {
+    for (const idioma of ['ES', 'EN', 'DE', 'IT', 'PT'] as const) {
+      const pdf = await servicio.generar({ ...pedido(2, 'Nota'), idioma });
+
+      expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+    }
+  });
+
   it('se genera igual si no se puede leer el logo', async () => {
     const sinLogo = new PedidoPdfService();
     (sinLogo as unknown as { logo: null }).logo = null;

@@ -46,7 +46,14 @@
   },
   "home": {
     "title": "IoT FENSTER Partner Portal",
-    "description": "B2B order management against a deferred purchase order. Log in with your partner account or register your company to request access."
+    "description": "B2B order management against a deferred purchase order. Log in with your partner account or register your company to request access.",
+    "badge": "B2B portal for distributors and installers",
+    "f1Title": "Your catalogue, your prices",
+    "f1Text": "Products authorised for your company, with your price list and discount already applied.",
+    "f2Title": "Order with your PO number",
+    "f2Text": "Confirm orders against your purchase order. No online payment: deferred invoicing.",
+    "f3Title": "Tracking through delivery",
+    "f3Text": "Order status at every step, a PDF summary and the shipment tracking link."
   },
   "login": {
     "title": "Log in",
@@ -220,7 +227,8 @@
     "cancelledOn": "Cancelled on {fecha}",
     "cancelReason": "Reason: {motivo}",
     "unitPrice": "{precio} € / unit",
-    "pvpDiscount": "RRP {pvp} € · −{descuento} %"
+    "pvpDiscount": "RRP {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "PDF language"
   },
   "adminPartners": {
     "title": "Companies",

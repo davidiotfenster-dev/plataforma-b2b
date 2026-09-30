@@ -195,7 +195,7 @@ export class PedidosService {
     razonSocialPartner: string,
   ): Promise<void> {
     try {
-      const pdfBuffer = await this.pedidoPdfService.generar(this.datosPdf(order, razonSocialPartner));
+      const pdfBuffer = await this.pedidoPdfService.generar(this.datosPdf(order, razonSocialPartner, order.usuario.idioma));
 
       await this.emailService.enviar(
         order.usuario.email,
@@ -211,8 +211,10 @@ export class PedidosService {
   private datosPdf(
     order: Prisma.OrderGetPayload<{ include: { items: true } }>,
     razonSocialPartner: string,
+    idioma: Idioma,
   ): DatosPedidoPdf {
     return {
+      idioma,
       codigoPed: order.codigoPed,
       razonSocialPartner,
       direccionEnvio: order.direccionEnvio,
@@ -326,7 +328,13 @@ export class PedidosService {
   }
 
   /// PDF del resumen de un pedido propio, el mismo que se envía por email al confirmarlo.
-  async generarPdf(partnerId: string, id: string): Promise<{ codigoPed: string; contenido: Buffer }> {
+  /// El idioma lo elige el usuario al descargarlo; si no indica ninguno, el que tiene guardado.
+  async generarPdf(
+    partnerId: string,
+    userId: string,
+    id: string,
+    idioma?: Idioma,
+  ): Promise<{ codigoPed: string; contenido: Buffer }> {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: { items: true, partner: { select: { razonSocial: true } } },
@@ -336,7 +344,9 @@ export class PedidosService {
       throw NO_ENCONTRADO();
     }
 
-    const contenido = await this.pedidoPdfService.generar(this.datosPdf(order, order.partner.razonSocial));
+    const idiomaPdf =
+      idioma ?? (await this.prisma.user.findUnique({ where: { id: userId }, select: { idioma: true } }))?.idioma ?? Idioma.ES;
+    const contenido = await this.pedidoPdfService.generar(this.datosPdf(order, order.partner.razonSocial, idiomaPdf));
     return { codigoPed: order.codigoPed, contenido };
   }
 

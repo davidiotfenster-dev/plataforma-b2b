@@ -37,6 +37,7 @@ describe('PedidosService — Mis pedidos del cliente', () => {
       groupBy: ReturnType<typeof vi.fn>;
     };
     pedidoEstadoHistorial: { count: ReturnType<typeof vi.fn> };
+    user: { findUnique: ReturnType<typeof vi.fn> };
   };
   let pdfService: { generar: ReturnType<typeof vi.fn> };
   let service: PedidosService;
@@ -50,6 +51,7 @@ describe('PedidosService — Mis pedidos del cliente', () => {
         groupBy: vi.fn().mockResolvedValue([{ estado: 'RECIBIDO', _count: { _all: 3 } }]),
       },
       pedidoEstadoHistorial: { count: vi.fn().mockResolvedValue(2) },
+      user: { findUnique: vi.fn().mockResolvedValue({ idioma: 'DE' }) },
     };
     pdfService = { generar: vi.fn().mockResolvedValue(Buffer.from('pdf')) };
     service = new PedidosService(
@@ -162,17 +164,34 @@ describe('PedidosService — Mis pedidos del cliente', () => {
         partner: { razonSocial: 'Cliente S.L.' },
       });
 
-      const { codigoPed, contenido } = await service.generarPdf(PARTNER_ID, 'o1');
+      const { codigoPed, contenido } = await service.generarPdf(PARTNER_ID, 'user-1', 'o1', 'EN');
 
       expect(codigoPed).toBe('PED-000001');
       expect(contenido).toEqual(Buffer.from('pdf'));
       expect(pdfService.generar.mock.calls[0][0].razonSocialPartner).toBe('Cliente S.L.');
     });
 
+    it('usa el idioma que elige el usuario al descargar', async () => {
+      prisma.order.findUnique.mockResolvedValue({ ...pedido(), items: [], partner: { razonSocial: 'X' } });
+
+      await service.generarPdf(PARTNER_ID, 'user-1', 'o1', 'IT');
+
+      expect(pdfService.generar.mock.calls[0][0].idioma).toBe('IT');
+      expect(prisma.user.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('si no elige idioma, usa el que el usuario tiene guardado', async () => {
+      prisma.order.findUnique.mockResolvedValue({ ...pedido(), items: [], partner: { razonSocial: 'X' } });
+
+      await service.generarPdf(PARTNER_ID, 'user-1', 'o1');
+
+      expect(pdfService.generar.mock.calls[0][0].idioma).toBe('DE');
+    });
+
     it('responde 404 opaco si el pedido es de otro partner y no genera nada', async () => {
       prisma.order.findUnique.mockResolvedValue({ ...pedido({ partnerId: 'otro' }), partner: { razonSocial: 'X' } });
 
-      await expect(service.generarPdf(PARTNER_ID, 'o1')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.generarPdf(PARTNER_ID, 'user-1', 'o1', 'ES')).rejects.toBeInstanceOf(NotFoundException);
       expect(pdfService.generar).not.toHaveBeenCalled();
     });
   });

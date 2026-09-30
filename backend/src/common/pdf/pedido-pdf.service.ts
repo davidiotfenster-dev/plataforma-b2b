@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
 import PDFDocument from 'pdfkit';
+import type { Idioma } from '../../generated/prisma/enums.js';
+import { formatearEuros, formatearPorcentaje, textosPdf, type TextosPdf } from './pedido-pdf.textos.js';
 
 export interface LineaPedidoPdf {
   skuComercial: string;
@@ -22,6 +24,8 @@ export interface DatosPedidoPdf {
   items: LineaPedidoPdf[];
   totalNeto: string;
   createdAt: Date;
+  /// Idioma de los rótulos y del formato de fechas e importes; español si no se indica.
+  idioma?: Idioma;
 }
 
 type Documento = InstanceType<typeof PDFDocument>;
@@ -45,30 +49,18 @@ const ANCHO_UTIL = ANCHO_PAGINA - 2 * MARGEN;
 const RESERVA_PIE = 56;
 const PADDING_CELDA = 6;
 
+/// Los títulos de las columnas vienen del idioma (ver `pedido-pdf.textos.ts`).
 const COLUMNAS = [
-  { titulo: 'Referencia', ancho: 82, alinea: 'left' },
-  { titulo: 'Producto', ancho: 163, alinea: 'left' },
-  { titulo: 'Cant.', ancho: 38, alinea: 'right' },
-  { titulo: 'PVP', ancho: 62, alinea: 'right' },
-  { titulo: 'Dto.', ancho: 40, alinea: 'right' },
-  { titulo: 'Neto ud.', ancho: 62, alinea: 'right' },
-  { titulo: 'Total', ancho: 68, alinea: 'right' },
+  { ancho: 82, alinea: 'left' },
+  { ancho: 163, alinea: 'left' },
+  { ancho: 38, alinea: 'right' },
+  { ancho: 62, alinea: 'right' },
+  { ancho: 40, alinea: 'right' },
+  { ancho: 62, alinea: 'right' },
+  { ancho: 68, alinea: 'right' },
 ] as const;
 
 const RUTA_LOGO = join(process.cwd(), 'assets', 'logo-iot-fenster.png');
-
-/// 1234.5 -> "1.234,50 €". Con separador de miles siempre: `es-ES` lo omite en
-/// los importes de 4 cifras y la columna quedaría desigual.
-function euros(valor: string): string {
-  const n = Number(valor);
-  const [entero, decimales] = Math.abs(n).toFixed(2).split('.');
-  return `${n < 0 ? '-' : ''}${entero.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decimales} €`;
-}
-
-function porcentaje(valor: string): string {
-  const n = Number(valor);
-  return n > 0 ? `${n.toLocaleString('es-ES', { maximumFractionDigits: 2 })} %` : '—';
-}
 
 @Injectable()
 export class PedidoPdfService {
@@ -90,11 +82,12 @@ export class PedidoPdfService {
   }
 
   async generar(pedido: DatosPedidoPdf): Promise<Buffer> {
+    const t = textosPdf(pedido.idioma);
     const doc = new PDFDocument({
       size: 'A4',
       margin: MARGEN,
       bufferPages: true,
-      info: { Title: `Pedido ${pedido.codigoPed}`, Author: 'IoT FENSTER', Subject: 'Resumen de pedido' },
+      info: { Title: t.tituloDocumento(pedido.codigoPed), Author: 'IoT FENSTER' },
     });
     const chunks: Buffer[] = [];
 
@@ -104,29 +97,29 @@ export class PedidoPdfService {
       doc.on('error', reject);
     });
 
-    let y = this.cabecera(doc, pedido, false);
-    y = this.datosPedido(doc, pedido, y);
+    let y = this.cabecera(doc, pedido, t, false);
+    y = this.datosPedido(doc, pedido, t, y);
     if (pedido.notas) {
-      y = this.notas(doc, pedido.notas, y);
+      y = this.notas(doc, pedido.notas, t, y);
     }
 
-    y = this.encabezadoTabla(doc, y);
+    y = this.encabezadoTabla(doc, t, y);
     pedido.items.forEach((linea, indice) => {
-      const celdas = this.celdas(linea);
+      const celdas = this.celdas(linea, t);
       const alto = this.altoFila(doc, celdas);
       if (y + alto > ALTO_PAGINA - RESERVA_PIE) {
         doc.addPage();
-        y = this.encabezadoTabla(doc, this.cabecera(doc, pedido, true));
+        y = this.encabezadoTabla(doc, t, this.cabecera(doc, pedido, t, true));
       }
       y = this.fila(doc, celdas, y, alto, indice % 2 === 1);
     });
 
     if (y + 70 > ALTO_PAGINA - RESERVA_PIE) {
       doc.addPage();
-      y = this.cabecera(doc, pedido, true);
+      y = this.cabecera(doc, pedido, t, true);
     }
-    this.total(doc, pedido, y);
-    this.pies(doc);
+    this.total(doc, pedido, t, y);
+    this.pies(doc, t);
 
     doc.end();
     return finalizado;
@@ -134,7 +127,7 @@ export class PedidoPdfService {
 
   /// Banda oscura con el logo (sus letras "FENSTER" son blancas) y el código del pedido.
   /// La versión compacta se repite en las páginas siguientes. Devuelve la Y donde empieza el contenido.
-  private cabecera(doc: Documento, pedido: DatosPedidoPdf, compacta: boolean): number {
+  private cabecera(doc: Documento, pedido: DatosPedidoPdf, t: TextosPdf, compacta: boolean): number {
     const alto = compacta ? 44 : 96;
     const altoLogo = compacta ? 20 : 44;
     const yLogo = (alto - altoLogo) / 2;
@@ -155,7 +148,7 @@ export class PedidoPdfService {
       doc.text(pedido.codigoPed, MARGEN, 16, { width: ANCHO_UTIL, align: 'right', lineBreak: false });
     } else {
       doc.font('Helvetica').fontSize(8).fillColor(COLOR.sobreMarino);
-      doc.text('CONFIRMACIÓN DE PEDIDO', MARGEN, 30, { width: ANCHO_UTIL, align: 'right', characterSpacing: 1.4, lineBreak: false });
+      doc.text(t.cabecera, MARGEN, 30, { width: ANCHO_UTIL, align: 'right', characterSpacing: 1.4, lineBreak: false });
       doc.font('Helvetica-Bold').fontSize(24).fillColor(COLOR.blanco);
       doc.text(pedido.codigoPed, MARGEN, 46, { width: ANCHO_UTIL, align: 'right', lineBreak: false });
     }
@@ -164,17 +157,17 @@ export class PedidoPdfService {
   }
 
   /// Panel con cliente, PO Number, fecha y dirección de envío.
-  private datosPedido(doc: Documento, pedido: DatosPedidoPdf, y: number): number {
+  private datosPedido(doc: Documento, pedido: DatosPedidoPdf, t: TextosPdf, y: number): number {
     const relleno = 14;
     const anchoIzquierda = 215;
     const xDerecha = MARGEN + relleno + anchoIzquierda + 20;
     const anchoDerecha = MARGEN + ANCHO_UTIL - relleno - xDerecha;
-    const fecha = pedido.createdAt.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Madrid' });
+    const fecha = pedido.createdAt.toLocaleString(t.locale, { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Madrid' });
 
     const izquierda = [
-      ['CLIENTE', pedido.razonSocialPartner],
-      ['PO NUMBER', pedido.poNumber],
-      ['FECHA DEL PEDIDO', fecha],
+      [t.cliente, pedido.razonSocialPartner],
+      [t.poNumber, pedido.poNumber],
+      [t.fecha, fecha],
     ] as const;
 
     doc.font('Helvetica-Bold').fontSize(10.5);
@@ -195,20 +188,20 @@ export class PedidoPdfService {
       yTexto += 12 + doc.heightOfString(valor, { width: anchoIzquierda }) + 9;
     }
 
-    this.etiqueta(doc, 'DIRECCIÓN DE ENVÍO', xDerecha, y + relleno);
+    this.etiqueta(doc, t.direccion, xDerecha, y + relleno);
     doc.font('Helvetica').fontSize(10.5).fillColor(COLOR.texto);
     doc.text(pedido.direccionEnvio, xDerecha, y + relleno + 12, { width: anchoDerecha });
 
     return y + alto + 16;
   }
 
-  private notas(doc: Documento, notas: string, y: number): number {
+  private notas(doc: Documento, notas: string, t: TextosPdf, y: number): number {
     const relleno = 12;
     doc.font('Helvetica').fontSize(9.5);
     const alto = 12 + doc.heightOfString(notas, { width: ANCHO_UTIL - 2 * relleno }) + 2 * relleno;
 
     doc.roundedRect(MARGEN, y, ANCHO_UTIL, alto, 6).lineWidth(0.8).strokeColor(COLOR.borde).stroke();
-    this.etiqueta(doc, 'NOTAS DEL PEDIDO', MARGEN + relleno, y + relleno);
+    this.etiqueta(doc, t.notas, MARGEN + relleno, y + relleno);
     doc.font('Helvetica').fontSize(9.5).fillColor(COLOR.texto);
     doc.text(notas, MARGEN + relleno, y + relleno + 12, { width: ANCHO_UTIL - 2 * relleno });
 
@@ -220,32 +213,32 @@ export class PedidoPdfService {
     doc.text(texto, x, y, { characterSpacing: 0.9, lineBreak: false });
   }
 
-  private encabezadoTabla(doc: Documento, y: number): number {
+  private encabezadoTabla(doc: Documento, t: TextosPdf, y: number): number {
     const alto = 22;
     doc.rect(MARGEN, y, ANCHO_UTIL, alto).fill(COLOR.marino);
     doc.font('Helvetica-Bold').fontSize(8).fillColor(COLOR.blanco);
 
     let x = MARGEN;
-    for (const columna of COLUMNAS) {
-      doc.text(columna.titulo, x + PADDING_CELDA, y + 7, {
+    COLUMNAS.forEach((columna, i) => {
+      doc.text(t.columnas[i], x + PADDING_CELDA, y + 7, {
         width: columna.ancho - 2 * PADDING_CELDA,
         align: columna.alinea,
         lineBreak: false,
       });
       x += columna.ancho;
-    }
+    });
     return y + alto;
   }
 
-  private celdas(linea: LineaPedidoPdf): string[] {
+  private celdas(linea: LineaPedidoPdf, t: TextosPdf): string[] {
     return [
       linea.skuComercial,
       linea.nombreProducto,
       String(linea.cantidad),
-      euros(linea.pvpHistorico),
-      porcentaje(linea.descuentoAplicado),
-      euros(linea.precioNetoUnitario),
-      euros(linea.totalLinea),
+      formatearEuros(linea.pvpHistorico, t),
+      formatearPorcentaje(linea.descuentoAplicado, t),
+      formatearEuros(linea.precioNetoUnitario, t),
+      formatearEuros(linea.totalLinea, t),
     ];
   }
 
@@ -277,14 +270,14 @@ export class PedidoPdfService {
     return y + alto;
   }
 
-  private total(doc: Documento, pedido: DatosPedidoPdf, y: number): void {
+  private total(doc: Documento, pedido: DatosPedidoPdf, t: TextosPdf, y: number): void {
     const unidades = pedido.items.reduce((suma, linea) => suma + linea.cantidad, 0);
     const lineas = pedido.items.length;
     const inicio = y + 18;
 
     doc.font('Helvetica').fontSize(9).fillColor(COLOR.suave);
     doc.text(
-      `${lineas} ${lineas === 1 ? 'línea' : 'líneas'} · ${unidades} ${unidades === 1 ? 'unidad' : 'unidades'}`,
+      `${lineas} ${t.linea[lineas === 1 ? 0 : 1]} · ${unidades} ${t.unidad[unidades === 1 ? 0 : 1]}`,
       MARGEN,
       inicio + 4,
       { lineBreak: false },
@@ -295,13 +288,13 @@ export class PedidoPdfService {
     doc.rect(x, inicio, ancho, 3).fill(COLOR.turquesa);
     doc.rect(x, inicio + 3, ancho, 46).fill(COLOR.fondo);
     doc.font('Helvetica-Bold').fontSize(7).fillColor(COLOR.suave);
-    doc.text('TOTAL NETO DEL PEDIDO', x + 12, inicio + 13, { characterSpacing: 0.9, lineBreak: false });
+    doc.text(t.totalNeto, x + 12, inicio + 13, { characterSpacing: 0.9, lineBreak: false });
     doc.font('Helvetica-Bold').fontSize(18).fillColor(COLOR.marino);
-    doc.text(euros(pedido.totalNeto), x + 12, inicio + 25, { width: ancho - 24, align: 'right', lineBreak: false });
+    doc.text(formatearEuros(pedido.totalNeto, t), x + 12, inicio + 25, { width: ancho - 24, align: 'right', lineBreak: false });
   }
 
   /// Pie en todas las páginas (una vez conocido el total): descripción y "Página x de y".
-  private pies(doc: Documento): void {
+  private pies(doc: Documento, t: TextosPdf): void {
     const { start, count } = doc.bufferedPageRange();
     for (let i = start; i < start + count; i++) {
       doc.switchToPage(i);
@@ -310,11 +303,11 @@ export class PedidoPdfService {
       const y = ALTO_PAGINA - 38;
       doc.moveTo(MARGEN, y - 8).lineTo(MARGEN + ANCHO_UTIL, y - 8).lineWidth(0.5).strokeColor(COLOR.borde).stroke();
       doc.font('Helvetica').fontSize(8).fillColor(COLOR.suave);
-      doc.text('IoT FENSTER · Resumen del pedido generado automáticamente por el Portal Partner', MARGEN, y, {
+      doc.text(t.pie, MARGEN, y, {
         width: ANCHO_UTIL - 90,
         lineBreak: false,
       });
-      doc.text(`Página ${i - start + 1} de ${count}`, MARGEN, y, { width: ANCHO_UTIL, align: 'right', lineBreak: false });
+      doc.text(t.pagina(i - start + 1, count), MARGEN, y, { width: ANCHO_UTIL, align: 'right', lineBreak: false });
     }
   }
 }
