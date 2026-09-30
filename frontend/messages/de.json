@@ -666,5 +666,176 @@
     "nothingToAdd": "Nichts fehlt.",
     "hideOthers": "Produkte anderer Marken ausblenden",
     "showOthers": "Produkt einer anderen Marke hinzufügen ({n})"
+  },
+  "ayuda": {
+    "boton": "Hilfe",
+    "abrir": "Hilfe öffnen",
+    "cerrar": "Hilfe schließen",
+    "titulo": "Hilfe",
+    "enEstaPantalla": "Auf dieser Seite",
+    "preguntasGenerales": "Allgemeine Fragen",
+    "masInfo": "Mehr Informationen",
+    "contacto": "Nicht gefunden, was Sie suchen?",
+    "escribirSoporte": "Support schreiben",
+    "temas": {
+      "inicio": "Startseite",
+      "login": "Anmelden",
+      "registro": "Firmenregistrierung",
+      "catalogo": "Katalog",
+      "carrito": "Warenkorb",
+      "checkout": "Bestellung bestätigen",
+      "pedidos": "Meine Bestellungen",
+      "pedidoDetalle": "Bestelldetails",
+      "adminEmpresas": "Unternehmen",
+      "adminFicha": "Unternehmensakte",
+      "adminMarcas": "Marken",
+      "adminProductos": "Produkte",
+      "adminPedidos": "Bestellungen",
+      "adminDashboard": "Statistiken"
+    },
+    "puntual": {
+      "estados": "Eingegangen, Bestätigt, In Vorbereitung, Bereit und Versendet sind die Schritte einer Bestellung, in dieser Reihenfolge. Storniert bedeutet, dass sie annulliert wurde.",
+      "precioNeto": "Ihr Stückpreis mit bereits angewendetem Rabatt. Er wird bei der Bestätigung der Bestellung festgeschrieben.",
+      "precioNetoCarrito": "Ihr Stückpreis mit bereits angewendetem Rabatt. Er kann sich ändern, wenn sich die Preisliste ändert; mit der Bestätigung der Bestellung wird er festgeschrieben.",
+      "tipoEmpresa": "Partner: hat eine eigene Untermarke. Kunde: kauft mit Blick auf die Geräte der Marke eines Partners."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "Was kann ich im Portal tun?",
+        "r": "Den Katalog Ihrer Marke mit Ihren Preisen ansehen, einen Warenkorb vorbereiten, Bestellungen bestätigen und ihren Status bis zum Versand verfolgen. Es gibt keine Online-Zahlung: Bestellungen werden mit Ihrer Bestellnummer (PO-Nummer) abgewickelt."
+      },
+      "noEntro": {
+        "p": "Ich kann mich nicht anmelden",
+        "r": "Prüfen Sie E-Mail und Passwort. Wenn Sie Ihr Unternehmen gerade registriert haben, können Sie sich erst anmelden, wenn Sie Ihre E-Mail bestätigt haben und ein IoT-FENSTER-Administrator die Registrierung freigegeben hat; bis dahin sehen Sie dieselbe Meldung über ungültige Zugangsdaten."
+      },
+      "olvidePassword": {
+        "p": "Ich habe mein Passwort vergessen",
+        "r": "Klicken Sie unter dem Formular auf „Passwort vergessen?“, um einen Link zum Erstellen eines neuen Passworts zu erhalten."
+      },
+      "correoEmpresa": {
+        "p": "Welche E-Mail soll ich verwenden?",
+        "r": "Die Firmen-E-Mail des Administrators Ihres Unternehmens. Sie muss zur selben Domain gehören, die Sie als Website-Domain angeben (zum Beispiel name@ihrefirma.com, wenn die Domain ihrefirma.com lautet)."
+      },
+      "despuesDeEnviar": {
+        "p": "Was passiert nach dem Absenden der Anfrage?",
+        "r": "Sie bestätigen Ihre E-Mail und ein IoT-FENSTER-Administrator prüft die Anfrage und legt Ihre Konditionen fest (Marke, Preisliste und Rabatt). Nach der Freigabe können Sie sich mit E-Mail und Passwort anmelden."
+      },
+      "precioVisto": {
+        "p": "Welchen Preis sehe ich?",
+        "r": "Ihren Nettopreis: die Listen-UVP mit bereits angewendetem Rabatt Ihres Unternehmens. Manche Produkte können einen eigenen Rabatt haben."
+      },
+      "productoFalta": {
+        "p": "Ich finde ein Produkt nicht",
+        "r": "Sie sehen nur die Geräte der Marke, die Ihrem Unternehmen zugewiesen ist. Wenn Sie ein anderes benötigen, fragen Sie Ihren Ansprechpartner bei IoT FENSTER."
+      },
+      "variantes": {
+        "p": "Was sind die farbigen Kreise?",
+        "r": "Jeder Kreis ist eine Variante desselben Modells. Wählen Sie die gewünschte aus, bevor Sie es in den Warenkorb legen."
+      },
+      "carritoGuardado": {
+        "p": "Wird mein Warenkorb gespeichert?",
+        "r": "Ja. Er bleibt in Ihrem Konto gespeichert, auch wenn Sie sich abmelden, bis Sie die Bestellung bestätigen."
+      },
+      "preciosCambian": {
+        "p": "Können sich die Preise ändern?",
+        "r": "Der Warenkorb zeigt immer die heutigen Preise. Ändert sich ein Preis, während er geöffnet ist, wird er aktualisiert und beim Bestätigen weisen wir Sie darauf hin, damit Sie die neue Summe prüfen können."
+      },
+      "poNumber": {
+        "p": "Was ist die PO-Nummer?",
+        "r": "Es ist die Nummer Ihrer Bestellung (Purchase Order). Sie identifiziert diese Bestellung sowohl in Ihrem Unternehmen als auch bei IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "Wie wird bezahlt?",
+        "r": "Es gibt keine Online-Zahlung. Mit der Bestätigung wird die Bestellung erfasst und mit Ihrer Bestellnummer abgewickelt."
+      },
+      "editarDespues": {
+        "p": "Kann ich die Bestellung nach der Bestätigung ändern?",
+        "r": "Nicht über das Portal: Mit der Bestätigung werden Preise und Rabatte festgeschrieben. Wenn Sie eine Änderung benötigen, wenden Sie sich an IoT FENSTER."
+      },
+      "estados": {
+        "p": "Was bedeutet jeder Status?",
+        "r": "Eingegangen: wir haben sie erhalten. Bestätigt: IoT FENSTER hat sie angenommen. In Vorbereitung: wir bereiten sie vor. Bereit: versandfertig. Versendet: unterwegs, mit Spediteur und Tracking-Link. Storniert: annulliert, den Grund sehen Sie dort."
+      },
+      "encontrarPedido": {
+        "p": "Wie finde ich eine Bestellung?",
+        "r": "Geben Sie im Suchfeld den PED-Code, die PO-Nummer oder ein Produkt ein und verfeinern Sie mit den Filtern für Status und Datum. Sie können nach Datum oder Summe sortieren."
+      },
+      "descargarPdf": {
+        "p": "Wie lade ich die Bestellübersicht herunter?",
+        "r": "Klicken Sie auf „PDF herunterladen“ und wählen Sie vor dem Download die Sprache des Dokuments."
+      },
+      "repetirPedido": {
+        "p": "Was macht „Erneut bestellen“?",
+        "r": "Es legt dieselben Positionen zu den heutigen Preisen in den Warenkorb und weist Sie auf nicht mehr verfügbare Artikel oder geänderte Preise hin. Es bestätigt nichts: Sie prüfen den Warenkorb und bestätigen selbst."
+      },
+      "precioFijo": {
+        "p": "Warum ändert sich der Preis einer Bestellung nicht?",
+        "r": "Bei der Bestätigung speichert die Bestellung UVP, Rabatt und Nettopreis dieses Moments. Sie werden nicht neu berechnet, auch wenn sich die Preisliste später ändert."
+      },
+      "partnerOCliente": {
+        "p": "Partner oder Kunde?",
+        "r": "Ein Partner hat eine eigene Untermarke (VBH, Procomsa, MySmartWindow). Ein Kunde kauft mit Blick auf die Geräte der Marke eines Partners; standardmäßig MySmartWindow."
+      },
+      "aprobarSolicitud": {
+        "p": "Wie genehmige ich eine Anfrage?",
+        "r": "Öffnen Sie den Tab „Genehmigung ausstehend“ und klicken Sie auf Genehmigen: Legen Sie Handelsmarke, Preisliste und Rabatt fest. Das Unternehmen erhält den Katalog seiner Marke und seine Benutzer können sich anmelden."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Sperren, archivieren oder löschen",
+        "r": "Sperren unterbricht den Zugang, bis Sie das Unternehmen reaktivieren. Archivieren blendet es in den Listen aus und behält Daten und Bestellungen (nicht möglich bei unversandten Bestellungen). Löschen entfernt es vollständig und ist nur ohne Bestellungen erlaubt."
+      },
+      "datosPorCompletar": {
+        "p": "Was sind „zu ergänzende Daten“?",
+        "r": "Aus einer Liste geladene Unternehmen tragen vorläufige Daten (Steuernummer, Domain oder Adresse „PENDIENTE“), bis Sie ihre Akte vervollständigen."
+      },
+      "descuentoEmpresa": {
+        "p": "Wie funktioniert der Rabatt?",
+        "r": "Der Rabatt des Unternehmens gilt auf die Listen-UVP aller seiner Produkte. Ein Produkt mit eigenem Rabatt verwendet diesen statt des allgemeinen."
+      },
+      "productosDeMarca": {
+        "p": "Produkte der Marke und Extras",
+        "r": "Die Produkte der Marke stammen aus dem Markenkatalog und erlauben nur Rabatt und Ausblenden. Extras werden von Hand zugewiesen und wie gewohnt verwaltet."
+      },
+      "cambiosAplican": {
+        "p": "Was passiert, wenn ich hier etwas ändere?",
+        "r": "Änderungen gelten sofort für alle Unternehmen, die diese Marke verwenden."
+      },
+      "anadirLoQueFalta": {
+        "p": "Was macht „Fehlendes hinzufügen“?",
+        "r": "Es fügt der Marke die Basisprodukte hinzu, die sie noch nicht hat, mit einem vorgeschlagenen Namen, den Sie bearbeiten können."
+      },
+      "productoBase": {
+        "p": "Was ist ein Basisprodukt?",
+        "r": "Das Gerät selbst. Dasselbe Gerät heißt je nach Marke anders (Connect-1, Wave-1, Icon1), ist aber ein einziges Basisprodukt."
+      },
+      "subirImagenes": {
+        "p": "Wie füge ich Fotos hinzu?",
+        "r": "Wählen Sie ein oder mehrere Produkte aus und nutzen Sie „Bild hochladen“. PNG, JPG oder WebP bis 3 MB werden akzeptiert."
+      },
+      "avanzarPedido": {
+        "p": "Wie schalte ich eine Bestellung weiter?",
+        "r": "Nur ein Administrator kann den Status ändern, jeweils einen Schritt: Eingegangen, Bestätigt, In Vorbereitung, Bereit und Versendet. Beim Versand werden Spediteur, Sendungsnummer und Tracking-Link abgefragt."
+      },
+      "cancelarPedido": {
+        "p": "Wie storniere ich eine Bestellung?",
+        "r": "Solange sie nicht versendet ist, kann sie mit einer Begründung storniert werden, die der Kunde sieht."
+      },
+      "corregirEstado": {
+        "p": "Kann ich einen Status korrigieren?",
+        "r": "Der Administrator kann in Ausnahmefällen einen Status erzwingen und dabei die Reihenfolge überspringen."
+      },
+      "cifrasCanceladas": {
+        "p": "Was zählen die Zahlen?",
+        "r": "Der fakturierte Gesamtbetrag und die Diagramme nach Unternehmen und Tag enthalten keine stornierten Bestellungen."
+      },
+      "cambiarIdioma": {
+        "p": "Wie ändere ich die Sprache?",
+        "r": "Mit der Sprachauswahl in der oberen Leiste. Sie wird in Ihrem Konto gespeichert."
+      },
+      "miCuenta": {
+        "p": "Mit welchem Konto bin ich angemeldet?",
+        "r": "Oben rechts, über der Leiste, sehen Sie „Angemeldet als“ mit der E-Mail des verwendeten Kontos."
+      }
+    }
   }
 }

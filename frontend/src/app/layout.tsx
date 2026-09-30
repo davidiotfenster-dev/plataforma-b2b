@@ -6,6 +6,7 @@ import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Navbar } from "@/components/navbar";
 import { Marca } from "@/components/marca";
+import { AyudaBurbuja } from "@/components/ayuda/ayuda-burbuja";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <span>© {new Date().getFullYear()} IoT FENSTER</span>
               </div>
             </footer>
+            <AyudaBurbuja />
           </Providers>
         </NextIntlClientProvider>
       </body>

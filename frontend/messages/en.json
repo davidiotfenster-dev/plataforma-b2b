@@ -666,5 +666,176 @@
     "nothingToAdd": "Nothing missing.",
     "hideOthers": "Hide products from other brands",
     "showOthers": "Add a product from another brand ({n})"
+  },
+  "ayuda": {
+    "boton": "Help",
+    "abrir": "Open help",
+    "cerrar": "Close help",
+    "titulo": "Help",
+    "enEstaPantalla": "On this screen",
+    "preguntasGenerales": "General questions",
+    "masInfo": "More information",
+    "contacto": "Cannot find what you are looking for?",
+    "escribirSoporte": "Write to support",
+    "temas": {
+      "inicio": "Home",
+      "login": "Sign in",
+      "registro": "Company registration",
+      "catalogo": "Catalog",
+      "carrito": "Cart",
+      "checkout": "Confirm order",
+      "pedidos": "My orders",
+      "pedidoDetalle": "Order details",
+      "adminEmpresas": "Companies",
+      "adminFicha": "Company file",
+      "adminMarcas": "Brands",
+      "adminProductos": "Products",
+      "adminPedidos": "Orders",
+      "adminDashboard": "Statistics"
+    },
+    "puntual": {
+      "estados": "Received, Confirmed, In preparation, Prepared and Shipped are the steps of an order, in that order. Cancelled means it has been called off.",
+      "precioNeto": "Your unit price with the discount already applied. It is fixed when the order is confirmed.",
+      "precioNetoCarrito": "Your unit price with the discount already applied. It can change if the price list changes; once the order is confirmed it is fixed.",
+      "tipoEmpresa": "Partner: has its own sub-brand. Customer: buys seeing the devices of a partner brand."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "What can I do in the portal?",
+        "r": "Browse your brand catalog with your prices, prepare a cart, confirm orders and follow their status until shipping. There is no online payment: orders are handled with your purchase order number (PO Number)."
+      },
+      "noEntro": {
+        "p": "I cannot sign in",
+        "r": "Check your email and password. If you have just registered your company, you cannot sign in until you verify your email and an IoT FENSTER administrator approves the registration; meanwhile you will see the same invalid credentials message."
+      },
+      "olvidePassword": {
+        "p": "I forgot my password",
+        "r": "Click “Forgot your password?” under the form to receive a link to create a new one."
+      },
+      "correoEmpresa": {
+        "p": "Which email should I use?",
+        "r": "The corporate email of your company administrator. It must belong to the same domain you give as the website domain (for example, name@yourcompany.com if the domain is yourcompany.com)."
+      },
+      "despuesDeEnviar": {
+        "p": "What happens after I send the request?",
+        "r": "You will verify your email and an IoT FENSTER administrator will review the request and set your terms (brand, price list and discount). Once approved, you can sign in with your email and password."
+      },
+      "precioVisto": {
+        "p": "Which price am I seeing?",
+        "r": "Your net price: the list RRP with your company discount already applied. Some products may have their own discount."
+      },
+      "productoFalta": {
+        "p": "I cannot find a product",
+        "r": "You only see the devices of the brand assigned to your company. If you need another one, ask your IoT FENSTER contact."
+      },
+      "variantes": {
+        "p": "What are the colored circles?",
+        "r": "Each circle is a variant of the same model. Choose the one you want before adding it to the cart."
+      },
+      "carritoGuardado": {
+        "p": "Is my cart saved?",
+        "r": "Yes. It stays saved in your account even if you sign out, until you confirm the order."
+      },
+      "preciosCambian": {
+        "p": "Can prices change?",
+        "r": "The cart always shows today prices. If a price changes while you have it open, it is updated and, when you confirm, we warn you so you can review the new total."
+      },
+      "poNumber": {
+        "p": "What is the PO Number?",
+        "r": "It is the number of your purchase order. It identifies this order both in your company and at IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "How do I pay?",
+        "r": "There is no online payment. When you confirm, the order is registered and handled with your purchase order."
+      },
+      "editarDespues": {
+        "p": "Can I change the order after confirming it?",
+        "r": "Not from the portal: when you confirm, prices and discounts are fixed. If you need a change, contact IoT FENSTER."
+      },
+      "estados": {
+        "p": "What does each status mean?",
+        "r": "Received: we have received it. Confirmed: IoT FENSTER has accepted it. In preparation: we are preparing it. Prepared: ready to go out. Shipped: it has left, with carrier and tracking link. Cancelled: it has been called off and you will see the reason."
+      },
+      "encontrarPedido": {
+        "p": "How do I find an order?",
+        "r": "Type the PED code, the PO Number or a product in the search box, and refine with the status and date filters. You can sort by date or by total."
+      },
+      "descargarPdf": {
+        "p": "How do I download the order summary?",
+        "r": "Click “Download PDF” and choose the language of the document before downloading it."
+      },
+      "repetirPedido": {
+        "p": "What does “Reorder” do?",
+        "r": "It adds the same lines to the cart at today prices and warns you about anything no longer available or with a changed price. It confirms nothing: you review the cart and confirm yourself."
+      },
+      "precioFijo": {
+        "p": "Why does the price of an order not change?",
+        "r": "When confirmed, the order keeps the RRP, discount and net price of that moment. They are not recalculated even if the price list changes later."
+      },
+      "partnerOCliente": {
+        "p": "Partner or customer?",
+        "r": "A partner has its own sub-brand (VBH, Procomsa, MySmartWindow). A customer buys seeing the devices of a partner brand; MySmartWindow by default."
+      },
+      "aprobarSolicitud": {
+        "p": "How do I approve a request?",
+        "r": "Open the “Pending approval” tab and click Approve: set the trade brand, price list and discount. The company receives the catalog of its brand and its users will be able to sign in."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Suspend, archive or delete",
+        "r": "Suspending cuts access until you reactivate the company. Archiving hides it from the lists while keeping data and orders (not possible with unshipped orders). Deleting erases it completely and is only allowed if it has no orders."
+      },
+      "datosPorCompletar": {
+        "p": "What is “data to complete”?",
+        "r": "Companies loaded from a list carry provisional data (tax ID, domain or address “PENDIENTE”) until you complete their file."
+      },
+      "descuentoEmpresa": {
+        "p": "How does the discount work?",
+        "r": "The company discount applies to the list RRP of all its products. A product with its own discount uses that one instead of the general one."
+      },
+      "productosDeMarca": {
+        "p": "Brand products and extras",
+        "r": "Brand products come from the brand catalog and only allow discount and hide. Extras are assigned by hand and managed as usual."
+      },
+      "cambiosAplican": {
+        "p": "What happens if I change something here?",
+        "r": "Changes apply immediately to every company using that brand."
+      },
+      "anadirLoQueFalta": {
+        "p": "What does “Add what is missing” do?",
+        "r": "It adds to the brand the base products it does not have yet, with a suggested name you can edit."
+      },
+      "productoBase": {
+        "p": "What is a base product?",
+        "r": "The device itself. The same device is named differently depending on the brand (Connect-1, Wave-1, Icon1) but it is a single base product."
+      },
+      "subirImagenes": {
+        "p": "How do I add photos?",
+        "r": "Select one or several products and use “Upload image”. PNG, JPG or WebP up to 3 MB are accepted."
+      },
+      "avanzarPedido": {
+        "p": "How do I move an order forward?",
+        "r": "Only an administrator can change the status, one step at a time: Received, Confirmed, In preparation, Prepared and Shipped. When shipping, carrier, dispatch number and tracking link are requested."
+      },
+      "cancelarPedido": {
+        "p": "How do I cancel an order?",
+        "r": "It can be cancelled as long as it has not been shipped, giving a reason that the customer will see."
+      },
+      "corregirEstado": {
+        "p": "Can I correct a status?",
+        "r": "The administrator can force a status skipping the sequence, for exceptional cases."
+      },
+      "cifrasCanceladas": {
+        "p": "What do the figures count?",
+        "r": "The invoiced total and the charts by company and by day do not include cancelled orders."
+      },
+      "cambiarIdioma": {
+        "p": "How do I change the language?",
+        "r": "With the language selector in the top bar. It is remembered in your account."
+      },
+      "miCuenta": {
+        "p": "Which account am I signed in with?",
+        "r": "At the top right, above the bar, you see “Signed in as” with the email of the account in use."
+      }
+    }
   }
 }

@@ -666,5 +666,176 @@
     "nothingToAdd": "No falta ninguno.",
     "hideOthers": "Ocultar productos de otras marcas",
     "showOthers": "Añadir un producto de otra marca ({n})"
+  },
+  "ayuda": {
+    "boton": "Ayuda",
+    "abrir": "Abrir la ayuda",
+    "cerrar": "Cerrar la ayuda",
+    "titulo": "Ayuda",
+    "enEstaPantalla": "En esta pantalla",
+    "preguntasGenerales": "Preguntas generales",
+    "masInfo": "Más información",
+    "contacto": "¿No encuentras lo que buscas?",
+    "escribirSoporte": "Escribir a soporte",
+    "temas": {
+      "inicio": "Inicio",
+      "login": "Iniciar sesión",
+      "registro": "Registro de empresa",
+      "catalogo": "Catálogo",
+      "carrito": "Carrito",
+      "checkout": "Confirmar pedido",
+      "pedidos": "Mis pedidos",
+      "pedidoDetalle": "Detalle del pedido",
+      "adminEmpresas": "Empresas",
+      "adminFicha": "Ficha de la empresa",
+      "adminMarcas": "Marcas",
+      "adminProductos": "Productos",
+      "adminPedidos": "Pedidos",
+      "adminDashboard": "Estadísticas"
+    },
+    "puntual": {
+      "estados": "Recibido, Confirmado, En preparación, Preparado y Enviado son los pasos de un pedido, en ese orden. Cancelado significa que se ha anulado.",
+      "precioNeto": "Tu precio unitario con el descuento ya aplicado. Queda fijado al confirmar el pedido.",
+      "precioNetoCarrito": "Tu precio unitario con el descuento ya aplicado. Puede cambiar si cambia la tarifa; al confirmar el pedido queda fijado.",
+      "tipoEmpresa": "Partner: tiene submarca propia. Cliente: compra viendo los dispositivos de la marca de un partner."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "¿Qué puedo hacer en el portal?",
+        "r": "Consultar el catálogo de tu marca con tus precios, preparar un carrito, confirmar pedidos y seguir su estado hasta el envío. No hay pago en línea: los pedidos se gestionan con tu número de orden de compra (PO Number)."
+      },
+      "noEntro": {
+        "p": "No puedo entrar",
+        "r": "Revisa el correo y la contraseña. Si acabas de registrar tu empresa, no podrás entrar hasta que verifiques tu correo y un administrador de IoT FENSTER apruebe el alta; mientras tanto verás el mismo aviso de credenciales no válidas."
+      },
+      "olvidePassword": {
+        "p": "He olvidado mi contraseña",
+        "r": "Pulsa «¿Olvidaste tu contraseña?» debajo del formulario para recibir un enlace con el que crear una nueva."
+      },
+      "correoEmpresa": {
+        "p": "¿Qué correo debo usar?",
+        "r": "El correo corporativo del administrador de tu empresa. Debe pertenecer al mismo dominio que indicas como dominio web (por ejemplo, nombre@tuempresa.com si el dominio es tuempresa.com)."
+      },
+      "despuesDeEnviar": {
+        "p": "¿Qué pasa después de enviar la solicitud?",
+        "r": "Verificarás tu correo y un administrador de IoT FENSTER revisará la solicitud y fijará tus condiciones (marca, tarifa y descuento). Cuando esté aprobada podrás entrar con tu correo y tu contraseña."
+      },
+      "precioVisto": {
+        "p": "¿Qué precio estoy viendo?",
+        "r": "Tu precio neto: el PVP de tarifa con el descuento de tu empresa ya aplicado. Algunos productos pueden tener un descuento propio."
+      },
+      "productoFalta": {
+        "p": "No encuentro un producto",
+        "r": "Solo ves los dispositivos de la marca asignada a tu empresa. Si necesitas otro, pídeselo a tu contacto en IoT FENSTER."
+      },
+      "variantes": {
+        "p": "¿Qué son los círculos de color?",
+        "r": "Cada círculo es una variante del mismo modelo. Elige la que quieras antes de añadirlo al carrito."
+      },
+      "carritoGuardado": {
+        "p": "¿Se guarda mi carrito?",
+        "r": "Sí. Queda guardado en tu cuenta aunque cierres la sesión, hasta que confirmes el pedido."
+      },
+      "preciosCambian": {
+        "p": "¿Pueden cambiar los precios?",
+        "r": "El carrito siempre muestra los precios de hoy. Si un precio cambia mientras lo tienes abierto, se actualiza y, al confirmar, te avisamos para que revises el nuevo total."
+      },
+      "poNumber": {
+        "p": "¿Qué es el PO Number?",
+        "r": "Es el número de tu orden de compra. Sirve para identificar este pedido tanto en tu empresa como en IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "¿Cómo se paga?",
+        "r": "No hay pago en línea. Al confirmar, el pedido queda registrado y se gestiona con tu orden de compra."
+      },
+      "editarDespues": {
+        "p": "¿Puedo cambiar el pedido después de confirmarlo?",
+        "r": "No desde el portal: al confirmar, los precios y los descuentos quedan fijados. Si necesitas un cambio, contacta con IoT FENSTER."
+      },
+      "estados": {
+        "p": "¿Qué significa cada estado?",
+        "r": "Recibido: lo hemos recibido. Confirmado: IoT FENSTER lo ha aceptado. En preparación: lo estamos preparando. Preparado: listo para salir. Enviado: ya ha salido, con transportista y enlace de seguimiento. Cancelado: se ha anulado y verás el motivo."
+      },
+      "encontrarPedido": {
+        "p": "¿Cómo encuentro un pedido?",
+        "r": "Escribe en el buscador el código PED, el PO Number o un producto, y afina con los filtros de estado y fechas. Puedes ordenar por fecha o por total."
+      },
+      "descargarPdf": {
+        "p": "¿Cómo descargo el resumen del pedido?",
+        "r": "Pulsa «Descargar PDF» y elige el idioma del documento antes de bajarlo."
+      },
+      "repetirPedido": {
+        "p": "¿Qué hace «Repetir pedido»?",
+        "r": "Añade al carrito las mismas líneas con los precios de hoy y te avisa de lo que ya no está disponible o ha cambiado de precio. No confirma nada: revisas el carrito y confirmas tú."
+      },
+      "precioFijo": {
+        "p": "¿Por qué el precio de un pedido no cambia?",
+        "r": "Al confirmar, el pedido guarda el PVP, el descuento y el precio neto de ese momento. No se recalculan aunque la tarifa cambie después."
+      },
+      "partnerOCliente": {
+        "p": "¿Partner o cliente?",
+        "r": "Un partner tiene submarca propia (VBH, Procomsa, MySmartWindow). Un cliente compra viendo los dispositivos de la marca de un partner; por defecto, MySmartWindow."
+      },
+      "aprobarSolicitud": {
+        "p": "¿Cómo apruebo una solicitud?",
+        "r": "Abre la pestaña «Pendiente de aprobación» y pulsa Aprobar: fija la marca comercial, la tarifa y el descuento. La empresa recibe el catálogo de su marca y sus usuarios podrán entrar."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Suspender, archivar o eliminar",
+        "r": "Suspender corta el acceso hasta que reactives la empresa. Archivar la oculta de las listas conservando datos y pedidos (no se puede con pedidos sin enviar). Eliminar la borra del todo y solo se permite si no tiene pedidos."
+      },
+      "datosPorCompletar": {
+        "p": "¿Qué son los «datos por completar»?",
+        "r": "Las empresas cargadas desde un listado llevan datos provisionales (CIF, dominio o dirección «PENDIENTE») hasta que completas su ficha."
+      },
+      "descuentoEmpresa": {
+        "p": "¿Cómo funciona el descuento?",
+        "r": "El descuento de la empresa se aplica al PVP de tarifa de todos sus productos. Un producto con descuento propio usa ese en lugar del general."
+      },
+      "productosDeMarca": {
+        "p": "Productos de su marca y extras",
+        "r": "Los productos de su marca vienen del catálogo de la marca y solo admiten descuento y ocultar. Los extras se asignan a mano y se gestionan como siempre."
+      },
+      "cambiosAplican": {
+        "p": "¿Qué pasa si cambio algo aquí?",
+        "r": "Los cambios se aplican al momento a todas las empresas que usan esa marca."
+      },
+      "anadirLoQueFalta": {
+        "p": "¿Qué hace «Añadir lo que falta»?",
+        "r": "Añade a la marca los productos base que todavía no tiene, con un nombre propuesto que puedes editar."
+      },
+      "productoBase": {
+        "p": "¿Qué es un producto base?",
+        "r": "El aparato en sí. Un mismo aparato se llama distinto según la marca (Connect-1, Wave-1, Icon1) pero es un único producto base."
+      },
+      "subirImagenes": {
+        "p": "¿Cómo pongo las fotos?",
+        "r": "Selecciona uno o varios productos y usa «Subir imagen». Se admiten PNG, JPG o WebP de hasta 3 MB."
+      },
+      "avanzarPedido": {
+        "p": "¿Cómo avanzo un pedido?",
+        "r": "Solo un administrador puede cambiar el estado, un paso cada vez: Recibido, Confirmado, En preparación, Preparado y Enviado. Al enviarlo se piden transportista, número de expedición y enlace de seguimiento."
+      },
+      "cancelarPedido": {
+        "p": "¿Cómo cancelo un pedido?",
+        "r": "Se puede cancelar mientras no esté enviado, indicando un motivo que verá el cliente."
+      },
+      "corregirEstado": {
+        "p": "¿Puedo corregir un estado?",
+        "r": "El administrador puede forzar un estado saltándose la secuencia, para casos excepcionales."
+      },
+      "cifrasCanceladas": {
+        "p": "¿Qué cuentan las cifras?",
+        "r": "El total facturado y los gráficos por empresa y por día no incluyen los pedidos cancelados."
+      },
+      "cambiarIdioma": {
+        "p": "¿Cómo cambio el idioma?",
+        "r": "Con el selector de idioma de la barra superior. Se recuerda en tu cuenta."
+      },
+      "miCuenta": {
+        "p": "¿Con qué cuenta he entrado?",
+        "r": "Arriba a la derecha, sobre la barra, ves «Sesión iniciada como» con el correo de la cuenta en uso."
+      }
+    }
   }
 }

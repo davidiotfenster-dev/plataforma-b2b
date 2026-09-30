@@ -6,10 +6,12 @@ import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ResumenCarrito } from "@/lib/types";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 
 export default function CarritoPage() {
   const queryClient = useQueryClient();
   const t = useTranslations("carrito");
+  const tAyuda = useTranslations("ayuda");
   const { data: carrito, isLoading } = useQuery<ResumenCarrito>({
     queryKey: ["carrito"],
     queryFn: () => api.get<ResumenCarrito>("/carrito/resumen"),
@@ -52,7 +54,12 @@ export default function CarritoPage() {
           <thead className="border-b border-neutral-200 bg-neutral-50 text-left text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">{t("product")}</th>
-              <th className="px-4 py-3 font-medium">{t("netPrice")}</th>
+              <th className="px-4 py-3 font-medium">
+                <span className="inline-flex items-center gap-1">
+                  {t("netPrice")}
+                  <AyudaPuntual texto={tAyuda("puntual.precioNetoCarrito")} />
+                </span>
+              </th>
               <th className="px-4 py-3 font-medium">{t("quantity")}</th>
               <th className="px-4 py-3 font-medium">{t("total")}</th>
               <th className="px-4 py-3" />

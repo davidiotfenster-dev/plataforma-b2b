@@ -192,6 +192,25 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 - Probado con una empresa de prueba (borrada): archivar, sesión abierta cortada,
   login bloqueado, desarchivar, nombre incorrecto (400), con pedidos (409).
 
+### 0.11 Ayuda dentro del portal (2026-09-30)
+- **Burbuja de ayuda** ("?" flotante abajo a la derecha, para TODOS: visitantes, clientes
+  y personal): abre un panel con las preguntas de la pantalla en la que estás y unas
+  generales (idioma, y con sesión "¿con qué cuenta he entrado?"). Contenido fijo y
+  traducido a los 5 idiomas; no toca datos de nadie (no es un chat con IA).
+  Código en `frontend/src/components/ayuda/`: `temas.ts` (qué preguntas salen en cada
+  ruta), `ayuda-burbuja.tsx` y `ayuda-puntual.tsx`. Textos en `messages/*.json`, clave
+  `ayuda` (`ayuda.q.<id>.p|r`, `ayuda.temas.<tema>`, `ayuda.puntual.*`).
+- **Iconos "?" puntuales** (pasas el ratón, los enfocas o los pulsas): estados en Mis
+  pedidos, "Precio neto" en el carrito y en el detalle del pedido, y "Tipo de empresa"
+  en la ficha de la empresa.
+- **Para añadir ayuda a una pantalla nueva**: añadir el tema y sus ids en `temas.ts`,
+  la ruta en `temaDeRuta`, y los textos en los 5 idiomas.
+- **Contacto de soporte**: el enlace "Escribir a soporte" está preparado pero oculto
+  hasta definir `NEXT_PUBLIC_SOPORTE_EMAIL` (variable de entorno del frontend, se
+  aplica al compilar). David aún no tiene el correo o teléfono.
+- Dos respuestas suponen que los emails funcionan (recuperar contraseña y verificar
+  correo); revisarlas al activar los emails del registro (ver pendientes).
+
 ### 0.10 Pendientes de usuarios y roles (análisis del 2026-09-30, sin hacer)
 1. No se puede añadir un 2º usuario a una empresa (solo el primero, en el registro o
    el alta directa). Los roles COMPRADOR y SOLO CONSULTA existen pero no se pueden

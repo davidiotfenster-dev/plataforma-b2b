@@ -12,11 +12,13 @@ import { useMe } from "@/hooks/use-me";
 import type { Locale } from "@/i18n/locales";
 import { DescargarPdf } from "@/components/descargar-pdf";
 import { EstadoBadge } from "@/components/estado-badge";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 import { fechaHora, LineaTiempoPedido } from "@/components/linea-tiempo-pedido";
 
 export default function PedidoDetallePage() {
   const params = useParams<{ id: string }>();
   const t = useTranslations("pedidoDetalle");
+  const tAyuda = useTranslations("ayuda");
   const locale = useLocale();
   const queryClient = useQueryClient();
   const { data: me } = useMe();
@@ -166,7 +168,12 @@ export default function PedidoDetallePage() {
             <tr>
               <th className="px-4 py-3 font-medium">{t("product")}</th>
               <th className="px-4 py-3 font-medium">{t("quantity")}</th>
-              <th className="hidden px-4 py-3 font-medium sm:table-cell">{t("netPrice")}</th>
+              <th className="hidden px-4 py-3 font-medium sm:table-cell">
+                <span className="inline-flex items-center gap-1">
+                  {t("netPrice")}
+                  <AyudaPuntual texto={tAyuda("puntual.precioNeto")} />
+                </span>
+              </th>
               <th className="px-4 py-3 font-medium">{t("total")}</th>
             </tr>
           </thead>

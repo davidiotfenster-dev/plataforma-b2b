@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { Check, Copy, Wand2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { Campo, CampoTexto, Seccion } from "@/components/campo";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 import { MARCA_INFO, MARCAS_CATALOGO, TIPOS_EMPRESA } from "@/lib/marcas";
 import type { CrearPartnerInput, MarcaCatalogo, Partner, TipoEmpresa } from "@/lib/types";
 
@@ -141,6 +142,7 @@ function generarPassword(): string {
 /// campos, con su etiqueta, agrupados por temas.
 export function PartnerForm({ partner }: { partner?: Partner }) {
   const t = useTranslations("adminPartners");
+  const tAyuda = useTranslations("ayuda");
   const router = useRouter();
   const queryClient = useQueryClient();
   const modoAlta = !partner;
@@ -253,8 +255,9 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
           {seccion.clave === "comercial" && (
             <>
               <div className="sm:col-span-3">
-                <label htmlFor="tipo-empresa" className="mb-1 block text-sm font-medium text-neutral-700">
+                <label htmlFor="tipo-empresa" className="mb-1 flex items-center gap-1 text-sm font-medium text-neutral-700">
                   {t("fields.tipo")}
+                  <AyudaPuntual texto={tAyuda("puntual.tipoEmpresa")} />
                 </label>
                 <select
                   id="tipo-empresa"

@@ -666,5 +666,176 @@
     "nothingToAdd": "Não falta nenhum.",
     "hideOthers": "Ocultar produtos de outras marcas",
     "showOthers": "Adicionar um produto de outra marca ({n})"
+  },
+  "ayuda": {
+    "boton": "Ajuda",
+    "abrir": "Abrir a ajuda",
+    "cerrar": "Fechar a ajuda",
+    "titulo": "Ajuda",
+    "enEstaPantalla": "Neste ecrã",
+    "preguntasGenerales": "Perguntas gerais",
+    "masInfo": "Mais informações",
+    "contacto": "Não encontra o que procura?",
+    "escribirSoporte": "Escrever ao suporte",
+    "temas": {
+      "inicio": "Início",
+      "login": "Iniciar sessão",
+      "registro": "Registo de empresa",
+      "catalogo": "Catálogo",
+      "carrito": "Carrinho",
+      "checkout": "Confirmar encomenda",
+      "pedidos": "As minhas encomendas",
+      "pedidoDetalle": "Detalhe da encomenda",
+      "adminEmpresas": "Empresas",
+      "adminFicha": "Ficha da empresa",
+      "adminMarcas": "Marcas",
+      "adminProductos": "Produtos",
+      "adminPedidos": "Encomendas",
+      "adminDashboard": "Estatísticas"
+    },
+    "puntual": {
+      "estados": "Recebida, Confirmada, Em preparação, Preparada e Enviada são os passos de uma encomenda, por essa ordem. Cancelada significa que foi anulada.",
+      "precioNeto": "O seu preço unitário com o desconto já aplicado. Fica fixado ao confirmar a encomenda.",
+      "precioNetoCarrito": "O seu preço unitário com o desconto já aplicado. Pode mudar se a tarifa mudar; ao confirmar a encomenda fica fixado.",
+      "tipoEmpresa": "Parceiro: tem submarca própria. Cliente: compra vendo os dispositivos da marca de um parceiro."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "O que posso fazer no portal?",
+        "r": "Consultar o catálogo da sua marca com os seus preços, preparar um carrinho, confirmar encomendas e seguir o seu estado até ao envio. Não há pagamento online: as encomendas gerem-se com o seu número de ordem de compra (PO Number)."
+      },
+      "noEntro": {
+        "p": "Não consigo entrar",
+        "r": "Verifique o email e a palavra-passe. Se acabou de registar a sua empresa, não poderá entrar até verificar o seu email e um administrador da IoT FENSTER aprovar o registo; entretanto verá o mesmo aviso de credenciais inválidas."
+      },
+      "olvidePassword": {
+        "p": "Esqueci-me da palavra-passe",
+        "r": "Clique em «Esqueceu-se da palavra-passe?» por baixo do formulário para receber uma ligação com a qual criar uma nova."
+      },
+      "correoEmpresa": {
+        "p": "Que email devo usar?",
+        "r": "O email corporativo do administrador da sua empresa. Deve pertencer ao mesmo domínio que indica como domínio web (por exemplo, nome@suaempresa.com se o domínio for suaempresa.com)."
+      },
+      "despuesDeEnviar": {
+        "p": "O que acontece depois de enviar o pedido?",
+        "r": "Verificará o seu email e um administrador da IoT FENSTER analisará o pedido e definirá as suas condições (marca, tarifa e desconto). Quando estiver aprovado, poderá entrar com o seu email e a sua palavra-passe."
+      },
+      "precioVisto": {
+        "p": "Que preço estou a ver?",
+        "r": "O seu preço líquido: o PVP de tarifa com o desconto da sua empresa já aplicado. Alguns produtos podem ter um desconto próprio."
+      },
+      "productoFalta": {
+        "p": "Não encontro um produto",
+        "r": "Só vê os dispositivos da marca atribuída à sua empresa. Se precisar de outro, peça-o ao seu contacto na IoT FENSTER."
+      },
+      "variantes": {
+        "p": "O que são os círculos de cor?",
+        "r": "Cada círculo é uma variante do mesmo modelo. Escolha a que quiser antes de o adicionar ao carrinho."
+      },
+      "carritoGuardado": {
+        "p": "O meu carrinho fica guardado?",
+        "r": "Sim. Fica guardado na sua conta mesmo que termine a sessão, até confirmar a encomenda."
+      },
+      "preciosCambian": {
+        "p": "Os preços podem mudar?",
+        "r": "O carrinho mostra sempre os preços de hoje. Se um preço mudar enquanto o tem aberto, é atualizado e, ao confirmar, avisamos para que reveja o novo total."
+      },
+      "poNumber": {
+        "p": "O que é o PO Number?",
+        "r": "É o número da sua ordem de compra. Serve para identificar esta encomenda tanto na sua empresa como na IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "Como se paga?",
+        "r": "Não há pagamento online. Ao confirmar, a encomenda fica registada e é gerida com a sua ordem de compra."
+      },
+      "editarDespues": {
+        "p": "Posso alterar a encomenda depois de a confirmar?",
+        "r": "Não a partir do portal: ao confirmar, os preços e os descontos ficam fixados. Se precisar de uma alteração, contacte a IoT FENSTER."
+      },
+      "estados": {
+        "p": "O que significa cada estado?",
+        "r": "Recebida: recebemo-la. Confirmada: a IoT FENSTER aceitou-a. Em preparação: estamos a prepará-la. Preparada: pronta para sair. Enviada: já saiu, com transportadora e ligação de seguimento. Cancelada: foi anulada e verá o motivo."
+      },
+      "encontrarPedido": {
+        "p": "Como encontro uma encomenda?",
+        "r": "Escreva na pesquisa o código PED, o PO Number ou um produto e refine com os filtros de estado e datas. Pode ordenar por data ou por total."
+      },
+      "descargarPdf": {
+        "p": "Como descarrego o resumo da encomenda?",
+        "r": "Clique em «Descarregar PDF» e escolha o idioma do documento antes de o descarregar."
+      },
+      "repetirPedido": {
+        "p": "O que faz «Repetir encomenda»?",
+        "r": "Adiciona ao carrinho as mesmas linhas com os preços de hoje e avisa do que já não está disponível ou mudou de preço. Não confirma nada: revê o carrinho e confirma você."
+      },
+      "precioFijo": {
+        "p": "Porque é que o preço de uma encomenda não muda?",
+        "r": "Ao confirmar, a encomenda guarda o PVP, o desconto e o preço líquido desse momento. Não se recalculam mesmo que a tarifa mude depois."
+      },
+      "partnerOCliente": {
+        "p": "Parceiro ou cliente?",
+        "r": "Um parceiro tem submarca própria (VBH, Procomsa, MySmartWindow). Um cliente compra vendo os dispositivos da marca de um parceiro; por defeito, MySmartWindow."
+      },
+      "aprobarSolicitud": {
+        "p": "Como aprovo um pedido?",
+        "r": "Abra o separador «Pendente de aprovação» e clique em Aprovar: defina a marca comercial, a tarifa e o desconto. A empresa recebe o catálogo da sua marca e os seus utilizadores poderão entrar."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Suspender, arquivar ou eliminar",
+        "r": "Suspender corta o acesso até reativar a empresa. Arquivar oculta-a das listas mantendo dados e encomendas (não é possível com encomendas por enviar). Eliminar apaga-a por completo e só é permitido se não tiver encomendas."
+      },
+      "datosPorCompletar": {
+        "p": "O que são os «dados por completar»?",
+        "r": "As empresas carregadas a partir de uma lista têm dados provisórios (NIF, domínio ou morada «PENDIENTE») até completar a sua ficha."
+      },
+      "descuentoEmpresa": {
+        "p": "Como funciona o desconto?",
+        "r": "O desconto da empresa aplica-se ao PVP de tarifa de todos os seus produtos. Um produto com desconto próprio usa esse em vez do geral."
+      },
+      "productosDeMarca": {
+        "p": "Produtos da marca e extras",
+        "r": "Os produtos da marca vêm do catálogo da marca e só admitem desconto e ocultar. Os extras atribuem-se à mão e gerem-se como sempre."
+      },
+      "cambiosAplican": {
+        "p": "O que acontece se mudar algo aqui?",
+        "r": "As alterações aplicam-se de imediato a todas as empresas que usam essa marca."
+      },
+      "anadirLoQueFalta": {
+        "p": "O que faz «Adicionar o que falta»?",
+        "r": "Adiciona à marca os produtos base que ainda não tem, com um nome proposto que pode editar."
+      },
+      "productoBase": {
+        "p": "O que é um produto base?",
+        "r": "O aparelho em si. O mesmo aparelho tem nomes diferentes consoante a marca (Connect-1, Wave-1, Icon1), mas é um único produto base."
+      },
+      "subirImagenes": {
+        "p": "Como coloco as fotografias?",
+        "r": "Selecione um ou vários produtos e use «Carregar imagem». São aceites PNG, JPG ou WebP até 3 MB."
+      },
+      "avanzarPedido": {
+        "p": "Como avanço uma encomenda?",
+        "r": "Só um administrador pode alterar o estado, um passo de cada vez: Recebida, Confirmada, Em preparação, Preparada e Enviada. Ao enviar, pedem-se transportadora, número de expedição e ligação de seguimento."
+      },
+      "cancelarPedido": {
+        "p": "Como cancelo uma encomenda?",
+        "r": "Pode cancelar-se enquanto não estiver enviada, indicando um motivo que o cliente verá."
+      },
+      "corregirEstado": {
+        "p": "Posso corrigir um estado?",
+        "r": "O administrador pode forçar um estado saltando a sequência, para casos excecionais."
+      },
+      "cifrasCanceladas": {
+        "p": "O que contam os valores?",
+        "r": "O total faturado e os gráficos por empresa e por dia não incluem as encomendas canceladas."
+      },
+      "cambiarIdioma": {
+        "p": "Como mudo o idioma?",
+        "r": "Com o seletor de idioma da barra superior. Fica guardado na sua conta."
+      },
+      "miCuenta": {
+        "p": "Com que conta entrei?",
+        "r": "No canto superior direito, por cima da barra, vê «Sessão iniciada como» com o email da conta em uso."
+      }
+    }
   }
 }

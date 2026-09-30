@@ -11,6 +11,7 @@ import type { EstadoPedido, PedidoResumen, PedidosPagina } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { EstadoBadge } from "@/components/estado-badge";
 import { Paginacion } from "@/components/paginacion";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 
 const POR_PAGINA = 10;
 const EN_CURSO: EstadoPedido[] = ["RECIBIDO", "CONFIRMADO", "EN_PREPARACION", "PREPARADO"];
@@ -52,6 +53,7 @@ function Envio({ pedido }: { pedido: PedidoResumen }) {
 export default function PedidosPage() {
   const t = useTranslations("pedidos");
   const tEstados = useTranslations("estados");
+  const tAyuda = useTranslations("ayuda");
   const locale = useLocale();
   const resumirProductos = useResumenProductos();
 
@@ -192,7 +194,11 @@ export default function PedidosPage() {
           </label>
         </div>
 
-        <div role="group" aria-label={t("statusFilter")} className="flex flex-wrap gap-2">
+        <div role="group" aria-label={t("statusFilter")} className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1 pr-1 text-xs text-neutral-500">
+            {t("status")}
+            <AyudaPuntual texto={tAyuda("puntual.estados")} />
+          </span>
           <button type="button" aria-pressed={estado === ""} onClick={() => cambiar(setEstado)("")} className={chip(estado === "")}>
             {t("allStatuses")} ({totalPedidos})
           </button>
