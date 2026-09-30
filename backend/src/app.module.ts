@@ -11,6 +11,8 @@ import { EmailModule } from './common/email/email.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { PartnersModule } from './partners/partners.module.js';
+import { CatalogoMarcaModule } from './catalogo-marca/catalogo-marca.module.js';
+import { ImagenesModule } from './imagenes/imagenes.module.js';
 import { ProductosModule } from './productos/productos.module.js';
 import { CarritoModule } from './carrito/carrito.module.js';
 import { PedidosModule } from './pedidos/pedidos.module.js';
@@ -33,6 +35,8 @@ import { AuditoriaModule } from './auditoria/auditoria.module.js';
     UsersModule,
     PartnersModule,
     ProductosModule,
+    ImagenesModule,
+    CatalogoMarcaModule,
     CarritoModule,
     PedidosModule,
     AuditoriaModule,

@@ -4,6 +4,10 @@ export type Idioma = "ES" | "EN" | "DE" | "IT" | "PT";
 
 export type EstadoPartner = "PENDIENTE_VERIFICACION_EMAIL" | "PENDIENTE_APROBACION" | "ACTIVO" | "SUSPENDIDO" | "RECHAZADO";
 
+export type TipoEmpresa = "PARTNER" | "CLIENTE";
+
+export type MarcaCatalogo = "VBH" | "PROCOMSA" | "MYSMARTWINDOW";
+
 export type EstadoPedido = "RECIBIDO" | "CONFIRMADO" | "EN_PREPARACION" | "PREPARADO" | "ENVIADO" | "CANCELADO";
 
 export interface Perfil {
@@ -24,6 +28,9 @@ export interface Producto {
   documentacionUrl: string | null;
   pvpBase: string;
   activo: boolean;
+  /// Color y modelo (identificador opaco) para agrupar las variantes de color; solo en el listado.
+  color?: string | null;
+  modeloId?: string;
 }
 
 export interface ProductoDetalle extends Producto {
@@ -128,6 +135,8 @@ export interface ProductoBaseAdmin {
   especificacionesJson?: EspecificacionesDispositivo | null;
   /// PVP de la tarifa oficial (igual para todos los partners); null = sin precio en tarifa.
   pvpTarifa?: string | null;
+  /// Foto del aparato (ruta `/imagenes/...`), la misma para todas las marcas.
+  imagenUrl?: string | null;
   _count?: { representaciones: number };
 }
 
@@ -171,7 +180,35 @@ export interface RepresentacionAdmin {
   pvpBase: string;
   descuentoOverride: string | null;
   activo: boolean;
-  productoBase: { id: string; skuIndustrial: string; nombreTecnico: string };
+  /// Producto del catálogo de su marca (nombre, SKU y PVP los fija la marca); null = extra asignado a mano.
+  productoMarcaId: string | null;
+  productoMarca: { marca: MarcaCatalogo; activo: boolean } | null;
+  productoBase: { id: string; skuIndustrial: string; nombreTecnico: string; imagenUrl: string | null };
+}
+
+/// Producto del catálogo de una submarca (`GET /catalogos-marca/:marca`).
+export interface ProductoMarcaAdmin {
+  id: string;
+  marca: MarcaCatalogo;
+  productoBaseId: string;
+  skuComercial: string;
+  nombreComercial: string;
+  pvpBase: string;
+  activo: boolean;
+  productoBase: {
+    id: string;
+    skuIndustrial: string;
+    nombreTecnico: string;
+    imagenUrl: string | null;
+    activo: boolean;
+    especificacionesJson: EspecificacionesDispositivo | null;
+  };
+}
+
+export interface CatalogoMarcaAdmin {
+  marca: MarcaCatalogo;
+  productos: ProductoMarcaAdmin[];
+  empresas: { partners: number; clientes: number };
 }
 
 export interface Partner {
@@ -203,6 +240,10 @@ export interface Partner {
   iva: string | null;
   notas: string | null;
   estado: EstadoPartner;
+  /// Partner (submarca propia) o cliente (usa la marca de un partner).
+  tipo: TipoEmpresa;
+  /// Marca cuyos dispositivos ve la empresa.
+  marcaCatalogo: MarcaCatalogo;
   creadoPorUsuarioId: string | null;
   createdAt: string;
   /// Cuántos usuarios, productos de catálogo y pedidos tiene (el listado y la ficha los traen ya contados).
@@ -218,6 +259,8 @@ export interface ResumenPartners {
 }
 
 export interface CrearPartnerInput {
+  tipo?: TipoEmpresa;
+  marcaCatalogo?: MarcaCatalogo;
   razonSocial: string;
   cif: string;
   direccionFiscal: string;

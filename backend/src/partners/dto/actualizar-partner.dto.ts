@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
 import {
   CODIGO_POSTAL_MENSAJE,
   CODIGO_POSTAL_REGEX,
@@ -6,6 +6,8 @@ import {
   DOMINIO_REGEX,
   TELEFONO_MENSAJE,
   TELEFONO_REGEX,
+  MARCAS_CATALOGO,
+  TIPOS_EMPRESA,
 } from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
@@ -46,6 +48,16 @@ export class ActualizarPartnerDto {
   @IsString()
   @IsNotEmpty()
   marcaComercial?: string;
+
+  /// Partner (submarca propia) o cliente.
+  @IsOptional()
+  @IsIn(TIPOS_EMPRESA)
+  tipo?: (typeof TIPOS_EMPRESA)[number];
+
+  /// Marca cuyos dispositivos ve la empresa.
+  @IsOptional()
+  @IsIn(MARCAS_CATALOGO)
+  marcaCatalogo?: (typeof MARCAS_CATALOGO)[number];
 
   @IsOptional()
   @IsString()

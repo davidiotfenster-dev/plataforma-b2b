@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, FileText, ShoppingCart } from "lucide-react";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, urlImagen } from "@/lib/api";
 import type { ProductoDetalle, ResumenCarrito } from "@/lib/types";
 
 export default function ProductoDetallePage() {
@@ -38,9 +38,9 @@ export default function ProductoDetallePage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
-          {producto.imagenUrl ? (
+          {urlImagen(producto.imagenUrl) ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={producto.imagenUrl} alt={producto.nombreComercial} className="h-full w-full object-cover" />
+            <img src={urlImagen(producto.imagenUrl)!} alt={producto.nombreComercial} className="h-full w-full object-contain p-4 mix-blend-multiply" />
           ) : (
             <span className="text-sm text-neutral-400">{t("noImage")}</span>
           )}

@@ -2,7 +2,8 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPartner } from '../generated/prisma/enums.js';
-import { especificacionesParaPartner } from './especificaciones-partner.js';
+import { especificacionesParaPartner, varianteParaPartner } from './especificaciones-partner.js';
+import { REPRESENTACION_VISIBLE } from '../catalogo-marca/catalogo-marca.service.js';
 import type { CrearProductoBaseDto } from './dto/crear-producto-base.dto.js';
 import type { ActualizarProductoBaseDto } from './dto/actualizar-producto-base.dto.js';
 import type { AsignarMasivoDto } from './dto/asignar-masivo.dto.js';
@@ -120,21 +121,30 @@ export class ProductosService {
   } as const;
 
   async listarCatalogo(partnerId: string) {
-    return this.prisma.representacionPartner.findMany({
-      where: { partnerId, activo: true, productoBase: { activo: true } },
-      select: ProductosService.CAMPOS_CATALOGO_PARTNER,
+    const filas = await this.prisma.representacionPartner.findMany({
+      where: { partnerId, ...REPRESENTACION_VISIBLE },
+      select: {
+        ...ProductosService.CAMPOS_CATALOGO_PARTNER,
+        productoBase: { select: { nombreTecnico: true, especificacionesJson: true, imagenUrl: true } },
+      },
       orderBy: { nombreComercial: 'asc' },
     });
+    // Color y modelo (opaco) para agrupar las variantes de color en una sola tarjeta.
+    return filas.map(({ productoBase, ...producto }) => ({
+      ...producto,
+      imagenUrl: producto.imagenUrl ?? productoBase.imagenUrl,
+      ...varianteParaPartner(productoBase.especificacionesJson, productoBase.nombreTecnico, partnerId),
+    }));
   }
 
   async obtenerRepresentacion(partnerId: string, id: string) {
     /// El filtro por `partnerId` va en la propia consulta: un producto de otro
     /// partner y uno inexistente son indistinguibles (mismo 404).
     const representacion = await this.prisma.representacionPartner.findFirst({
-      where: { id, partnerId, activo: true, productoBase: { activo: true } },
+      where: { id, partnerId, ...REPRESENTACION_VISIBLE },
       select: {
         ...ProductosService.CAMPOS_CATALOGO_PARTNER,
-        productoBase: { select: { especificacionesJson: true } },
+        productoBase: { select: { especificacionesJson: true, imagenUrl: true } },
       },
     });
 
@@ -145,6 +155,7 @@ export class ProductosService {
     const { productoBase, ...producto } = representacion;
     return {
       ...producto,
+      imagenUrl: producto.imagenUrl ?? productoBase.imagenUrl,
       productoBase: { especificacionesJson: especificacionesParaPartner(productoBase.especificacionesJson) },
     };
   }

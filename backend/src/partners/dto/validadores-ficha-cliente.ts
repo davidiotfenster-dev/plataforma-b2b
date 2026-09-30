@@ -18,3 +18,6 @@ export const DOMINIO_MENSAJE = 'Debe ser un dominio válido (ej. empresa.com, si
 /// Código postal: alfanumérico corto (cubre los formatos de ES/DE/IT/PT).
 export const CODIGO_POSTAL_REGEX = /^[A-Za-z0-9\s-]{3,10}$/;
 export const CODIGO_POSTAL_MENSAJE = 'Debe ser un código postal válido';
+
+export const TIPOS_EMPRESA = ['PARTNER', 'CLIENTE'] as const;
+export const MARCAS_CATALOGO = ['VBH', 'PROCOMSA', 'MYSMARTWINDOW'] as const;

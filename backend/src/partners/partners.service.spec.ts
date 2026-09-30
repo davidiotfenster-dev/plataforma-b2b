@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PartnersService } from './partners.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
+import type { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 
 describe('PartnersService — resumen y filtros del panel', () => {
   let prisma: {
@@ -23,7 +24,7 @@ describe('PartnersService — resumen y filtros del panel', () => {
         findMany: vi.fn().mockResolvedValue([]),
       },
     };
-    service = new PartnersService(prisma as unknown as PrismaService);
+    service = new PartnersService(prisma as unknown as PrismaService, {} as unknown as CatalogoMarcaService);
   });
 
   describe('resumen', () => {

@@ -102,6 +102,15 @@ export class PartnersController {
     return this.partnersService.asignarProductos(id, dto, this.restriccion(usuario));
   }
 
+  @Delete(':id/catalogo')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async eliminarTodasLasRepresentaciones(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.partnersService.eliminarTodasLasRepresentaciones(id, this.restriccion(usuario));
+  }
+
   @Patch(':id/catalogo/:repId')
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   async actualizarRepresentacion(

@@ -1,6 +1,7 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPartner, RolUsuario } from '../generated/prisma/enums.js';
 import type { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
@@ -29,7 +30,10 @@ const CONTADORES_PARTNER = {
 
 @Injectable()
 export class PartnersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly catalogoMarca: CatalogoMarcaService,
+  ) {}
 
   /// Alta directa (sin registro público ni verificación de email): la usa
   /// ADMIN_FENSTER o COMERCIAL. Queda ACTIVO de inmediato con su primer
@@ -39,7 +43,7 @@ export class PartnersService {
     const passwordHash = await bcrypt.hash(dto.passwordUsuario, SALT_ROUNDS);
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
+      const creado = await this.prisma.$transaction(async (tx) => {
         const partner = await tx.partner.create({
           data: {
             razonSocial: dto.razonSocial,
@@ -49,6 +53,8 @@ export class PartnersService {
             dominioWeb: dto.dominioWeb,
             codigoCliente: dto.codigoCliente,
             marcaComercial: dto.marcaComercial,
+            tipo: dto.tipo,
+            marcaCatalogo: dto.marcaCatalogo,
             tarifa: dto.tarifa,
             descuentoPorcentaje: dto.descuentoPorcentaje ?? 0,
             telefono1: dto.telefono1,
@@ -87,6 +93,9 @@ export class PartnersService {
 
         return partner;
       });
+      // Nace con el catálogo de su marca ya puesto.
+      await this.catalogoMarca.sincronizarEmpresa(creado.id);
+      return creado;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const campo = (error.meta?.target as string[] | undefined)?.join(', ') ?? 'campo único';
@@ -103,6 +112,7 @@ export class PartnersService {
     const filtros: Prisma.PartnerWhereInput[] = [];
     if (restringirCreadoPorId) filtros.push({ creadoPorUsuarioId: restringirCreadoPorId });
     if (query.estado) filtros.push({ estado: query.estado });
+    if (query.tipo) filtros.push({ tipo: query.tipo });
     if (query.busqueda) {
       filtros.push({
         OR: [
@@ -163,10 +173,10 @@ export class PartnersService {
   }
 
   async actualizar(id: string, dto: ActualizarPartnerDto, restringirCreadoPorId?: string) {
-    await this.obtenerOFallar(id, restringirCreadoPorId);
+    const anterior = await this.obtenerOFallar(id, restringirCreadoPorId);
 
     try {
-      return await this.prisma.partner.update({
+      const actualizado = await this.prisma.partner.update({
         where: { id },
         data: {
           razonSocial: dto.razonSocial,
@@ -176,6 +186,8 @@ export class PartnersService {
           dominioWeb: dto.dominioWeb,
           codigoCliente: dto.codigoCliente,
           marcaComercial: dto.marcaComercial,
+          tipo: dto.tipo,
+          marcaCatalogo: dto.marcaCatalogo,
           tarifa: dto.tarifa,
           descuentoPorcentaje: dto.descuentoPorcentaje,
           telefono1: dto.telefono1,
@@ -197,6 +209,10 @@ export class PartnersService {
           notas: dto.notas,
         },
       });
+      // Cambio de marca: su catálogo pasa al de la nueva marca (los productos
+      // de la anterior salen también de sus carritos; los pedidos no cambian).
+      if (actualizado.marcaCatalogo !== anterior.marcaCatalogo) await this.catalogoMarca.sincronizarEmpresa(id);
+      return actualizado;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const campo = (error.meta?.target as string[] | undefined)?.join(', ') ?? 'campo único';
@@ -229,7 +245,10 @@ export class PartnersService {
     await this.obtenerOFallar(id, restringirCreadoPorId);
     return this.prisma.representacionPartner.findMany({
       where: { partnerId: id },
-      include: { productoBase: { select: { id: true, skuIndustrial: true, nombreTecnico: true } } },
+      include: {
+        productoBase: { select: { id: true, skuIndustrial: true, nombreTecnico: true, imagenUrl: true } },
+        productoMarca: { select: { marca: true, activo: true } },
+      },
       orderBy: { nombreComercial: 'asc' },
     });
   }
@@ -277,9 +296,21 @@ export class PartnersService {
   /// comercial y solo pierden el enlace (SetNull).
   async eliminarRepresentacion(partnerId: string, repId: string, restringirCreadoPorId?: string) {
     await this.obtenerOFallar(partnerId, restringirCreadoPorId);
-    await this.obtenerRepresentacionOFallar(partnerId, repId);
+    const representacion = await this.obtenerRepresentacionOFallar(partnerId, repId);
+    if (representacion.productoMarcaId) {
+      throw new BadRequestException('Este producto viene del catálogo de su marca: ocúltalo en vez de borrarlo, o quítalo del catálogo de la marca.');
+    }
     await this.prisma.representacionPartner.delete({ where: { id: repId } });
     return { eliminado: true };
+  }
+
+  /// Borra todos los productos EXTRA de la empresa (los de su marca se quedan:
+  /// se gestionan desde el catálogo de la marca). Desaparecen de sus carritos;
+  /// los pedidos ya hechos no se tocan.
+  async eliminarTodasLasRepresentaciones(partnerId: string, restringirCreadoPorId?: string) {
+    await this.obtenerOFallar(partnerId, restringirCreadoPorId);
+    const { count } = await this.prisma.representacionPartner.deleteMany({ where: { partnerId, productoMarcaId: null } });
+    return { eliminados: count };
   }
 
   async actualizarRepresentacion(
@@ -289,7 +320,16 @@ export class PartnersService {
     restringirCreadoPorId?: string,
   ) {
     await this.obtenerOFallar(partnerId, restringirCreadoPorId);
-    await this.obtenerRepresentacionOFallar(partnerId, repId);
+    const representacion = await this.obtenerRepresentacionOFallar(partnerId, repId);
+    const cambiaDatosDeMarca =
+      (dto.skuComercial !== undefined && dto.skuComercial !== representacion.skuComercial) ||
+      (dto.nombreComercial !== undefined && dto.nombreComercial !== representacion.nombreComercial) ||
+      (dto.pvpBase !== undefined && Number(dto.pvpBase) !== Number(representacion.pvpBase));
+    if (representacion.productoMarcaId && cambiaDatosDeMarca) {
+      throw new BadRequestException(
+        'Nombre, SKU y PVP de este producto los fija el catálogo de su marca. Aquí solo se cambian el descuento o si se muestra.',
+      );
+    }
 
     try {
       return await this.prisma.representacionPartner.update({

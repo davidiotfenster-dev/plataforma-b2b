@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 /// `ProductoBase.especificacionesJson` mezcla datos INTERNOS de IoT FENSTER
 /// (grupo, color, referencias y GTIN de todas las marcas...) con las
 /// especificaciones técnicas que sí puede ver el partner. El partner solo debe
@@ -26,3 +28,26 @@ export function especificacionesParaPartner(json: unknown): Record<string, Valor
   }
   return Object.keys(visibles).length > 0 ? visibles : null;
 }
+
+/// Color y "modelo" de un producto para agrupar en el catálogo del partner las
+/// variantes que solo se diferencian en el color. El grupo y el nombre técnico
+/// pueden nombrar a otras marcas, así que al partner solo sale un identificador
+/// opaco (hash con sal del partner) y el color, nunca el texto de origen.
+export function varianteParaPartner(
+  json: unknown,
+  nombreTecnico: string,
+  partnerId: string,
+): { color: string | null; modeloId: string } {
+  const datos = json && typeof json === 'object' && !Array.isArray(json) ? (json as Record<string, unknown>) : {};
+  const color = typeof datos.color === 'string' && datos.color ? datos.color : null;
+  const grupo = typeof datos.grupo === 'string' ? datos.grupo : '';
+  const inicio = color ? nombreTecnico.toLowerCase().indexOf(color.toLowerCase()) : -1;
+  const sinColor =
+    color && inicio >= 0 ? nombreTecnico.slice(0, inicio) + nombreTecnico.slice(inicio + color.length) : nombreTecnico;
+  const modeloId = createHash('sha256')
+    .update(`${partnerId}|${grupo}|${sinColor.replace(/\s+/g, ' ').trim()}`)
+    .digest('hex')
+    .slice(0, 16);
+  return { color, modeloId };
+}
+

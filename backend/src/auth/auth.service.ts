@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { EmailService } from '../common/email/email.service.js';
 import { asuntoResetPassword, cuerpoResetPassword } from '../common/email/plantillas-email.js';
 import { EstadoPartner, Idioma, RolUsuario } from '../generated/prisma/enums.js';
@@ -42,6 +43,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly catalogoMarca: CatalogoMarcaService,
   ) {}
 
   async registrarPartner(dto: RegistroPartnerDto): Promise<{ partnerId: string; userId: string }> {
@@ -210,6 +212,8 @@ export class AuthService {
         data: { activo: true },
       }),
     ]);
+    // Al entrar ya ve el catálogo de su marca (MySmartWindow por defecto).
+    await this.catalogoMarca.sincronizarEmpresa(partnerId);
   }
 
   async rechazarPartner(partnerId: string): Promise<void> {

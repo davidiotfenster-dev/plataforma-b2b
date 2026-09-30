@@ -8,6 +8,7 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { EstadoPartnerBadge, PartnerAvatar, tieneDatosPorCompletar } from "@/components/partner-ui";
 import { useMe } from "@/hooks/use-me";
+import { InsigniaMarca } from "@/lib/marcas";
 import type { Partner } from "@/lib/types";
 import { usePartnerAcciones } from "./partner-acciones";
 
@@ -62,6 +63,14 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 <div className="flex flex-wrap items-center gap-3">
                   <h1 className="text-2xl font-semibold text-neutral-900">{partner.razonSocial}</h1>
                   <EstadoPartnerBadge estado={partner.estado} />
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${
+                      partner.tipo === "PARTNER" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"
+                    }`}
+                  >
+                    {t(partner.tipo === "PARTNER" ? "typePartner" : "typeClient")}
+                  </span>
+                  <InsigniaMarca marca={partner.marcaCatalogo} />
                 </div>
                 <p className="mt-0.5 text-sm text-neutral-500">
                   {[partner.cif, partner.codigoCliente && t("clientCode", { codigo: partner.codigoCliente }), partner.pais]

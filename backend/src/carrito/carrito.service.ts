@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { REPRESENTACION_VISIBLE } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { CANTIDAD_MAXIMA_POR_LINEA } from './dto/agregar-item.dto.js';
 
@@ -101,7 +102,7 @@ export class CarritoService {
     /// Filtro por partner dentro de la propia consulta, y solo productos que
     /// siguen a la venta (ni la asignación ni el producto base desactivados).
     const representacion = await this.prisma.representacionPartner.findFirst({
-      where: { id: representacionPartnerId, partnerId, activo: true, productoBase: { activo: true } },
+      where: { id: representacionPartnerId, partnerId, ...REPRESENTACION_VISIBLE },
       select: { id: true },
     });
 

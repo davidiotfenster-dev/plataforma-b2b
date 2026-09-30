@@ -5,13 +5,14 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, CheckCircle2, Plus, Search, X } from "lucide-react";
+import { AlertTriangle, Building2, CheckCircle2, Handshake, Plus, Search, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { MenuAcciones, type AccionMenu } from "@/components/menu-acciones";
 import { Paginacion } from "@/components/paginacion";
 import { EstadoPartnerBadge, PartnerAvatar, tieneDatosPorCompletar } from "@/components/partner-ui";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useMe } from "@/hooks/use-me";
+import { InsigniaMarca, MARCA_INFO } from "@/lib/marcas";
 import type { EstadoPartner, Paginado, Partner, ResumenPartners } from "@/lib/types";
 import { usePartnerAcciones } from "./partner-acciones";
 
@@ -19,15 +20,6 @@ const LIMITE_POR_PAGINA = 20;
 
 /// Pestañas de estado, en el orden en que le importan a quien gestiona altas.
 const ESTADOS_PESTANA: EstadoPartner[] = ["PENDIENTE_APROBACION", "ACTIVO", "SUSPENDIDO", "RECHAZADO", "PENDIENTE_VERIFICACION_EMAIL"];
-
-function FilaEsqueleto() {
-  return (
-    <li className="flex items-center gap-3 border-t border-neutral-100 px-4 py-4">
-      <span className="size-9 animate-pulse rounded-lg bg-neutral-200" />
-      <span className="h-4 w-56 animate-pulse rounded bg-neutral-200" />
-    </li>
-  );
-}
 
 function ListaPartners() {
   const t = useTranslations("adminPartners");
@@ -69,18 +61,28 @@ function ListaPartners() {
     queryFn: () => api.get<ResumenPartners>("/partners/resumen"),
   });
 
-  const { data: respuesta, isLoading } = useQuery<Paginado<Partner>>({
-    queryKey: ["admin-partners", { estado, soloIncompletos, pagina, q }],
-    queryFn: () => {
-      const consulta = new URLSearchParams({ page: String(pagina), limit: String(LIMITE_POR_PAGINA) });
-      if (estado) consulta.set("estado", estado);
-      if (soloIncompletos) consulta.set("datosPorCompletar", "true");
-      if (q) consulta.set("busqueda", q);
-      return api.get<Paginado<Partner>>(`/partners?${consulta}`);
-    },
+  function consultaEmpresas(tipo: "PARTNER" | "CLIENTE", page: number, limit: number) {
+    const consulta = new URLSearchParams({ tipo, page: String(page), limit: String(limit) });
+    if (estado) consulta.set("estado", estado);
+    if (soloIncompletos) consulta.set("datosPorCompletar", "true");
+    if (q) consulta.set("busqueda", q);
+    return api.get<Paginado<Partner>>(`/partners?${consulta}`);
+  }
+
+  // Los partners son pocos (uno por submarca): se traen todos de una vez.
+  const { data: respuestaPartners, isLoading: cargandoPartners } = useQuery<Paginado<Partner>>({
+    queryKey: ["admin-partners", { tipo: "PARTNER", estado, soloIncompletos, q }],
+    queryFn: () => consultaEmpresas("PARTNER", 1, 100),
     placeholderData: keepPreviousData,
   });
 
+  const { data: respuesta, isLoading } = useQuery<Paginado<Partner>>({
+    queryKey: ["admin-partners", { tipo: "CLIENTE", estado, soloIncompletos, pagina, q }],
+    queryFn: () => consultaEmpresas("CLIENTE", pagina, LIMITE_POR_PAGINA),
+    placeholderData: keepPreviousData,
+  });
+
+  const socios = respuestaPartners?.data ?? [];
   const partners = respuesta?.data ?? [];
   const hayFiltros = Boolean(estado || soloIncompletos || q);
   const pendientes = resumen?.porEstado.PENDIENTE_APROBACION ?? 0;
@@ -108,8 +110,106 @@ function ListaPartners() {
     ];
   }
 
+  /// Tarjeta de una empresa. Partner: el logo de su submarca. Cliente: sus
+  /// iniciales y la marca cuyos dispositivos ve. El borde superior es el color de esa marca.
+  function tarjetaEmpresa(partner: Partner) {
+    const info = MARCA_INFO[partner.marcaCatalogo];
+    const recuentos = partner._count;
+    const esPartner = partner.tipo === "PARTNER";
+    const identificacion = [
+      partner.cif.startsWith("PENDIENTE") ? null : partner.cif,
+      partner.codigoCliente && t("clientCode", { codigo: partner.codigoCliente }),
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    return (
+      <li
+        key={partner.id}
+        onClick={() => router.push(`/admin/partners/${partner.id}`)}
+        className={`flex min-w-0 cursor-pointer flex-col rounded-xl border border-t-4 border-neutral-200 bg-white p-4 shadow-sm transition hover:shadow-md ${info.borde}`}
+      >
+        <div className="flex items-start gap-3">
+          {esPartner ? (
+            <span className={`flex size-11 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white ${info.acento}`}>
+              {info.submarca.slice(0, 2).toUpperCase()}
+            </span>
+          ) : (
+            <PartnerAvatar nombre={partner.razonSocial} />
+          )}
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/admin/partners/${partner.id}`}
+              onClick={(e) => e.stopPropagation()}
+              title={partner.razonSocial}
+              className="block truncate font-semibold text-neutral-900 hover:underline"
+            >
+              {partner.razonSocial}
+            </Link>
+            {esPartner ? (
+              <p className="text-sm text-neutral-500">{t("ownBrand", { marca: info.submarca })}</p>
+            ) : (
+              <p className="truncate text-xs text-neutral-500">{identificacion || "—"}</p>
+            )}
+          </div>
+          <div onClick={(e) => e.stopPropagation()}>
+            <MenuAcciones acciones={accionesDeFila(partner)} etiqueta={t("moreActions", { partner: partner.razonSocial })} />
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <EstadoPartnerBadge estado={partner.estado} />
+          {!esPartner && <InsigniaMarca marca={partner.marcaCatalogo} />}
+          {tieneDatosPorCompletar(partner) && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700">
+              <AlertTriangle size={11} /> {t("incompleteData")}
+            </span>
+          )}
+        </div>
+        {/* Empuja las cifras al pie: todas las tarjetas de una fila quedan alineadas. */}
+        <div className="min-h-4 flex-1" />
+        {recuentos && (
+          <dl className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-3 text-center">
+            <div>
+              <dt className="text-[11px] uppercase tracking-wide text-neutral-400">{t("statProducts")}</dt>
+              <dd className="text-lg font-semibold text-neutral-900">{recuentos.representaciones}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-wide text-neutral-400">{t("statOrders")}</dt>
+              <dd className="text-lg font-semibold text-neutral-900">{recuentos.ordenes}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-wide text-neutral-400">{t("statDiscount")}</dt>
+              <dd className="text-lg font-semibold text-neutral-900">{Number(partner.descuentoPorcentaje)}%</dd>
+            </div>
+          </dl>
+        )}
+        {((esAdmin && partner.estado === "PENDIENTE_APROBACION") || partner.estado === "SUSPENDIDO") && (
+          <div className="mt-3 flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+            {esAdmin && partner.estado === "PENDIENTE_APROBACION" && (
+              <button
+                onClick={() => acciones.pedirAprobar(partner)}
+                className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700"
+              >
+                {t("approve")}
+              </button>
+            )}
+            {partner.estado === "SUSPENDIDO" && (
+              <button
+                onClick={() => acciones.pedirReactivar(partner)}
+                className="rounded-md border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50"
+              >
+                {t("reactivate")}
+              </button>
+            )}
+          </div>
+        )}
+      </li>
+    );
+  }
+
   return (
-    <div>
+    // Más ancho que el resto del portal para que quepan más tarjetas por fila. Sin
+    // `transform`: los diálogos de acciones son `fixed`.
+    <div style={{ width: "min(1440px, calc(100vw - 3rem))", marginLeft: "calc(50% - min(720px, 50vw - 1.5rem))" }}>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900">{t("title")}</h1>
@@ -124,7 +224,10 @@ function ListaPartners() {
       </div>
 
       {mensaje && (
-        <p role="status" className="mb-4 flex items-center justify-between gap-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+        <p
+          role="status"
+          className="mb-4 flex items-center justify-between gap-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800"
+        >
           <span className="inline-flex items-center gap-2">
             <CheckCircle2 size={16} /> {mensaje}
           </span>
@@ -191,9 +294,7 @@ function ListaPartners() {
             onClick={() => cambiarFiltros({ incompletos: soloIncompletos ? null : "1", p: null })}
             aria-pressed={soloIncompletos}
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
-              soloIncompletos
-                ? "border-amber-500 bg-amber-500 text-white"
-                : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+              soloIncompletos ? "border-amber-500 bg-amber-500 text-white" : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
             }`}
           >
             <AlertTriangle size={13} /> {t("incompleteFilter", { n: resumen?.datosPorCompletar ?? 0 })}
@@ -212,119 +313,56 @@ function ListaPartners() {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-        <div className="hidden grid-cols-12 gap-4 bg-neutral-50 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-neutral-500 md:grid">
-          <div className="col-span-4">{t("colPartner")}</div>
-          <div className="col-span-2">{t("colStatus")}</div>
-          <div className="col-span-2">{t("colConditions")}</div>
-          <div className="col-span-2">{t("colActivity")}</div>
-          <div className="col-span-2 text-right">{t("colActions")}</div>
-        </div>
-
-        <ul>
-          {isLoading && [0, 1, 2, 3, 4].map((i) => <FilaEsqueleto key={i} />)}
-          {partners.map((partner) => {
-            const recuentos = partner._count;
-            return (
-              <li
-                key={partner.id}
-                onClick={() => router.push(`/admin/partners/${partner.id}`)}
-                className="grid cursor-pointer grid-cols-1 gap-2 border-t border-neutral-100 px-4 py-3.5 first:border-t-0 hover:bg-neutral-50 md:grid-cols-12 md:items-center md:gap-4 md:first:border-t"
-              >
-                <div className="flex min-w-0 items-center gap-3 md:col-span-4">
-                  <PartnerAvatar nombre={partner.razonSocial} />
-                  <div className="min-w-0">
-                    <Link
-                      href={`/admin/partners/${partner.id}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="block truncate font-medium text-neutral-900 hover:underline"
-                    >
-                      {partner.razonSocial}
-                    </Link>
-                    <p className="truncate text-xs text-neutral-500">
-                      {[partner.cif.startsWith("PENDIENTE") ? null : partner.cif, partner.codigoCliente && t("clientCode", { codigo: partner.codigoCliente })]
-                        .filter(Boolean)
-                        .join(" · ") || "—"}
-                    </p>
-                    {tieneDatosPorCompletar(partner) && (
-                      <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-amber-700">
-                        <AlertTriangle size={11} /> {t("incompleteData")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <EstadoPartnerBadge estado={partner.estado} />
-                </div>
-
-                <div className="text-sm md:col-span-2">
-                  {partner.estado === "ACTIVO" || partner.tarifa ? (
-                    <>
-                      <p className="text-neutral-800">
-                        {partner.tarifa ?? "—"} · {t("discountShort", { n: Number(partner.descuentoPorcentaje) })}
-                      </p>
-                      <p className="text-xs text-neutral-500">{partner.marcaComercial ?? t("noBrand")}</p>
-                    </>
-                  ) : (
-                    <span className="text-neutral-400">—</span>
-                  )}
-                </div>
-
-                <div className="text-sm md:col-span-2">
-                  {recuentos && (
-                    <>
-                      {partner.estado === "ACTIVO" && recuentos.representaciones === 0 ? (
-                        <p className="font-medium text-amber-700">{t("noCatalog")}</p>
-                      ) : (
-                        <p className="text-neutral-800">{t("productsCount", { n: recuentos.representaciones })}</p>
-                      )}
-                      <p className="text-xs text-neutral-500">{t("ordersCount", { n: recuentos.ordenes })}</p>
-                    </>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-end gap-2 md:col-span-2">
-                  {esAdmin && partner.estado === "PENDIENTE_APROBACION" && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        acciones.pedirAprobar(partner);
-                      }}
-                      className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700"
-                    >
-                      {t("approve")}
-                    </button>
-                  )}
-                  {partner.estado === "SUSPENDIDO" && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        acciones.pedirReactivar(partner);
-                      }}
-                      className="rounded-md border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50"
-                    >
-                      {t("reactivate")}
-                    </button>
-                  )}
-                  <MenuAcciones acciones={accionesDeFila(partner)} etiqueta={t("moreActions", { partner: partner.razonSocial })} />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-
-        {!isLoading && partners.length === 0 && (
-          <div className="border-t border-neutral-100 px-4 py-12 text-center">
-            <p className="text-neutral-600">{hayFiltros ? t("noResults") : t("empty")}</p>
-            {!hayFiltros && (
-              <Link href="/admin/partners/nuevo" className="mt-3 inline-block text-sm font-medium text-neutral-900 underline">
-                {t("newPartner")}
-              </Link>
-            )}
+      {(esAdmin || cargandoPartners || socios.length > 0) && (
+        <section className="mb-8" aria-labelledby="titulo-partners">
+          <div className="mb-3 flex items-center gap-2">
+            <Handshake size={18} className="text-neutral-700" />
+            <h2 id="titulo-partners" className="text-lg font-semibold text-neutral-900">
+              {t("partnersTitle")} <span className="font-normal text-neutral-400">{respuestaPartners?.total ?? ""}</span>
+            </h2>
+            <p className="hidden text-sm text-neutral-500 sm:block">· {t("partnersHelp")}</p>
           </div>
-        )}
+          {cargandoPartners ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="h-40 animate-pulse rounded-xl bg-neutral-200" />
+              ))}
+            </div>
+          ) : socios.length > 0 ? (
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{socios.map(tarjetaEmpresa)}</ul>
+          ) : (
+            <p className="rounded-xl border border-dashed border-neutral-300 px-4 py-6 text-center text-sm text-neutral-500">
+              {hayFiltros ? t("noResults") : t("partnersEmpty")}
+            </p>
+          )}
+        </section>
+      )}
+
+      <div className="mb-3 flex items-center gap-2">
+        <Building2 size={18} className="text-neutral-700" />
+        <h2 className="text-lg font-semibold text-neutral-900">
+          {t("clientsTitle")} <span className="font-normal text-neutral-400">{respuesta?.total ?? ""}</span>
+        </h2>
+        <p className="hidden text-sm text-neutral-500 sm:block">· {t("clientsHelp")}</p>
       </div>
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <span key={i} className="h-44 animate-pulse rounded-xl bg-neutral-200" />
+          ))}
+        </div>
+      ) : partners.length > 0 ? (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{partners.map(tarjetaEmpresa)}</ul>
+      ) : (
+        <div className="rounded-xl border border-dashed border-neutral-300 px-4 py-12 text-center">
+          <p className="text-neutral-600">{hayFiltros ? t("noResults") : t("empty")}</p>
+          {!hayFiltros && (
+            <Link href="/admin/partners/nuevo" className="mt-3 inline-block text-sm font-medium text-neutral-900 underline">
+              {t("newPartner")}
+            </Link>
+          )}
+        </div>
+      )}
 
       {respuesta && (
         <Paginacion page={respuesta.page} limit={respuesta.limit} total={respuesta.total} onPageChange={(p) => cambiarFiltros({ p: String(p) })} />
