@@ -42,9 +42,9 @@ Arrancados con `cloudflared tunnel --url http://localhost:<puerto>` (túneles
 **cambia cada vez que se reinicia el túnel**, y sin garantía de uptime).
 
 - **Frontend (lo que debe abrir tu compañero):**
-  `https://town-unexpected-delivers-random.trycloudflare.com`
+  `https://conferencing-oaks-onion-cordless.trycloudflare.com`
 - **Backend (uso interno, el frontend lo llama solo):**
-  `https://lecture-andale-adequate-benefits.trycloudflare.com`
+  `https://dating-tolerance-nano-history.trycloudflare.com`
 
 Si alguno de los dos procesos `cloudflared` se cae, hay que relanzarlo y
 **volver a actualizar las URLs** en los sitios del punto 3 (las URLs nuevas
