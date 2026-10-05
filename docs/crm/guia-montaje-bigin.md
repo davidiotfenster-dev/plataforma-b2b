@@ -2,11 +2,13 @@
 
 Para montar ahora el CRM en una cuenta de Zoho y ajustarlo después con lo que pida la dirección comercial. Cubre las funcionalidades 1 a 19 de [`funcionalidades.md`](funcionalidades.md); la conexión con la plataforma (20 a 22) va aparte, ver [`integracion-plataforma.md`](integracion-plataforma.md).
 
-Está escrita para **Bigin Premier**. Los nombres de los menús son orientativos y pueden variar un poco según la versión de Bigin: si algo no está donde dice, buscarlo por el nombre en el buscador de Ajustes. Lo marcado **(comprobar)** hay que verlo en la cuenta, porque no se ha podido probar aún. Si la cuenta es Zoho CRM en lugar de Bigin, los pasos son los mismos con otros nombres: Pipelines = Deals, Empresas = Accounts.
+Está escrita para **Bigin Premier**, con los nombres de menú de la cuenta en español (centro de datos `.eu`): en el menú de la izquierda, **Ciclos de venta**, Contactos, Empresas, Productos, Actividades y Paneles; en Configuración, **Usuarios y controles, Organización, Campos, Etapas, Formularios, Automatización, Administración de datos y Toppings**. Si algo no está donde dice, buscarlo por el nombre en el buscador de arriba (Ctrl+K). Lo marcado **(comprobar)** hay que verlo en la cuenta, porque no se ha podido probar aún. Si la cuenta es Zoho CRM en lugar de Bigin, los pasos son los mismos con otros nombres: Pipelines = Deals, Empresas = Accounts.
 
 Tiempo estimado: una mañana para la base y otra para las mejoras.
 
 ## 0. Antes de empezar
+
+> **Plan gratuito.** La cuenta de prueba figura con el *plan de suscripción gratuito* (aviso de arriba, con el botón *Actualizar*). El plan gratuito de Bigin tiene **1 usuario, 1 pipeline y 3 automatizaciones**, y no tiene roles ni perfiles. Con él se pueden hacer los pasos 1, 2, 4 (vistas), 5 y 6, pero **no** el 3 (usuarios y roles por país) ni todas las automatizaciones. Para esos pasos hay que pasar a **Premier** (o activar su prueba gratuita si Zoho la ofrece). Conviene decidirlo antes de montar, para no rehacer nada.
 
 1. Entrar en la cuenta y mirar **arriba a la izquierda**: debe poner Bigin. Anotar el plan (Free, Express o Premier) y la fecha en que caduca la prueba.
 2. Mirar la dirección de la página: debe acabar en `.eu` (centro de datos europeo). Si acaba en `.com`, avisar antes de cargar datos de clientes.
@@ -14,9 +16,9 @@ Tiempo estimado: una mañana para la base y otra para las mejoras.
 
 ## 1. Pipeline de ventas (funcionalidades 1 y 2)
 
-Ajustes → **Pipelines** (o Personalización → Pipelines).
+Los registros de venta se ven en **Ciclos de venta** (menú de la izquierda; el módulo se llama «Proceso de venta»). Las etapas se definen en Configuración → **Etapas**.
 
-1. Crear un pipeline llamado **Ventas Europa**.
+1. En Configuración → **Etapas**, crear (o renombrar el pipeline existente como) **Ventas Europa**.
 2. Añadir estas etapas, en este orden:
 
 | # | Etapa | Tipo |
@@ -37,7 +39,7 @@ Si Bigin pide una probabilidad por etapa, poner de 10 % (Nuevo lead) subiendo ha
 
 ## 2. Campos propios (funcionalidades 3 y 4)
 
-Ajustes → **Módulos y campos** (o Personalización → Campos).
+Configuración → **Campos**, eligiendo el módulo (Proceso de venta, Empresas o Contactos).
 
 **En Pipelines (oportunidades):**
 
@@ -64,7 +66,7 @@ Origen, Importe (potencial económico), Descripción (observaciones), Propietari
 
 ## 3. Usuarios, roles y permisos (funcionalidad 8)
 
-Ajustes → **Usuarios y control** → Roles y Perfiles.
+Configuración → **Usuarios y controles** → Roles y Perfiles (**requiere plan de pago**).
 
 1. **Perfil «Agente»:** puede ver, crear y editar oportunidades, empresas y contactos. **No** puede borrar ni exportar.
 2. **Perfil «Dirección»:** como Agente, más exportar y ver todos los paneles.
@@ -97,7 +99,7 @@ Prueba: entrar como agente de Italia y comprobar que no ve oportunidades de Espa
 | Sin próxima acción | Etapa abierta y Próxima acción vacía |
 | Revisión semanal | Sin próxima acción, o más de 30 días sin actividad, o Empresa con País vacío |
 
-**Aviso diario de vencidas** (Automatizar → Flujos de trabajo): al llegar la Fecha próxima acción de una oportunidad abierta, enviar una alerta o correo al propietario con el nombre de la empresa y la acción pendiente. Comprobar si Bigin permite ejecutarlo «a las 8:00 de cada día» sobre una fecha de campo; si no, usar una tarea automática con vencimiento en esa fecha.
+**Aviso diario de vencidas** (Configuración → **Automatización** → pestaña *Reglas de automatización* → **Flujos de trabajo** → *Nuevo flujo de trabajo*; en la cuenta ya existe uno de ejemplo, «Big Deal Rule», sobre el módulo Proceso de venta): al llegar la Fecha próxima acción de una oportunidad abierta, enviar una alerta o correo al propietario con el nombre de la empresa y la acción pendiente. Comprobar si Bigin permite ejecutarlo «a las 8:00 de cada día» sobre una fecha de campo; si no, usar una tarea automática con vencimiento en esa fecha.
 
 ## 5. Panel de dirección (funcionalidad 9)
 
@@ -134,12 +136,12 @@ Instalar **Bigin** desde la App Store o Google Play, entrar con el correo del us
 | # | Qué hacer |
 |---|---|
 | 12 Motivo de pérdida | Campo lista «Motivo de pérdida»: Precio, Competencia, Sin presupuesto, Producto no encaja, Sin respuesta, Otro. Obligatorio al pasar a Perdido (comprobar) |
-| 13 Muestras | Campos «Muestra enviada (fecha)», «Unidades de muestra» y «Resultado» (Pendiente, Positivo, Negativo). Flujo: al pasar a Muestra enviada, crear tarea «Revisar resultado» a 15 días |
+| 13 Muestras | Campos «Muestra enviada (fecha)», «Unidades de muestra» y «Resultado» (Pendiente, Positivo, Negativo). Con *Automatización de etapas*: al pasar a Muestra enviada, crear tarea «Revisar resultado» a 15 días |
 | 14 Ferias | Campo lista «Feria» con las ferias del año; gráfico de oportunidades y ganadas por feria |
-| 15 Paradas | Campo fecha «Fecha cambio de fase» actualizado por un flujo en cada cambio de etapa, y una vista de las abiertas con más de 30 días |
+| 15 Paradas | Campo fecha «Fecha cambio de fase» actualizado en cada cambio de etapa (con *Automatización de etapas*, en la misma pantalla de Automatización), y una vista de las abiertas con más de 30 días |
 | 16 Objetivos | Medidor de objetivos del panel, uno por agente |
 | 17 Plantillas de correo | Una plantilla por idioma (ES, EN, DE, IT, PT) y por tipo: presentación, envío de catálogo, seguimiento de muestra, seguimiento de oferta |
-| 18 Correo del comercial | Cada usuario conecta su buzón en Ajustes → Correo |
+| 18 Correo del comercial | Cada usuario conecta su buzón en Configuración → Canales → **Correo electrónico** |
 | 19 Revisión semanal | La vista del punto 4, abierta cada lunes en la reunión |
 
 Si los comerciales envían correo desde Zoho con direcciones @iotfenster.com, añadir en el DNS los registros SPF y DKIM que Zoho indique (ver [`correos.md`](correos.md)).
