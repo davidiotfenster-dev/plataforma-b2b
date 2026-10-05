@@ -1,9 +1,34 @@
-# Contexto de la sesión en curso (actualizado 2026-09-30)
+# Contexto de la sesión en curso (actualizado 2026-10-02)
+
+## CAMBIO 2026-10-02 — «cliente» pasa a «distribuidor» (leer primero)
+
+Decidido por David. Distribuidor y partner son la **misma clase de empresa**;
+partner = el distribuidor que compra más y tiene submarca propia. El tipo
+`CLIENTE` se llama ahora `DISTRIBUIDOR` (BD, backend, frontend y los 5 idiomas).
+Todo lo que más abajo diga «cliente» como tipo de empresa se lee «distribuidor».
+- **Los pedidos los gestiona siempre IoT FENSTER**, también los de VBH y
+  Procomsa. La idea de que el partner viese y aprobase los pedidos de sus
+  distribuidores se planteó y se **descartó** el mismo día (la pregunta 1 de 0.1
+  queda respondida: todo pasa por IoT FENSTER).
+- **Rol COMERCIAL desactivado por ahora**: interruptor `COMERCIAL_ACTIVO`
+  (apagado por defecto; `true` en `backend/.env` lo reactiva). Sin él, un
+  comercial no puede entrar ni usar una sesión abierta. No se borra ningún dato.
+  Las altas de empresas las hace solo el administrador mientras tanto.
+- Migración nueva `20261002150000_renombrar_tipo_empresa_cliente_a_distribuidor`
+  (`ALTER TYPE ... RENAME VALUE`, reversible con el valor inverso). Respuesta de
+  `GET /catalogos-marca/:marca`: la clave `empresas.clientes` pasó a `empresas.distribuidores`.
+- No se tocó (otro sentido de «cliente»): `codigoCliente` y «FICHA CLIENTE» (ERP),
+  la etiqueta «CLIENTE» del PDF del pedido y «PO Number del cliente».
+- Las filas antiguas de auditoría `PARTNER_PROMOCIONADO/DEGRADADO` conservan
+  `"CLIENTE"` en su contenido (el registro es inmutable).
+- Sigue abierto: la palabra alemana (hoy «Händler»), si el comercial vuelve a dar
+  de alta cuando se reactive, y quién factura al distribuidor.
+- Base local: 13 distribuidores (todos con marca MySmartWindow) y 3 partners.
 
 ## 0. ESTADO AL 2026-09-30 — leer primero
 
 **Resumen de una línea**: el portal distingue ya **partners** (VBH, Procomsa,
-MySmartWindow, con submarca propia) y **clientes** (el resto, que ven los
+MySmartWindow, con submarca propia) y **distribuidores** (antes «clientes»; el resto, que ven los
 dispositivos de la marca de un partner; MySmartWindow por defecto). Hay un
 **catálogo único por marca** que se aplica solo a todas sus empresas. Todo
 probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
@@ -11,9 +36,9 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 ### 0.1 Modelo de negocio (decidido por David)
 - **Partner** = empresa que compra volumen y tiene submarca propia: VBH → Wave,
   Procomsa → ICON, MySmartWindow → Connect. Su marca es fija.
-- **Cliente** = todos los demás distribuidores / clientes finales. Ven el
+- **Distribuidor** (antes «Cliente») = todas las demás empresas. Ven el
   catálogo de UNA marca; por defecto MySmartWindow (Connect), el admin la puede
-  cambiar (p. ej. un cliente del norte a VBH).
+  cambiar (p. ej. un distribuidor del norte a VBH).
 - Un mismo aparato se llama distinto según la marca (Connect-1 = Wave-1 =
   Icon1): es UN `ProductoBase` con los nombres/GTIN por marca en
   `especificacionesJson.referencias`. NO se separa (se probó y se deshizo).
@@ -21,14 +46,14 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
   producto). Un catálogo por marca; por empresa solo descuento y ocultar.
 - **Pendiente de dirección** (documento para el jefe, con las preguntas):
   https://claude.ai/code/artifact/7affca0c-a1a9-4d5d-a0e0-2ccddcbff17d
-  La clave es la pregunta 1: ¿el cliente compra a IoT FENSTER directamente o a
-  través del partner (el partner ve sus clientes/pedidos)? Hasta que responda,
-  el partner NO ve nada de los clientes de su marca.
+  La clave era la pregunta 1: ¿el distribuidor compra a IoT FENSTER directamente
+  o a través del partner? **Respondida el 2026-10-02**: todo pasa por IoT FENSTER;
+  el partner NO ve nada de los distribuidores de su marca.
 
 ### 0.2 Qué hay implementado hoy (backend + frontend)
 - **Base de datos** (5 migraciones nuevas, ya aplicadas en local; la 5ª, `historial_estados_pedido`, es de 0.8):
   `imagen_producto_base` (`ProductoBase.imagenUrl`),
-  `tipo_empresa_y_marca_catalogo` (`Partner.tipo` PARTNER/CLIENTE y
+  `tipo_empresa_y_marca_catalogo` (`Partner.tipo` PARTNER/DISTRIBUIDOR (antes CLIENTE) y
   `Partner.marcaCatalogo` VBH/PROCOMSA/MYSMARTWINDOW),
   `catalogo_por_marca` (tabla `ProductoMarca` + `RepresentacionPartner.productoMarcaId`),
   `numeracion_pedidos_sin_huecos` (borra la secuencia `pedido_codigo_seq`).
@@ -45,7 +70,7 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 - **Numeración de pedidos sin huecos**: `src/pedidos/codigo-pedido.ts` (último
   PED + 1 con bloqueo de PostgreSQL). **El siguiente pedido será PED-000007.**
 - **Pantallas admin**: menú "Partners" → **"Empresas"** (tarjetas: partners
-  arriba, clientes debajo, borde del color de su marca); menú nuevo **"Marcas"**
+  arriba, distribuidores debajo, borde del color de su marca); menú nuevo **"Marcas"**
   (catálogo de cada submarca, editable, "Añadir lo que falta"); ficha de
   empresa con tipo y marca en Datos → Comercial; catálogo de la empresa con
   "Productos de su marca" + "Productos extra" + "Borrar extras"; catálogo
@@ -67,7 +92,7 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 - 3 partners: VBH, Procomsa ("Procedimientos de construc. Moderna S.A.") y
   **MySmartWindow** (creado hoy con datos PROVISIONALES:
   `PENDIENTE-MYSMARTWINDOW`, sin usuario de acceso → completar su ficha).
-- 12 clientes, todos con marca MySmartWindow (incluido el "Partner Ficticio
+- 12 distribuidores (hoy 13 en la base local), todos con marca MySmartWindow (incluido el "Partner Ficticio
   S.L." de pruebas, cuyo login es `partner@fenster.test`).
 - **Datos de PRUEBA en el catálogo** (hay que sustituirlos por los reales):
   PVP 50 € en 23 productos sin precio de tarifa y GTIN `TEST000000001`…`022`.
@@ -233,7 +258,7 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
    puede restablecer la contraseña de sus clientes.
 6. Sin doble factor para ADMIN_FENSTER (imprescindible antes de producción, junto
    con cambiar la contraseña de prueba).
-7. Esperar la respuesta del jefe sobre partner/cliente antes de tocar el alcance por marca.
+7. Esperar la respuesta del jefe sobre partner/distribuidor antes de tocar el alcance por marca.
 
 ---
 
@@ -458,7 +483,7 @@ Casos con matices que David debería revisar cuando pueda:
 |---|---|---|
 | Admin FENSTER | `admin@fenster.test` | `Fenster2026!` |
 | Comercial | `comercial@fenster.test` | `Fenster2026!` |
-| Partner (cliente) | `partner@fenster.test` | `Fenster2026!` |
+| Partner Ficticio (distribuidor) | `partner@fenster.test` | `Fenster2026!` |
 
 ## 8. Cómo arrancar todo desde cero
 

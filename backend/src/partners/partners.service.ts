@@ -1,9 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { EstadoPartner, EstadoPedido, RolUsuario } from '../generated/prisma/enums.js';
+import { EstadoPartner, EstadoPedido, RolUsuario, TipoEmpresa } from '../generated/prisma/enums.js';
 import type { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
 import type { CrearPartnerDto } from './dto/crear-partner.dto.js';
 import type { AsignarProductosDto } from './dto/asignar-productos.dto.js';
@@ -40,7 +40,14 @@ export class PartnersService {
   /// ADMIN_FENSTER o COMERCIAL. Queda ACTIVO de inmediato con su primer
   /// usuario ya operativo. `creadoPorUsuarioId` queda grabado siempre (sirve
   /// de rastro de auditoría y es lo que acota la visibilidad de COMERCIAL).
-  async crear(dto: CrearPartnerDto, creadoPorUsuarioId: string) {
+  ///
+  /// Solo un ADMIN_FENSTER puede dar de alta directamente un PARTNER: ser partner
+  /// implica una inversión de IoT FENSTER (submarca, app/web a medida). Cualquier
+  /// otro rol que lo pida recibe un 403 explícito; sin `tipo` la empresa nace DISTRIBUIDOR.
+  async crear(dto: CrearPartnerDto, creadoPorUsuarioId: string, rol: RolUsuario) {
+    if (dto.tipo === TipoEmpresa.PARTNER && rol !== RolUsuario.ADMIN_FENSTER) {
+      throw new ForbiddenException('Solo un administrador puede dar de alta una empresa como Partner. Dala de alta como Distribuidor.');
+    }
     const passwordHash = await bcrypt.hash(dto.passwordUsuario, SALT_ROUNDS);
 
     try {
@@ -173,8 +180,26 @@ export class PartnersService {
     return partner;
   }
 
+  /// Ficha del partner con su volumen de compra (lo que justifica, o no, promocionarlo).
   async obtener(id: string, restringirCreadoPorId?: string) {
-    return this.obtenerOFallar(id, restringirCreadoPorId);
+    const partner = await this.obtenerOFallar(id, restringirCreadoPorId);
+    return { ...partner, volumen: await this.volumenCompras(id) };
+  }
+
+  /// Dispositivos y pedidos que lleva comprados la empresa, sin contar los cancelados.
+  /// `umbralPromocion` es el aviso configurable (PARTNER_UMBRAL_UNIDADES); nulo si no está puesto.
+  private async volumenCompras(partnerId: string) {
+    const pedidos = { partnerId, estado: { not: EstadoPedido.CANCELADO } };
+    const [lineas, totalPedidos] = await Promise.all([
+      this.prisma.orderItem.aggregate({ _sum: { cantidad: true }, where: { order: pedidos } }),
+      this.prisma.order.count({ where: pedidos }),
+    ]);
+    const umbral = Number(process.env.PARTNER_UMBRAL_UNIDADES);
+    return {
+      unidades: lineas._sum.cantidad ?? 0,
+      pedidos: totalPedidos,
+      umbralPromocion: Number.isInteger(umbral) && umbral > 0 ? umbral : null,
+    };
   }
 
   async actualizar(id: string, dto: ActualizarPartnerDto, restringirCreadoPorId?: string) {
@@ -191,7 +216,6 @@ export class PartnersService {
           dominioWeb: dto.dominioWeb,
           codigoCliente: dto.codigoCliente,
           marcaComercial: dto.marcaComercial,
-          tipo: dto.tipo,
           marcaCatalogo: dto.marcaCatalogo,
           tarifa: dto.tarifa,
           descuentoPorcentaje: dto.descuentoPorcentaje,
@@ -241,6 +265,49 @@ export class PartnersService {
       throw new ConflictException(`Solo se puede reactivar un partner SUSPENDIDO (estado actual: ${partner.estado})`);
     }
     return this.prisma.partner.update({ where: { id }, data: { estado: EstadoPartner.ACTIVO } });
+  }
+
+  /// Pasar una empresa de Distribuidor a Partner (solo ADMIN_FENSTER, ver el controlador).
+  /// Es la única vía para cambiar el tipo: queda en la auditoría con quién, cuándo y
+  /// el volumen de compra que lo justificó.
+  async promocionar(id: string, adminUserId: string) {
+    return this.cambiarTipo(id, TipoEmpresa.PARTNER, adminUserId);
+  }
+
+  /// Vuelta atrás de `promocionar`: Partner a Distribuidor. Sus datos y pedidos no cambian.
+  async degradar(id: string, adminUserId: string) {
+    return this.cambiarTipo(id, TipoEmpresa.DISTRIBUIDOR, adminUserId);
+  }
+
+  private async cambiarTipo(id: string, nuevoTipo: TipoEmpresa, adminUserId: string) {
+    const partner = await this.obtenerOFallar(id);
+    if (partner.tipo === nuevoTipo) {
+      throw new ConflictException(`La empresa ya es ${nuevoTipo === TipoEmpresa.PARTNER ? 'Partner' : 'Distribuidor'}`);
+    }
+    if (nuevoTipo === TipoEmpresa.PARTNER && (partner.archivadoEn || partner.estado !== EstadoPartner.ACTIVO)) {
+      throw new ConflictException('Solo se puede promocionar a Partner una empresa activa y no archivada');
+    }
+
+    const volumen = await this.volumenCompras(id);
+    const [actualizada] = await this.prisma.$transaction([
+      this.prisma.partner.update({ where: { id }, data: { tipo: nuevoTipo } }),
+      this.prisma.auditLog.create({
+        data: {
+          level: 'info',
+          eventType: nuevoTipo === TipoEmpresa.PARTNER ? 'PARTNER_PROMOCIONADO' : 'PARTNER_DEGRADADO',
+          userId: adminUserId,
+          partnerId: id,
+          payload: {
+            razonSocial: partner.razonSocial,
+            tipoAnterior: partner.tipo,
+            tipoNuevo: nuevoTipo,
+            unidadesCompradas: volumen.unidades,
+            pedidos: volumen.pedidos,
+          },
+        },
+      }),
+    ]);
+    return actualizada;
   }
 
   private async registrarAuditoria(userId: string, eventType: string, payload: Prisma.InputJsonValue, partnerId?: string) {

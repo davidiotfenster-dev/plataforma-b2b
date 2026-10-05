@@ -9,7 +9,7 @@ import { ActualizarProductoMarcaDto, AnadirCatalogoMarcaDto } from './dto/catalo
 const marcaPipe = new ParseEnumPipe(MarcaCatalogo);
 
 /// Catálogos de las submarcas: solo ADMIN_FENSTER. Un cambio aquí llega al
-/// momento a todas las empresas (partners y clientes) de esa marca.
+/// momento a todas las empresas (partners y distribuidores) de esa marca.
 @Controller('catalogos-marca')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(RolUsuario.ADMIN_FENSTER)

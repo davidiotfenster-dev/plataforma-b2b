@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import type { MarcaCatalogo } from '../generated/prisma/enums.js';
+import type { MarcaCatalogo, TipoEmpresa } from '../generated/prisma/enums.js';
 import { propuestaDeMarca } from './propuesta.js';
 import type { ActualizarProductoMarcaDto, ItemCatalogoMarcaDto } from './dto/catalogo-marca.dto.js';
 
@@ -15,7 +15,7 @@ export interface ResultadoSincronizacion {
 
 const esConflicto = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002';
 
-/// Lo que ve un partner o cliente de su catálogo: activo para la empresa, el
+/// Lo que ve un partner o distribuidor de su catálogo: activo para la empresa, el
 /// producto base activo y, si viene de su marca, activo también en la marca.
 export const REPRESENTACION_VISIBLE = {
   activo: true,
@@ -24,7 +24,7 @@ export const REPRESENTACION_VISIBLE = {
 } satisfies Prisma.RepresentacionPartnerWhereInput;
 
 /// Catálogo de cada submarca (Wave, ICON, Connect). Es la fuente de verdad:
-/// cada empresa (partner o cliente) con esa `marcaCatalogo` tiene una
+/// cada empresa (partner o distribuidor) con esa `marcaCatalogo` tiene una
 /// `RepresentacionPartner` enlazada por producto, que se sincroniza aquí. La
 /// empresa conserva lo suyo (ocultar un producto, su descuento) y los
 /// productos extra que se le asignen a mano (`productoMarcaId` nulo).
@@ -45,8 +45,10 @@ export class CatalogoMarcaService {
       }),
       this.prisma.partner.groupBy({ by: ['tipo'], where: { marcaCatalogo: marca }, _count: { _all: true } }),
     ]);
-    const cuenta = (tipo: string) => empresas.find((e) => e.tipo === tipo)?._count._all ?? 0;
-    return { marca, productos, empresas: { partners: cuenta('PARTNER'), clientes: cuenta('CLIENTE') } };
+    /// Tipado con el enum (no `string`) para que un valor mal escrito no compile en
+    /// vez de devolver 0 en silencio.
+    const cuenta = (tipo: TipoEmpresa) => empresas.find((e) => e.tipo === tipo)?._count._all ?? 0;
+    return { marca, productos, empresas: { partners: cuenta('PARTNER'), distribuidores: cuenta('DISTRIBUIDOR') } };
   }
 
   async anadir(marca: MarcaCatalogo, items: ItemCatalogoMarcaDto[]) {

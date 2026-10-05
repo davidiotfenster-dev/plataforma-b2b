@@ -45,7 +45,7 @@ export class CrearPartnerDto {
   @IsNotEmpty()
   marcaComercial?: string;
 
-  /// Partner (submarca propia) o cliente.
+  /// Partner (submarca propia) o distribuidor.
   @IsOptional()
   @IsIn(TIPOS_EMPRESA)
   tipo?: (typeof TIPOS_EMPRESA)[number];

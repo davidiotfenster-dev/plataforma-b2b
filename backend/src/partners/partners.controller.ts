@@ -33,7 +33,7 @@ export class PartnersController {
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   @HttpCode(HttpStatus.CREATED)
   async crear(@CurrentUser() usuario: UsuarioAutenticado, @Body() dto: CrearPartnerDto) {
-    return this.partnersService.crear(dto, usuario.userId);
+    return this.partnersService.crear(dto, usuario.userId, usuario.rol);
   }
 
   @Get()
@@ -77,6 +77,20 @@ export class PartnersController {
   @HttpCode(HttpStatus.OK)
   async reactivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
     return this.partnersService.reactivar(id, this.restriccion(usuario));
+  }
+
+  /// Distribuidor -> Partner y vuelta atrás: solo ADMIN_FENSTER (el rol por defecto del
+  /// controlador). Un comercial da de alta distribuidores, pero ser partner lo decide la empresa.
+  @Post(':id/promocionar')
+  @HttpCode(HttpStatus.OK)
+  async promocionar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.promocionar(id, usuario.userId);
+  }
+
+  @Post(':id/degradar')
+  @HttpCode(HttpStatus.OK)
+  async degradar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.degradar(id, usuario.userId);
   }
 
   @Post(':id/archivar')

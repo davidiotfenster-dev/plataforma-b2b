@@ -27,7 +27,7 @@ export const PREGUNTAS_POR_TEMA: Record<TemaAyuda, readonly string[]> = {
   checkout: ["poNumber", "comoSePaga", "editarDespues"],
   pedidos: ["estados", "encontrarPedido"],
   pedidoDetalle: ["descargarPdf", "repetirPedido", "precioFijo"],
-  adminEmpresas: ["partnerOCliente", "aprobarSolicitud", "suspenderArchivarEliminar"],
+  adminEmpresas: ["partnerODistribuidor", "aprobarSolicitud", "suspenderArchivarEliminar"],
   adminFicha: ["datosPorCompletar", "descuentoEmpresa", "productosDeMarca"],
   adminMarcas: ["cambiosAplican", "anadirLoQueFalta"],
   adminProductos: ["productoBase", "subirImagenes"],

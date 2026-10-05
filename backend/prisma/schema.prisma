@@ -107,12 +107,13 @@ model User {
   @@index([partnerId])
 }
 
-/// Partner = empresa con submarca propia de nuestros dispositivos (VBH,
-/// Procomsa, MySmartWindow). Cliente = el resto de distribuidores y clientes
-/// finales, que compran con la marca de uno de los partners.
+/// Todas las empresas que compran son iguales: se llaman distribuidores. Partner
+/// = el distribuidor que hace compras más grandes y tiene submarca propia de
+/// nuestros dispositivos (VBH, Procomsa, MySmartWindow). El distribuidor compra
+/// viendo los dispositivos de la marca de su `marcaCatalogo`.
 enum TipoEmpresa {
   PARTNER
-  CLIENTE
+  DISTRIBUIDOR
 }
 
 /// Submarca con la que una empresa ve los dispositivos: Wave (VBH), ICON
@@ -175,10 +176,10 @@ model Partner {
   /// pedidos. Es reversible (a diferencia del borrado, que solo vale sin pedidos).
   archivadoEn DateTime?
 
-  /// Partner (submarca propia, fija) o cliente. Todo alta nueva es cliente.
-  tipo TipoEmpresa @default(CLIENTE)
+  /// Partner (submarca propia, fija) o distribuidor. Todo alta nueva es distribuidor.
+  tipo TipoEmpresa @default(DISTRIBUIDOR)
 
-  /// Marca cuyos dispositivos ve la empresa. Un partner, la suya; un cliente,
+  /// Marca cuyos dispositivos ve la empresa. Un partner, la suya; un distribuidor,
   /// MySmartWindow por defecto, y el admin puede cambiarla.
   marcaCatalogo MarcaCatalogo @default(MYSMARTWINDOW)
 

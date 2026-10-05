@@ -232,7 +232,7 @@
   },
   "adminPartners": {
     "title": "Unternehmen",
-    "subtitle": "Partner mit eigener Untermarke und Kunden, die unter der Marke eines Partners kaufen: Anmeldungen, Konditionen und Katalog.",
+    "subtitle": "Partner mit eigener Untermarke und Händler, die unter der Marke eines Partners kaufen: Anmeldungen, Konditionen und Katalog.",
     "newPartner": "Neues Unternehmen",
     "dismissMessage": "Hinweis schließen",
     "pendingBanner": "{n, plural, one {# Partner wartet auf Ihre Freigabe.} other {# Partner warten auf Ihre Freigabe.}}",
@@ -274,7 +274,9 @@
       "reactivar": "{partner} wurde reaktiviert.",
       "archivar": "{partner} archiviert.",
       "desarchivar": "{partner} wiederhergestellt.",
-      "eliminar": "{partner} gelöscht."
+      "eliminar": "{partner} gelöscht.",
+      "promocionar": "{partner} ist jetzt Partner.",
+      "degradar": "{partner} ist wieder Händler."
     },
     "confirm": {
       "rechazar": {
@@ -301,6 +303,16 @@
         "title": "{partner} wiederherstellen?",
         "body": "Das Unternehmen erscheint wieder in den Listen und, falls es aktiv war, können sich seine Benutzer wieder anmelden.",
         "button": "Wiederherstellen"
+      },
+      "promocionar": {
+        "title": "{partner} zum Partner befördern?",
+        "body": "Das Unternehmen wird Partner (eigene Untermarke), normalerweise weil sein Bestellvolumen dies rechtfertigt. Es wird im Audit-Protokoll mit den bisher gekauften Einheiten festgehalten, und Sie können es rückgängig machen.",
+        "button": "Befördern"
+      },
+      "degradar": {
+        "title": "{partner} wieder zum Händler machen?",
+        "body": "Das Unternehmen ist nicht mehr Partner, sondern Händler. Seine Daten und Bestellungen ändern sich nicht. Es wird im Audit-Protokoll festgehalten.",
+        "button": "Zum Händler machen"
       }
     },
     "approveTitle": "{partner} freigeben",
@@ -385,7 +397,7 @@
       "marcaComercial": "Bestimmt, welche Namen und SKUs er bei der Produktzuweisung sieht: VBH, Procomsa…",
       "descuentoPorcentaje": "Gilt für alle seine Produkte, außer für die mit eigenem Rabatt.",
       "passwordUsuario": "Mindestens 8 Zeichen. Sie teilen es dem Partner mit.",
-      "marcaCatalogo": "Namen und Codes in seinem Katalog. Kunden nutzen standardmäßig MySmartWindow."
+      "marcaCatalogo": "Namen und Codes in seinem Katalog. Händler nutzen standardmäßig MySmartWindow."
     },
     "generatePassword": "Erzeugen",
     "copy": "Kopieren",
@@ -397,19 +409,18 @@
     "saveChanges": "Änderungen speichern",
     "partnersTitle": "Partner",
     "partnersHelp": "Unternehmen mit eigener Untermarke unserer Geräte",
-    "clientsTitle": "Kunden",
-    "clientsHelp": "Händler und Endkunden; sie sehen die Geräte der zugewiesenen Marke",
+    "distribuidoresTitle": "Händler",
+    "distribuidoresHelp": "Unternehmen, die mit Blick auf die Geräte der zugewiesenen Marke kaufen",
     "partnersEmpty": "Noch keine Partner.",
     "ownBrand": "Untermarke {marca}",
     "statProducts": "Produkte",
     "statOrders": "Bestellungen",
     "statDiscount": "Rabatt",
-    "colClient": "Kunde",
     "colBrand": "Marke und Konditionen",
     "typePartner": "Partner",
-    "typeClient": "Kunde",
+    "typeDistribuidor": "Händler",
     "typePartnerLong": "Partner (eigene Untermarke)",
-    "typeClientLong": "Kunde",
+    "typeDistribuidorLong": "Händler",
     "tabArchived": "Archiviert",
     "archive": "Archivieren",
     "unarchive": "Wiederherstellen",
@@ -419,7 +430,11 @@
     "deleteTitle": "{partner} löschen",
     "deleteBody": "Das Unternehmen, {usuarios, plural, one {sein Benutzer} other {seine # Benutzer}}, sein Katalog und seine Warenkörbe werden gelöscht. Dies kann nicht rückgängig gemacht werden. Es ist nur möglich, weil keine Bestellungen vorliegen; wenn Sie die Daten behalten möchten, archivieren Sie es.",
     "deleteConfirmLabel": "Geben Sie „{partner}“ zur Bestätigung ein",
-    "deleteButton": "Endgültig löschen"
+    "deleteButton": "Endgültig löschen",
+    "promote": "Zum Partner befördern",
+    "demote": "Zum Händler machen",
+    "volumeLine": "{unidades, plural, one {# Einheit} other {# Einheiten}} in {pedidos, plural, one {# Bestellung} other {# Bestellungen}}",
+    "promoteHint": "Dieser Händler hat bereits {unidades} Einheiten gekauft (Schwellenwert: {umbral}). Ist es Zeit, ihn zum Partner zu befördern?"
   },
   "adminPedidos": {
     "title": "Auftragsabwicklung",
@@ -637,7 +652,7 @@
   },
   "adminMarcas": {
     "title": "Markenkataloge",
-    "description": "Jede Untermarke hat einen einzigen Katalog: Produkte, Namen, SKUs und Preise. Alle Unternehmen dieser Marke (der Partner und seine Kunden) sehen ihn sofort; jedes Unternehmen passt nur seinen Rabatt an oder blendet Produkte aus.",
+    "description": "Jede Untermarke hat einen einzigen Katalog: Produkte, Namen, SKUs und Preise. Alle Unternehmen dieser Marke (der Partner und seine Händler) sehen ihn sofort; jedes Unternehmen passt nur seinen Rabatt an oder blendet Produkte aus.",
     "genericError": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     "sku": "SKU",
     "name": "Name in der Marke",
@@ -652,7 +667,7 @@
     "add": "Hinzufügen",
     "otherBrandsOnly": "Nur in anderen Marken benannt",
     "filled": "{n} Produkte hinzugefügt.",
-    "cardStats": "{productos} Produkte · {partners} Partner · {clientes} Kunden",
+    "cardStats": "{productos} Produkte · {partners} Partner · {distribuidores} Händler",
     "search": "Nach Name oder SKU suchen…",
     "clear": "Suche löschen",
     "fill": "Fehlendes hinzufügen ({n})",
@@ -697,7 +712,7 @@
       "estados": "Eingegangen, Bestätigt, In Vorbereitung, Bereit und Versendet sind die Schritte einer Bestellung, in dieser Reihenfolge. Storniert bedeutet, dass sie annulliert wurde.",
       "precioNeto": "Ihr Stückpreis mit bereits angewendetem Rabatt. Er wird bei der Bestätigung der Bestellung festgeschrieben.",
       "precioNetoCarrito": "Ihr Stückpreis mit bereits angewendetem Rabatt. Er kann sich ändern, wenn sich die Preisliste ändert; mit der Bestätigung der Bestellung wird er festgeschrieben.",
-      "tipoEmpresa": "Partner: hat eine eigene Untermarke. Kunde: kauft mit Blick auf die Geräte der Marke eines Partners."
+      "tipoEmpresa": "Partner: Händler, der mehr einkauft und eine eigene Untermarke hat. Händler: kauft mit Blick auf die Geräte der zugewiesenen Marke, standardmäßig MySmartWindow."
     },
     "q": {
       "quePuedoHacer": {
@@ -772,9 +787,9 @@
         "p": "Warum ändert sich der Preis einer Bestellung nicht?",
         "r": "Bei der Bestätigung speichert die Bestellung UVP, Rabatt und Nettopreis dieses Moments. Sie werden nicht neu berechnet, auch wenn sich die Preisliste später ändert."
       },
-      "partnerOCliente": {
-        "p": "Partner oder Kunde?",
-        "r": "Ein Partner hat eine eigene Untermarke (VBH, Procomsa, MySmartWindow). Ein Kunde kauft mit Blick auf die Geräte der Marke eines Partners; standardmäßig MySmartWindow."
+      "partnerODistribuidor": {
+        "p": "Partner oder Händler?",
+        "r": "Ein Partner ist ein Händler, der mehr einkauft und eine eigene Untermarke hat (VBH, Procomsa, MySmartWindow). Ein Händler kauft mit Blick auf die Geräte der zugewiesenen Marke; standardmäßig MySmartWindow."
       },
       "aprobarSolicitud": {
         "p": "Wie genehmige ich eine Anfrage?",

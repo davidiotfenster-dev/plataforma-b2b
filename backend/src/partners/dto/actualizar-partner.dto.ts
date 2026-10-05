@@ -7,7 +7,6 @@ import {
   TELEFONO_MENSAJE,
   TELEFONO_REGEX,
   MARCAS_CATALOGO,
-  TIPOS_EMPRESA,
 } from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
@@ -49,10 +48,9 @@ export class ActualizarPartnerDto {
   @IsNotEmpty()
   marcaComercial?: string;
 
-  /// Partner (submarca propia) o cliente.
-  @IsOptional()
-  @IsIn(TIPOS_EMPRESA)
-  tipo?: (typeof TIPOS_EMPRESA)[number];
+  /// Ojo: `tipo` (Partner/Distribuidor) NO se edita aquí. Solo un admin puede cambiarlo,
+  /// y lo hace con `promocionar` / `degradar` para que quede en la auditoría.
+  /// Al no estar en este DTO, enviarlo da 400 (forbidNonWhitelisted).
 
   /// Marca cuyos dispositivos ve la empresa.
   @IsOptional()

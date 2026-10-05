@@ -1,9 +1,9 @@
-/// Separa las empresas en partners y clientes (2026-09-30):
+/// Separa las empresas en partners y distribuidores (entonces «clientes») (2026-09-30):
 ///  - VBH y Procomsa pasan a PARTNER con su marca (Wave / ICON).
 ///  - Se crea el partner MySmartWindow (marca Connect) con datos provisionales
 ///    ("PENDIENTE-...", salen como "datos por completar" en el panel) y se le
 ///    asigna el catálogo de su marca con el PVP de tarifa.
-///  - El resto de empresas quedan como CLIENTE con marca MySmartWindow (valor
+///  - El resto de empresas quedan como DISTRIBUIDOR (entonces CLIENTE) con marca MySmartWindow (valor
 ///    por defecto de la columna).
 /// Idempotente: se puede volver a ejecutar sin duplicar nada.
 ///

@@ -232,7 +232,7 @@
   },
   "adminPartners": {
     "title": "Companies",
-    "subtitle": "Partners with their own sub-brand and clients who buy under a partner's brand: sign-ups, terms and catalogue.",
+    "subtitle": "Partners with their own sub-brand and distributors who buy under a partner's brand: sign-ups, terms and catalogue.",
     "newPartner": "New company",
     "dismissMessage": "Dismiss message",
     "pendingBanner": "{n, plural, one {# partner is waiting for your approval.} other {# partners are waiting for your approval.}}",
@@ -274,7 +274,9 @@
       "reactivar": "{partner} reactivated.",
       "archivar": "{partner} archived.",
       "desarchivar": "{partner} unarchived.",
-      "eliminar": "{partner} deleted."
+      "eliminar": "{partner} deleted.",
+      "promocionar": "{partner} is now a Partner.",
+      "degradar": "{partner} is a Distributor again."
     },
     "confirm": {
       "rechazar": {
@@ -301,6 +303,16 @@
         "title": "Unarchive {partner}?",
         "body": "It will appear in the lists again and, if it was active, its users will be able to sign in again.",
         "button": "Unarchive"
+      },
+      "promocionar": {
+        "title": "Promote {partner} to Partner?",
+        "body": "They become a Partner (own sub-brand), normally because their purchase volume justifies it. It is recorded in the audit log with the units bought so far, and you can undo it.",
+        "button": "Promote"
+      },
+      "degradar": {
+        "title": "Move {partner} back to Distributor?",
+        "body": "They stop being a Partner and become a Distributor. Their data and orders do not change. It is recorded in the audit log.",
+        "button": "Make Distributor"
       }
     },
     "approveTitle": "Approve {partner}",
@@ -385,7 +397,7 @@
       "marcaComercial": "Decides which names and SKUs they see when products are assigned: VBH, Procomsa…",
       "descuentoPorcentaje": "Applied to all their products except those with their own discount.",
       "passwordUsuario": "At least 8 characters. You give it to the partner.",
-      "marcaCatalogo": "Names and codes shown in their catalogue. Clients use MySmartWindow by default."
+      "marcaCatalogo": "Names and codes shown in their catalogue. Distributors use MySmartWindow by default."
     },
     "generatePassword": "Generate",
     "copy": "Copy",
@@ -397,19 +409,18 @@
     "saveChanges": "Save changes",
     "partnersTitle": "Partners",
     "partnersHelp": "companies with their own sub-brand of our devices",
-    "clientsTitle": "Clients",
-    "clientsHelp": "distributors and end customers; they see the devices of their assigned brand",
+    "distribuidoresTitle": "Distributors",
+    "distribuidoresHelp": "companies that buy seeing the devices of their assigned brand",
     "partnersEmpty": "No partners yet.",
     "ownBrand": "{marca} sub-brand",
     "statProducts": "Products",
     "statOrders": "Orders",
     "statDiscount": "Discount",
-    "colClient": "Client",
     "colBrand": "Brand and terms",
     "typePartner": "Partner",
-    "typeClient": "Client",
+    "typeDistribuidor": "Distributor",
     "typePartnerLong": "Partner (own sub-brand)",
-    "typeClientLong": "Client",
+    "typeDistribuidorLong": "Distributor",
     "tabArchived": "Archived",
     "archive": "Archive",
     "unarchive": "Unarchive",
@@ -419,7 +430,11 @@
     "deleteTitle": "Delete {partner}",
     "deleteBody": "The company, {usuarios, plural, one {its user} other {its # users}}, its catalog and its carts will be erased. This cannot be undone. It is only possible because it has no orders; if you prefer to keep its data, archive it.",
     "deleteConfirmLabel": "Type “{partner}” to confirm",
-    "deleteButton": "Delete permanently"
+    "deleteButton": "Delete permanently",
+    "promote": "Promote to Partner",
+    "demote": "Make Distributor",
+    "volumeLine": "{unidades, plural, one {# unit} other {# units}} in {pedidos, plural, one {# order} other {# orders}}",
+    "promoteHint": "This distributor has already bought {unidades} units (threshold: {umbral}). Time to promote them to Partner?"
   },
   "adminPedidos": {
     "title": "Order fulfillment",
@@ -637,7 +652,7 @@
   },
   "adminMarcas": {
     "title": "Brand catalogues",
-    "description": "Each sub-brand has a single catalogue: products, names, SKUs and prices. Every company on that brand (the partner and its clients) sees it right away; each company only adjusts its discount or hides products.",
+    "description": "Each sub-brand has a single catalogue: products, names, SKUs and prices. Every company on that brand (the partner and its distributors) sees it right away; each company only adjusts its discount or hides products.",
     "genericError": "Could not save. Please try again.",
     "sku": "SKU",
     "name": "Name in the brand",
@@ -652,7 +667,7 @@
     "add": "Add",
     "otherBrandsOnly": "Only named in other brands",
     "filled": "{n} products added.",
-    "cardStats": "{productos} products · {partners} partner · {clientes} clients",
+    "cardStats": "{productos} products · {partners} partner · {distribuidores} distributors",
     "search": "Search by name or SKU…",
     "clear": "Clear search",
     "fill": "Add what is missing ({n})",
@@ -697,7 +712,7 @@
       "estados": "Received, Confirmed, In preparation, Prepared and Shipped are the steps of an order, in that order. Cancelled means it has been called off.",
       "precioNeto": "Your unit price with the discount already applied. It is fixed when the order is confirmed.",
       "precioNetoCarrito": "Your unit price with the discount already applied. It can change if the price list changes; once the order is confirmed it is fixed.",
-      "tipoEmpresa": "Partner: has its own sub-brand. Customer: buys seeing the devices of a partner brand."
+      "tipoEmpresa": "Partner: a distributor that buys more and has its own sub-brand. Distributor: buys seeing the devices of its assigned brand, MySmartWindow by default."
     },
     "q": {
       "quePuedoHacer": {
@@ -772,9 +787,9 @@
         "p": "Why does the price of an order not change?",
         "r": "When confirmed, the order keeps the RRP, discount and net price of that moment. They are not recalculated even if the price list changes later."
       },
-      "partnerOCliente": {
-        "p": "Partner or customer?",
-        "r": "A partner has its own sub-brand (VBH, Procomsa, MySmartWindow). A customer buys seeing the devices of a partner brand; MySmartWindow by default."
+      "partnerODistribuidor": {
+        "p": "Partner or distributor?",
+        "r": "A partner is a distributor that buys more and has its own sub-brand (VBH, Procomsa, MySmartWindow). A distributor buys seeing the devices of its assigned brand; MySmartWindow by default."
       },
       "aprobarSolicitud": {
         "p": "How do I approve a request?",

@@ -114,3 +114,24 @@ describe('CatalogoMarcaService.sincronizarEmpresa', () => {
     expect(r.conflictos).toEqual(['B']);
   });
 });
+
+describe('CatalogoMarcaService.listar — recuento de empresas por tipo', () => {
+  it('cuenta partners y distribuidores de la marca (y 0 si no hay de un tipo)', async () => {
+    const prisma = {
+      productoMarca: { findMany: vi.fn().mockResolvedValue([]) },
+      partner: {
+        groupBy: vi.fn().mockResolvedValue([
+          { tipo: 'PARTNER', _count: { _all: 1 } },
+          { tipo: 'DISTRIBUIDOR', _count: { _all: 12 } },
+        ]),
+      },
+    };
+    const servicio = new CatalogoMarcaService(prisma as unknown as PrismaService);
+
+    expect((await servicio.listar('MYSMARTWINDOW')).empresas).toEqual({ partners: 1, distribuidores: 12 });
+    expect(prisma.partner.groupBy).toHaveBeenCalledWith(expect.objectContaining({ where: { marcaCatalogo: 'MYSMARTWINDOW' } }));
+
+    prisma.partner.groupBy.mockResolvedValue([{ tipo: 'PARTNER', _count: { _all: 1 } }]);
+    expect((await servicio.listar('VBH')).empresas).toEqual({ partners: 1, distribuidores: 0 });
+  });
+});

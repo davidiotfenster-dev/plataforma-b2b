@@ -27,7 +27,7 @@ function normalizar(texto: string): string {
 }
 
 /// Familia de marca que ve la empresa: la marca de catálogo de su ficha
-/// (partner: la suya; cliente: MySmartWindow salvo que se cambie).
+/// (partner: la suya; distribuidor: MySmartWindow salvo que se cambie).
 export function familiasDelPartner(partner: Pick<Partner, "marcaCatalogo">): string[] {
   return [FAMILIA_DE_MARCA[partner.marcaCatalogo]];
 }

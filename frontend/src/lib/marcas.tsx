@@ -1,7 +1,7 @@
 import type { MarcaCatalogo, TipoEmpresa } from "./types";
 
 export const MARCAS_CATALOGO: MarcaCatalogo[] = ["MYSMARTWINDOW", "VBH", "PROCOMSA"];
-export const TIPOS_EMPRESA: TipoEmpresa[] = ["PARTNER", "CLIENTE"];
+export const TIPOS_EMPRESA: TipoEmpresa[] = ["PARTNER", "DISTRIBUIDOR"];
 
 /// Nombre y colores de cada submarca en el panel (solo decorativo).
 export const MARCA_INFO: Record<MarcaCatalogo, { etiqueta: string; submarca: string; insignia: string; acento: string; borde: string }> = {

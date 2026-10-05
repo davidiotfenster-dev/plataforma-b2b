@@ -20,6 +20,7 @@ import { AprobarPartnerDto } from './dto/aprobar-partner.dto.js';
 import { ActualizarIdiomaDto } from './dto/actualizar-idioma.dto.js';
 import { OlvidePasswordDto } from './dto/olvide-password.dto.js';
 import { ResetearPasswordDto } from './dto/resetear-password.dto.js';
+import { ReenviarVerificacionDto } from './dto/reenviar-verificacion.dto.js';
 import { LocalAuthGuard } from './guards/local-auth.guard.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { JWT_COOKIE_NAME, cookieSameSite } from './strategies/jwt.strategy.js';
@@ -49,6 +50,17 @@ export class AuthController {
   async verificarEmail(@Query('token') token: string) {
     await this.authService.verificarEmail(token);
     return { mensaje: 'Email verificado correctamente. Su alta queda pendiente de aprobación.' };
+  }
+
+  /// "No me llegó el correo". Responde igual exista o no la cuenta, como `olvide-password`.
+  @Post('reenviar-verificacion')
+  @UseGuards(ThrottlerGuard)
+  @HttpCode(HttpStatus.OK)
+  async reenviarVerificacion(@Body() dto: ReenviarVerificacionDto) {
+    await this.authService.reenviarVerificacion(dto.email);
+    return {
+      mensaje: 'Si existe un registro pendiente de verificar con ese email, se ha enviado un nuevo enlace.',
+    };
   }
 
   @Post('partners/:id/aprobar')

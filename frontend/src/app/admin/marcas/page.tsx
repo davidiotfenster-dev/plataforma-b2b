@@ -237,7 +237,7 @@ function CatalogosMarcaPageContenido() {
   }, [productosBase, actual, marca, texto]);
   const propios = disponibles.filter((d) => d.deLaMarca);
   const deOtras = disponibles.filter((d) => !d.deLaMarca);
-  const numEmpresas = (actual?.empresas.partners ?? 0) + (actual?.empresas.clientes ?? 0);
+  const numEmpresas = (actual?.empresas.partners ?? 0) + (actual?.empresas.distribuidores ?? 0);
 
   return (
     <div style={{ width: "min(1440px, calc(100vw - 3rem))", marginLeft: "calc(50% - min(720px, 50vw - 1.5rem))" }}>
@@ -270,7 +270,7 @@ function CatalogosMarcaPageContenido() {
                 </span>
                 <span className="block text-xs text-neutral-500">
                   {datos
-                    ? t("cardStats", { productos: datos.productos.length, partners: datos.empresas.partners, clientes: datos.empresas.clientes })
+                    ? t("cardStats", { productos: datos.productos.length, partners: datos.empresas.partners, distribuidores: datos.empresas.distribuidores })
                     : "…"}
                 </span>
               </span>

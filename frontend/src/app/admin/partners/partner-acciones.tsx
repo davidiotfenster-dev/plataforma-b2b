@@ -11,9 +11,11 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Modal } from "@/components/modal";
 import type { Partner } from "@/lib/types";
 
-type TipoAccion = "rechazar" | "suspender" | "reactivar" | "archivar" | "desarchivar";
+type TipoAccion = "rechazar" | "suspender" | "reactivar" | "archivar" | "desarchivar" | "promocionar" | "degradar";
 
 const RUTA_ACCION: Record<TipoAccion, (id: string) => string> = {
+  promocionar: (id) => `/partners/${id}/promocionar`,
+  degradar: (id) => `/partners/${id}/degradar`,
   rechazar: (id) => `/auth/partners/${id}/rechazar`,
   suspender: (id) => `/partners/${id}/suspender`,
   reactivar: (id) => `/partners/${id}/reactivar`,
@@ -102,6 +104,8 @@ export function usePartnerAcciones(onHecho?: (mensaje: string) => void, onElimin
     pedirReactivar: (partner: Partner) => pedirConfirmacion("reactivar", partner),
     pedirArchivar: (partner: Partner) => pedirConfirmacion("archivar", partner),
     pedirDesarchivar: (partner: Partner) => pedirConfirmacion("desarchivar", partner),
+    pedirPromocionar: (partner: Partner) => pedirConfirmacion("promocionar", partner),
+    pedirDegradar: (partner: Partner) => pedirConfirmacion("degradar", partner),
     pedirEliminar: (partner: Partner) => setEliminando(partner),
     dialogos,
   };

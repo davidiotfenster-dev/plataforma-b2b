@@ -4,7 +4,7 @@ export type Idioma = "ES" | "EN" | "DE" | "IT" | "PT";
 
 export type EstadoPartner = "PENDIENTE_VERIFICACION_EMAIL" | "PENDIENTE_APROBACION" | "ACTIVO" | "SUSPENDIDO" | "RECHAZADO";
 
-export type TipoEmpresa = "PARTNER" | "CLIENTE";
+export type TipoEmpresa = "PARTNER" | "DISTRIBUIDOR";
 
 export type MarcaCatalogo = "VBH" | "PROCOMSA" | "MYSMARTWINDOW";
 
@@ -240,7 +240,7 @@ export interface ProductoMarcaAdmin {
 export interface CatalogoMarcaAdmin {
   marca: MarcaCatalogo;
   productos: ProductoMarcaAdmin[];
-  empresas: { partners: number; clientes: number };
+  empresas: { partners: number; distribuidores: number };
 }
 
 export interface Partner {
@@ -272,7 +272,7 @@ export interface Partner {
   iva: string | null;
   notas: string | null;
   estado: EstadoPartner;
-  /// Partner (submarca propia) o cliente (usa la marca de un partner).
+  /// Partner (submarca propia) o distribuidor (usa la marca de un partner).
   tipo: TipoEmpresa;
   /// Marca cuyos dispositivos ve la empresa.
   marcaCatalogo: MarcaCatalogo;
@@ -282,6 +282,16 @@ export interface Partner {
   createdAt: string;
   /// Cuántos usuarios, productos de catálogo y pedidos tiene (el listado y la ficha los traen ya contados).
   _count?: { usuarios: number; representaciones: number; ordenes: number };
+  /// Solo viene en la ficha (`GET /partners/:id`), no en el listado.
+  volumen?: VolumenCompras;
+}
+
+/// Lo que lleva comprado una empresa (sin pedidos cancelados). `umbralPromocion` es el
+/// aviso configurado en el servidor (PARTNER_UMBRAL_UNIDADES); nulo si no hay.
+export interface VolumenCompras {
+  unidades: number;
+  pedidos: number;
+  umbralPromocion: number | null;
 }
 
 /// Cifras de las pestañas del panel de partners (`GET /partners/resumen`).

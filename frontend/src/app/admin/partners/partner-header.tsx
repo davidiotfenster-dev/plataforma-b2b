@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Archive, ArrowLeft, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, CheckCircle2, TrendingUp, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { EstadoPartnerBadge, PartnerAvatar, tieneDatosPorCompletar } from "@/components/partner-ui";
 import { useMe } from "@/hooks/use-me";
@@ -31,6 +31,8 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
     queryKey: ["admin-partner", partnerId],
     queryFn: () => api.get<Partner>(`/partners/${partnerId}`),
   });
+
+  const puedePromocionar = esAdmin && partner?.tipo === "DISTRIBUIDOR" && partner.estado === "ACTIVO" && !partner.archivadoEn;
 
   if (isError) {
     return (
@@ -76,7 +78,7 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                       partner.tipo === "PARTNER" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"
                     }`}
                   >
-                    {t(partner.tipo === "PARTNER" ? "typePartner" : "typeClient")}
+                    {t(partner.tipo === "PARTNER" ? "typePartner" : "typeDistribuidor")}
                   </span>
                   <InsigniaMarca marca={partner.marcaCatalogo} />
                 </div>
@@ -85,6 +87,11 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                     .filter(Boolean)
                     .join(" · ")}
                 </p>
+                {partner.volumen && (
+                  <p className="mt-0.5 text-sm text-neutral-500">
+                    {t("volumeLine", { unidades: partner.volumen.unidades, pedidos: partner.volumen.pedidos })}
+                  </p>
+                )}
               </>
             ) : (
               <span className="block h-8 w-64 animate-pulse rounded bg-neutral-200" />
@@ -126,6 +133,23 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
                 {t("reactivate")}
               </button>
             )}
+            {/* Ser partner lo decide solo un admin: el servidor también lo exige (403 al comercial). */}
+            {puedePromocionar && (
+              <button
+                onClick={() => acciones.pedirPromocionar(partner)}
+                className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+              >
+                {t("promote")}
+              </button>
+            )}
+            {esAdmin && partner.tipo === "PARTNER" && (
+              <button
+                onClick={() => acciones.pedirDegradar(partner)}
+                className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                {t("demote")}
+              </button>
+            )}
             <button
               onClick={() => (partner.archivadoEn ? acciones.pedirDesarchivar(partner) : acciones.pedirArchivar(partner))}
               className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
@@ -160,6 +184,13 @@ export function PartnerHeader({ partnerId, activa }: { partnerId: string; activa
           <button onClick={() => setMensaje(null)} aria-label={t("dismissMessage")} className="text-green-700 hover:text-green-900">
             <X size={14} />
           </button>
+        </p>
+      )}
+
+      {puedePromocionar && partner?.volumen?.umbralPromocion != null && partner.volumen.unidades >= partner.volumen.umbralPromocion && (
+        <p className="mt-4 flex flex-wrap items-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
+          <TrendingUp size={16} className="shrink-0" />
+          <span>{t("promoteHint", { unidades: partner.volumen.unidades, umbral: partner.volumen.umbralPromocion })}</span>
         </p>
       )}
 

@@ -62,7 +62,7 @@ function ListaPartners() {
     queryFn: () => api.get<ResumenPartners>("/partners/resumen"),
   });
 
-  function consultaEmpresas(tipo: "PARTNER" | "CLIENTE", page: number, limit: number) {
+  function consultaEmpresas(tipo: "PARTNER" | "DISTRIBUIDOR", page: number, limit: number) {
     const consulta = new URLSearchParams({ tipo, page: String(page), limit: String(limit) });
     if (estado && !archivadas) consulta.set("estado", estado);
     if (archivadas) consulta.set("archivadas", "true");
@@ -79,8 +79,8 @@ function ListaPartners() {
   });
 
   const { data: respuesta, isLoading } = useQuery<Paginado<Partner>>({
-    queryKey: ["admin-partners", { tipo: "CLIENTE", estado, archivadas, soloIncompletos, pagina, q }],
-    queryFn: () => consultaEmpresas("CLIENTE", pagina, LIMITE_POR_PAGINA),
+    queryKey: ["admin-partners", { tipo: "DISTRIBUIDOR", estado, archivadas, soloIncompletos, pagina, q }],
+    queryFn: () => consultaEmpresas("DISTRIBUIDOR", pagina, LIMITE_POR_PAGINA),
     placeholderData: keepPreviousData,
   });
 
@@ -125,7 +125,7 @@ function ListaPartners() {
     ];
   }
 
-  /// Tarjeta de una empresa. Partner: el logo de su submarca. Cliente: sus
+  /// Tarjeta de una empresa. Partner: el logo de su submarca. Distribuidor: sus
   /// iniciales y la marca cuyos dispositivos ve. El borde superior es el color de esa marca.
   function tarjetaEmpresa(partner: Partner) {
     const info = MARCA_INFO[partner.marcaCatalogo];
@@ -361,9 +361,9 @@ function ListaPartners() {
       <div className="mb-3 flex items-center gap-2">
         <Building2 size={18} className="text-neutral-700" />
         <h2 className="text-lg font-semibold text-neutral-900">
-          {t("clientsTitle")} <span className="font-normal text-neutral-400">{respuesta?.total ?? ""}</span>
+          {t("distribuidoresTitle")} <span className="font-normal text-neutral-400">{respuesta?.total ?? ""}</span>
         </h2>
-        <p className="hidden text-sm text-neutral-500 sm:block">· {t("clientsHelp")}</p>
+        <p className="hidden text-sm text-neutral-500 sm:block">· {t("distribuidoresHelp")}</p>
       </div>
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">

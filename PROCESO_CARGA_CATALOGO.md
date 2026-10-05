@@ -160,3 +160,10 @@ Para poder probar el panel de un partner con todo el catálogo, se rellenó lo q
 - Escritorio (≥1280 px): una fila → marca | secciones | idioma + Salir. Tablet (768–1279 px): fila 1 marca … idioma + Salir, fila 2 secciones. Móvil: fila 1 marca … Salir, debajo secciones e idioma.
 - El email del usuario no cabía en la barra principal: se muestra en una franja fina encima ("Sesión iniciada como <email> · <empresa o rol>", a la derecha, visible en escritorio, tablet y móvil) y además queda en el tooltip de "Salir" y en su etiqueta para lectores de pantalla.
 - Medido con admin en 1440, 1280, 1024, 768 y 375 px: sin scroll horizontal y cada bloque en su fila.
+
+
+---
+
+## Nota 2026-10-02: «cliente» se llama ahora «distribuidor»
+
+Este diario es de fechas anteriores y no se reescribe. Donde diga `CLIENTE` o «cliente» como tipo de empresa, léase `DISTRIBUIDOR` / «distribuidor»: el valor se renombró con la migración `20261002150000_renombrar_tipo_empresa_cliente_a_distribuidor`. Ver `CONTEXTO_SESION.md`.

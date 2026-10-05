@@ -1,11 +1,18 @@
 import { EstadoPedido, Idioma } from '../../generated/prisma/enums.js';
 
-/// Traducciones de los emails transaccionales existentes (confirmación de
-/// pedido y cambio de estado), en el idioma preferido del destinatario
+/// Traducciones de los emails transaccionales (confirmación de pedido, cambio
+/// de estado, restablecer contraseña y alta de empresas: verificación,
+/// aprobada, rechazada), en el idioma preferido del destinatario
 /// (`User.idioma`). Deliberadamente separado de `EmailService` (que solo
 /// sabe enviar, no de negocio) para mantener el servicio de envío agnóstico
-/// del idioma. La verificación de registro y el resumen en PDF quedan fuera
-/// de este alcance (ver PROGRESO.md, bloque E del backlog de frontend).
+/// del idioma. El aviso interno de nueva solicitud va siempre en español: lo
+/// reciben los administradores de IoT FENSTER.
+
+/// Los datos que escribe el usuario (razón social, país) acaban dentro del HTML
+/// de un correo: se escapan para que no puedan inyectar etiquetas.
+export function escaparHtml(texto: string): string {
+  return texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 const ESTADOS: Record<Idioma, Record<EstadoPedido, string>> = {
   ES: {
@@ -162,4 +169,83 @@ export function cuerpoResetPassword(idioma: Idioma, enlace: string): string {
     PT: `<p>Recebemos um pedido para repor a sua palavra-passe. Este link expira em 1 hora:</p><p><a href="${enlace}">${enlace}</a></p><p>Se não foi você, pode ignorar este email.</p>`,
   };
   return cuerpos[idioma];
+}
+
+export function asuntoVerificacionEmail(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Confirma tu correo en IoT FENSTER',
+    EN: 'Confirm your email at IoT FENSTER',
+    DE: 'Bestätigen Sie Ihre E-Mail-Adresse bei IoT FENSTER',
+    IT: 'Conferma la tua email su IoT FENSTER',
+    PT: 'Confirme o seu email na IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoVerificacionEmail(idioma: Idioma, enlace: string): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Gracias por registrar tu empresa. Confirma tu correo corporativo con este enlace (caduca en 24 horas):</p><p><a href="${enlace}">${enlace}</a></p><p>Después, un administrador de IoT FENSTER revisará y aprobará el alta. Si no has sido tú, puedes ignorar este correo.</p>`,
+    EN: `<p>Thank you for registering your company. Please confirm your corporate email with this link (it expires in 24 hours):</p><p><a href="${enlace}">${enlace}</a></p><p>An IoT FENSTER administrator will then review and approve your registration. If this wasn't you, you can ignore this email.</p>`,
+    DE: `<p>Vielen Dank für die Registrierung Ihres Unternehmens. Bitte bestätigen Sie Ihre Firmen-E-Mail über diesen Link (gültig für 24 Stunden):</p><p><a href="${enlace}">${enlace}</a></p><p>Anschließend prüft und genehmigt ein Administrator von IoT FENSTER Ihre Registrierung. Falls Sie das nicht waren, können Sie diese E-Mail ignorieren.</p>`,
+    IT: `<p>Grazie per aver registrato la tua azienda. Conferma la tua email aziendale con questo link (scade tra 24 ore):</p><p><a href="${enlace}">${enlace}</a></p><p>Poi un amministratore di IoT FENSTER esaminerà e approverà la registrazione. Se non sei stato tu, puoi ignorare questa email.</p>`,
+    PT: `<p>Obrigado por registar a sua empresa. Confirme o seu email corporativo com este link (expira em 24 horas):</p><p><a href="${enlace}">${enlace}</a></p><p>Depois, um administrador da IoT FENSTER irá analisar e aprovar o registo. Se não foi você, pode ignorar este email.</p>`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoCuentaAprobada(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Tu cuenta de IoT FENSTER está activa',
+    EN: 'Your IoT FENSTER account is active',
+    DE: 'Ihr IoT FENSTER-Konto ist aktiv',
+    IT: 'Il tuo account IoT FENSTER è attivo',
+    PT: 'A sua conta IoT FENSTER está ativa',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoCuentaAprobada(idioma: Idioma, enlaceLogin: string): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Tu empresa ha sido aprobada. Ya puedes iniciar sesión y hacer pedidos:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p>`,
+    EN: `<p>Your company has been approved. You can now sign in and place orders:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p>`,
+    DE: `<p>Ihr Unternehmen wurde genehmigt. Sie können sich jetzt anmelden und Bestellungen aufgeben:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p>`,
+    IT: `<p>La tua azienda è stata approvata. Ora puoi accedere e fare ordini:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p>`,
+    PT: `<p>A sua empresa foi aprovada. Já pode iniciar sessão e fazer encomendas:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p>`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoCuentaRechazada(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Sobre tu solicitud de alta en IoT FENSTER',
+    EN: 'About your IoT FENSTER registration request',
+    DE: 'Zu Ihrer Registrierungsanfrage bei IoT FENSTER',
+    IT: 'Sulla tua richiesta di registrazione su IoT FENSTER',
+    PT: 'Sobre o seu pedido de registo na IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoCuentaRechazada(idioma: Idioma): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: '<p>No hemos podido aprobar el alta de tu empresa en este momento. Si crees que se trata de un error, ponte en contacto con IoT FENSTER.</p>',
+    EN: '<p>We were unable to approve your company registration at this time. If you believe this is a mistake, please contact IoT FENSTER.</p>',
+    DE: '<p>Wir konnten die Registrierung Ihres Unternehmens derzeit nicht genehmigen. Wenn Sie glauben, dass es sich um einen Irrtum handelt, wenden Sie sich bitte an IoT FENSTER.</p>',
+    IT: '<p>Al momento non siamo riusciti ad approvare la registrazione della tua azienda. Se pensi che si tratti di un errore, contatta IoT FENSTER.</p>',
+    PT: '<p>De momento não foi possível aprovar o registo da sua empresa. Se considera que se trata de um engano, contacte a IoT FENSTER.</p>',
+  };
+  return cuerpos[idioma];
+}
+
+/// Aviso interno (siempre en español) a los administradores cuando una empresa
+/// ha verificado su correo y queda pendiente de aprobación.
+export function asuntoNuevaSolicitud(razonSocial: string): string {
+  return `Nueva solicitud de alta: ${razonSocial.replace(/[\r\n]+/g, ' ')}`;
+}
+
+export function cuerpoNuevaSolicitud(razonSocial: string, pais: string, enlace: string): string {
+  return (
+    `<p>La empresa <strong>${escaparHtml(razonSocial)}</strong> (${escaparHtml(pais)}) ha verificado su correo y espera aprobación.</p>` +
+    `<p><a href="${enlace}">Revisar la solicitud</a></p>`
+  );
 }

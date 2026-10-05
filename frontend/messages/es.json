@@ -232,7 +232,7 @@
   },
   "adminPartners": {
     "title": "Empresas",
-    "subtitle": "Partners con submarca propia y clientes que compran con la marca de un partner: altas, condiciones y catálogo.",
+    "subtitle": "Partners con submarca propia y distribuidores que compran con la marca de un partner: altas, condiciones y catálogo.",
     "newPartner": "Nueva empresa",
     "dismissMessage": "Cerrar aviso",
     "pendingBanner": "{n, plural, one {# partner espera tu aprobación.} other {# partners esperan tu aprobación.}}",
@@ -274,7 +274,9 @@
       "reactivar": "{partner} reactivado.",
       "archivar": "{partner} archivada.",
       "desarchivar": "{partner} desarchivada.",
-      "eliminar": "{partner} eliminada."
+      "eliminar": "{partner} eliminada.",
+      "promocionar": "{partner} ahora es Partner.",
+      "degradar": "{partner} vuelve a ser Distribuidor."
     },
     "confirm": {
       "rechazar": {
@@ -301,6 +303,16 @@
         "title": "¿Desarchivar a {partner}?",
         "body": "Volverá a aparecer en las listas y, si estaba activa, sus usuarios podrán entrar de nuevo.",
         "button": "Desarchivar"
+      },
+      "promocionar": {
+        "title": "¿Promocionar a {partner} a Partner?",
+        "body": "Pasa a ser Partner (submarca propia), normalmente porque su volumen de compra lo justifica. Queda registrado en la auditoría con las unidades compradas hasta hoy, y puedes revertirlo.",
+        "button": "Promocionar"
+      },
+      "degradar": {
+        "title": "¿Devolver a {partner} a Distribuidor?",
+        "body": "Deja de ser Partner y pasa a Distribuidor. Sus datos y pedidos no cambian. Queda registrado en la auditoría.",
+        "button": "Pasar a Distribuidor"
       }
     },
     "approveTitle": "Aprobar a {partner}",
@@ -385,7 +397,7 @@
       "marcaComercial": "Decide qué nombres y SKU ve al asignarle productos: VBH, Procomsa…",
       "descuentoPorcentaje": "Se aplica a todos sus productos salvo los que tengan un descuento propio.",
       "passwordUsuario": "Mínimo 8 caracteres. Se la comunicas tú al partner.",
-      "marcaCatalogo": "Nombres y códigos que verá en su catálogo. Un cliente usa MySmartWindow por defecto."
+      "marcaCatalogo": "Nombres y códigos que verá en su catálogo. Un distribuidor usa MySmartWindow por defecto."
     },
     "generatePassword": "Generar",
     "copy": "Copiar",
@@ -397,19 +409,18 @@
     "saveChanges": "Guardar cambios",
     "partnersTitle": "Partners",
     "partnersHelp": "empresas con submarca propia de nuestros dispositivos",
-    "clientsTitle": "Clientes",
-    "clientsHelp": "distribuidores y clientes finales; ven los dispositivos de la marca asignada",
+    "distribuidoresTitle": "Distribuidores",
+    "distribuidoresHelp": "empresas que compran viendo los dispositivos de la marca asignada",
     "partnersEmpty": "Todavía no hay partners.",
     "ownBrand": "Submarca {marca}",
     "statProducts": "Productos",
     "statOrders": "Pedidos",
     "statDiscount": "Descuento",
-    "colClient": "Cliente",
     "colBrand": "Marca y condiciones",
     "typePartner": "Partner",
-    "typeClient": "Cliente",
+    "typeDistribuidor": "Distribuidor",
     "typePartnerLong": "Partner (submarca propia)",
-    "typeClientLong": "Cliente",
+    "typeDistribuidorLong": "Distribuidor",
     "tabArchived": "Archivadas",
     "archive": "Archivar",
     "unarchive": "Desarchivar",
@@ -419,7 +430,11 @@
     "deleteTitle": "Eliminar {partner}",
     "deleteBody": "Se borrarán la empresa, {usuarios, plural, one {su usuario} other {sus # usuarios}}, su catálogo y sus carritos. No se puede deshacer. Solo es posible porque no tiene pedidos; si prefieres conservar sus datos, archívala.",
     "deleteConfirmLabel": "Escribe «{partner}» para confirmar",
-    "deleteButton": "Eliminar definitivamente"
+    "deleteButton": "Eliminar definitivamente",
+    "promote": "Promocionar a Partner",
+    "demote": "Pasar a Distribuidor",
+    "volumeLine": "{unidades, plural, one {# unidad} other {# unidades}} en {pedidos, plural, one {# pedido} other {# pedidos}}",
+    "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?"
   },
   "adminPedidos": {
     "title": "Fulfillment de pedidos",
@@ -637,7 +652,7 @@
   },
   "adminMarcas": {
     "title": "Catálogos de marca",
-    "description": "Cada submarca tiene un único catálogo: productos, nombres, SKU y precios. Todas las empresas de esa marca (el partner y sus clientes) lo ven al momento; cada empresa solo ajusta su descuento u oculta productos.",
+    "description": "Cada submarca tiene un único catálogo: productos, nombres, SKU y precios. Todas las empresas de esa marca (el partner y sus distribuidores) lo ven al momento; cada empresa solo ajusta su descuento u oculta productos.",
     "genericError": "No se ha podido guardar. Inténtalo de nuevo.",
     "sku": "SKU",
     "name": "Nombre en la marca",
@@ -652,7 +667,7 @@
     "add": "Añadir",
     "otherBrandsOnly": "Solo tiene nombre en otras marcas",
     "filled": "{n} productos añadidos.",
-    "cardStats": "{productos} productos · {partners} partner · {clientes} clientes",
+    "cardStats": "{productos} productos · {partners} partner · {distribuidores} distribuidores",
     "search": "Buscar por nombre o SKU…",
     "clear": "Borrar búsqueda",
     "fill": "Añadir lo que falta ({n})",
@@ -697,7 +712,7 @@
       "estados": "Recibido, Confirmado, En preparación, Preparado y Enviado son los pasos de un pedido, en ese orden. Cancelado significa que se ha anulado.",
       "precioNeto": "Tu precio unitario con el descuento ya aplicado. Queda fijado al confirmar el pedido.",
       "precioNetoCarrito": "Tu precio unitario con el descuento ya aplicado. Puede cambiar si cambia la tarifa; al confirmar el pedido queda fijado.",
-      "tipoEmpresa": "Partner: tiene submarca propia. Cliente: compra viendo los dispositivos de la marca de un partner."
+      "tipoEmpresa": "Partner: distribuidor que compra más y tiene submarca propia. Distribuidor: compra viendo los dispositivos de la marca asignada, por defecto MySmartWindow."
     },
     "q": {
       "quePuedoHacer": {
@@ -772,9 +787,9 @@
         "p": "¿Por qué el precio de un pedido no cambia?",
         "r": "Al confirmar, el pedido guarda el PVP, el descuento y el precio neto de ese momento. No se recalculan aunque la tarifa cambie después."
       },
-      "partnerOCliente": {
-        "p": "¿Partner o cliente?",
-        "r": "Un partner tiene submarca propia (VBH, Procomsa, MySmartWindow). Un cliente compra viendo los dispositivos de la marca de un partner; por defecto, MySmartWindow."
+      "partnerODistribuidor": {
+        "p": "¿Partner o distribuidor?",
+        "r": "Un partner es un distribuidor que compra más y tiene submarca propia (VBH, Procomsa, MySmartWindow). Un distribuidor compra viendo los dispositivos de la marca asignada; por defecto, MySmartWindow."
       },
       "aprobarSolicitud": {
         "p": "¿Cómo apruebo una solicitud?",

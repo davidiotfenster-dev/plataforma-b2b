@@ -11,7 +11,7 @@ export class ListarPartnersQueryDto extends PaginacionQueryDto {
   @IsString()
   busqueda?: string;
 
-  /// Solo partners o solo clientes.
+  /// Solo partners o solo distribuidores.
   @IsOptional()
   @IsIn(TIPOS_EMPRESA)
   tipo?: (typeof TIPOS_EMPRESA)[number];

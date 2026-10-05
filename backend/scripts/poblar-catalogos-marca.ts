@@ -1,6 +1,6 @@
 /// Rellena el catálogo de cada submarca (Wave, ICON, Connect) con los
 /// productos que vende, con su nombre, SKU y PVP de tarifa, y deja el catálogo
-/// de cada empresa (partner o cliente) al día con el de su marca. Los productos
+/// de cada empresa (partner o distribuidor) al día con el de su marca. Los productos
 /// que una empresa ya tenía se enlazan a su marca conservando su descuento y si
 /// estaban ocultos. Idempotente: añade solo lo que falta.
 ///
