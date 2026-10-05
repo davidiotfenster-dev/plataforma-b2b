@@ -94,6 +94,26 @@
     "backToLogin": "Zur Anmeldung",
     "genericError": "Fehler beim Zurücksetzen des Passworts"
   },
+  "verificarEmail": {
+    "verifying": "Ihre E-Mail-Adresse wird bestätigt…",
+    "doneTitle": "E-Mail-Adresse bestätigt",
+    "doneBody": "Vielen Dank. Ihre Registrierung wartet jetzt auf Freigabe: IoT FENSTER prüft die Daten Ihres Unternehmens und benachrichtigt Sie per E-Mail, sobald Sie sich anmelden können.",
+    "goToLogin": "Zur Anmeldung",
+    "alreadyTitle": "Diese E-Mail-Adresse war bereits bestätigt",
+    "alreadyBody": "Sie müssen nichts weiter tun. Wenn Ihre Registrierung freigegeben ist, können Sie sich anmelden; andernfalls benachrichtigen wir Sie per E-Mail.",
+    "expiredTitle": "Der Link ist abgelaufen",
+    "expiredBody": "Bestätigungslinks sind 24 Stunden gültig. Fordern Sie mit der E-Mail-Adresse, mit der Sie Ihr Unternehmen registriert haben, einen neuen an.",
+    "invalidTitle": "Dieser Link funktioniert nicht",
+    "invalidBody": "Möglicherweise wurde er bereits verwendet oder ist unvollständig. Wenn Sie Ihre E-Mail-Adresse bereits bestätigt haben, müssen Sie nichts weiter tun; andernfalls fordern Sie einen neuen Link an.",
+    "genericError": "Ihre E-Mail-Adresse konnte nicht bestätigt werden. Versuchen Sie es in einigen Minuten erneut oder fordern Sie einen neuen Link an.",
+    "missingTokenTitle": "Dem Link fehlt ein Teil",
+    "missingTokenBody": "Öffnen Sie den vollständigen Link aus der E-Mail oder fordern Sie einen neuen an.",
+    "resendLabel": "Brauchen Sie einen neuen Link? Geben Sie die E-Mail-Adresse ein, mit der Sie Ihr Unternehmen registriert haben",
+    "resendSubmit": "Neuen Link senden",
+    "resendSubmitting": "Wird gesendet…",
+    "resendDone": "Falls zu dieser E-Mail-Adresse eine Registrierung auf Bestätigung wartet, haben wir Ihnen einen neuen Link gesendet. Prüfen Sie auch Ihren Spam-Ordner.",
+    "tooManyRequests": "Zu viele Versuche hintereinander. Warten Sie eine Minute und versuchen Sie es erneut."
+  },
   "registro": {
     "title": "Unternehmen registrieren",
     "razonSocial": "Firmenname",

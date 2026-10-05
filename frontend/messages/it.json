@@ -94,6 +94,26 @@
     "backToLogin": "Vai al login",
     "genericError": "Errore durante la reimpostazione della password"
   },
+  "verificarEmail": {
+    "verifying": "Verifica della tua email in corso…",
+    "doneTitle": "Email verificata",
+    "doneBody": "Grazie. La tua registrazione è ora in attesa di approvazione: IoT FENSTER esaminerà i dati della tua azienda e ti avviserà via email quando potrai accedere.",
+    "goToLogin": "Vai all'accesso",
+    "alreadyTitle": "Questa email era già verificata",
+    "alreadyBody": "Non devi fare altro. Se la tua registrazione è già approvata puoi accedere; altrimenti ti avviseremo via email.",
+    "expiredTitle": "Il link è scaduto",
+    "expiredBody": "I link di verifica valgono 24 ore. Richiedine uno nuovo con l'email con cui hai registrato la tua azienda.",
+    "invalidTitle": "Questo link non funziona",
+    "invalidBody": "Potresti averlo già usato oppure è incompleto. Se hai già verificato la tua email non devi fare altro; altrimenti richiedi un nuovo link.",
+    "genericError": "Non è stato possibile verificare l'email. Riprova tra qualche minuto o richiedi un nuovo link.",
+    "missingTokenTitle": "Al link manca una parte",
+    "missingTokenBody": "Apri il link completo che hai ricevuto via email oppure richiedine uno nuovo.",
+    "resendLabel": "Ti serve un nuovo link? Inserisci l'email con cui hai registrato la tua azienda",
+    "resendSubmit": "Invia nuovo link",
+    "resendSubmitting": "Invio in corso…",
+    "resendDone": "Se c'è una registrazione in attesa di verifica con questa email, ti abbiamo inviato un nuovo link. Controlla anche la cartella spam.",
+    "tooManyRequests": "Troppi tentativi di seguito. Attendi un minuto e riprova."
+  },
   "registro": {
     "title": "Registra la tua azienda",
     "razonSocial": "Ragione sociale",

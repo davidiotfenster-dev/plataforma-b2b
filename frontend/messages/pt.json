@@ -94,6 +94,26 @@
     "backToLogin": "Ir para o login",
     "genericError": "Erro ao repor a palavra-passe"
   },
+  "verificarEmail": {
+    "verifying": "A verificar o seu email…",
+    "doneTitle": "Email verificado",
+    "doneBody": "Obrigado. O seu registo fica agora pendente de aprovação: a IoT FENSTER vai rever os dados da sua empresa e avisá-lo por email quando puder entrar.",
+    "goToLogin": "Ir para o início de sessão",
+    "alreadyTitle": "Este email já estava verificado",
+    "alreadyBody": "Não precisa de fazer mais nada. Se o seu registo já foi aprovado, pode iniciar sessão; caso contrário, avisá-lo-emos por email.",
+    "expiredTitle": "A ligação expirou",
+    "expiredBody": "As ligações de verificação são válidas durante 24 horas. Peça uma nova com o email com que registou a sua empresa.",
+    "invalidTitle": "Esta ligação não funciona",
+    "invalidBody": "Pode já ter sido usada ou estar incompleta. Se já verificou o seu email, não precisa de fazer mais nada; caso contrário, peça uma nova ligação.",
+    "genericError": "Não foi possível verificar o email. Tente novamente dentro de alguns minutos ou peça uma nova ligação.",
+    "missingTokenTitle": "Falta uma parte da ligação",
+    "missingTokenBody": "Abra a ligação completa que recebeu por email ou peça uma nova.",
+    "resendLabel": "Precisa de uma nova ligação? Indique o email com que registou a sua empresa",
+    "resendSubmit": "Enviar nova ligação",
+    "resendSubmitting": "A enviar…",
+    "resendDone": "Se existir um registo pendente de verificação com esse email, enviámos-lhe uma nova ligação. Verifique também a pasta de spam.",
+    "tooManyRequests": "Demasiadas tentativas seguidas. Aguarde um minuto e tente novamente."
+  },
   "registro": {
     "title": "Registar a minha empresa",
     "razonSocial": "Denominação social",

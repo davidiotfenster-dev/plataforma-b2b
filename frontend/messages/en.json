@@ -94,6 +94,26 @@
     "backToLogin": "Go to log in",
     "genericError": "Error resetting the password"
   },
+  "verificarEmail": {
+    "verifying": "Verifying your email…",
+    "doneTitle": "Email verified",
+    "doneBody": "Thank you. Your registration is now awaiting approval: IoT FENSTER will review your company details and let you know by email when you can sign in.",
+    "goToLogin": "Go to sign in",
+    "alreadyTitle": "This email was already verified",
+    "alreadyBody": "There is nothing else to do. If your registration has been approved you can sign in; otherwise we will let you know by email.",
+    "expiredTitle": "The link has expired",
+    "expiredBody": "Verification links are valid for 24 hours. Request a new one with the email you used to register your company.",
+    "invalidTitle": "This link does not work",
+    "invalidBody": "You may have used it already, or it may be incomplete. If you have already verified your email there is nothing else to do; otherwise request a new link.",
+    "genericError": "We could not verify your email. Try again in a few minutes or request a new link.",
+    "missingTokenTitle": "Part of the link is missing",
+    "missingTokenBody": "Open the full link you received by email, or request a new one.",
+    "resendLabel": "Need a new link? Enter the email you used to register your company",
+    "resendSubmit": "Send new link",
+    "resendSubmitting": "Sending…",
+    "resendDone": "If there is a registration awaiting verification with that email, we have sent you a new link. Please also check your spam folder.",
+    "tooManyRequests": "Too many attempts in a row. Wait a minute and try again."
+  },
   "registro": {
     "title": "Register your company",
     "razonSocial": "Company name",
