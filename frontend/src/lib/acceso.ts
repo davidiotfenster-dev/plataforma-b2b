@@ -6,6 +6,7 @@ import type { RolUsuario } from "@/lib/types";
 /// que alguien vea una pantalla vacía o a medio cargar que no es la suya.
 const ZONAS: { prefijos: string[]; roles: RolUsuario[] }[] = [
   { prefijos: ["/admin"], roles: ["ADMIN_FENSTER", "COMERCIAL"] },
+  { prefijos: ["/equipo"], roles: ["PARTNER_ADMIN"] },
   {
     prefijos: ["/catalogo", "/carrito", "/checkout", "/pedidos"],
     roles: ["PARTNER_ADMIN", "PARTNER_COMPRADOR", "PARTNER_CONSULTA"],

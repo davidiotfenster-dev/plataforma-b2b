@@ -3,10 +3,12 @@ import { AuthService } from './auth.service.js';
 import {
   asuntoCuentaAprobada,
   asuntoCuentaRechazada,
+  asuntoInvitacionUsuario,
   asuntoNuevaSolicitud,
   asuntoVerificacionEmail,
   cuerpoCuentaAprobada,
   cuerpoCuentaRechazada,
+  cuerpoInvitacionUsuario,
   cuerpoNuevaSolicitud,
   cuerpoVerificacionEmail,
 } from '../common/email/plantillas-email.js';
@@ -37,6 +39,7 @@ describe('AuthService — correos del alta de empresas', () => {
     $transaction: ReturnType<typeof vi.fn>;
   };
   let email: { enviar: ReturnType<typeof vi.fn> };
+  let jwt: { signAsync: ReturnType<typeof vi.fn>; decode: ReturnType<typeof vi.fn>; verifyAsync: ReturnType<typeof vi.fn> };
   let service: AuthService;
 
   const alta = (idioma?: Idioma) =>
@@ -72,7 +75,7 @@ describe('AuthService — correos del alta de empresas', () => {
       ),
     };
     email = { enviar: vi.fn().mockResolvedValue(undefined) };
-    const jwt = {
+    jwt = {
       signAsync: vi.fn().mockResolvedValue('tok-123'),
       decode: vi.fn().mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 }),
       verifyAsync: vi.fn().mockResolvedValue({ sub: 'user-1' }),
@@ -186,6 +189,23 @@ describe('AuthService — correos del alta de empresas', () => {
     });
   });
 
+  describe('invitar a un usuario nuevo', () => {
+    it('le manda el enlace para crear su contraseña, válido 7 días, con el texto de invitación', async () => {
+      await service.invitarUsuario({ id: 'user-9', email: 'luis@nueva.com', idioma: Idioma.EN }, 'Nueva S.L.');
+
+      expect(jwt.signAsync).toHaveBeenCalledWith({ sub: 'user-9', tipo: 'reset-password' }, { expiresIn: '7d' });
+      expect(prisma.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 'user-9' }, data: expect.objectContaining({ tokenResetPassword: 'tok-123' }) }),
+      );
+      const enlace = `${FRONTEND}/resetear-password?token=tok-123`;
+      expect(email.enviar).toHaveBeenCalledWith(
+        'luis@nueva.com',
+        asuntoInvitacionUsuario(Idioma.EN),
+        cuerpoInvitacionUsuario(Idioma.EN, enlace, 'Nueva S.L.'),
+      );
+    });
+  });
+
   describe('aprobar y rechazar', () => {
     beforeEach(() => {
       prisma.partner.findUnique.mockResolvedValue({ id: 'partner-1', estado: 'PENDIENTE_APROBACION' });
@@ -243,6 +263,14 @@ describe('plantillas del alta de empresas', () => {
     }
     expect(cuerpoVerificacionEmail(idioma, enlace)).toContain(enlace);
     expect(cuerpoCuentaAprobada(idioma, enlace)).toContain(enlace);
+  });
+
+  it.each(idiomas)('la invitación a un usuario nuevo lleva el enlace y la empresa escapada en %s', (idioma) => {
+    const enlace = 'https://portal.test/resetear-password?token=abc';
+    const cuerpo = cuerpoInvitacionUsuario(idioma, enlace, '<b>Hausen</b> & Co');
+    expect(asuntoInvitacionUsuario(idioma).trim().length).toBeGreaterThan(10);
+    expect(cuerpo).toContain(enlace);
+    expect(cuerpo).toContain('&lt;b&gt;Hausen&lt;/b&gt; &amp; Co');
   });
 
   it('el aviso interno escapa el HTML y no deja saltos de línea en el asunto', () => {

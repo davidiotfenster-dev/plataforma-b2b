@@ -32,6 +32,7 @@
     "catalogo": "Catalogo",
     "carrito": "Carrello",
     "pedidos": "Ordini",
+    "usuarios": "Utenti",
     "partners": "Aziende",
     "logout": "Esci",
     "login": "Accedi",
@@ -115,6 +116,32 @@
     "resendSubmitting": "Invio in corso…",
     "resendDone": "Se c'è una registrazione in attesa di verifica con questa email, ti abbiamo inviato un nuovo link. Controlla anche la cartella spam.",
     "tooManyRequests": "Troppi tentativi di seguito. Attendi un minuto e riprova."
+  },
+  "nuevoUsuario": {
+    "add": "Aggiungi utente",
+    "title": "Nuovo utente",
+    "help": "Riceverà un'email per creare la sua password. Il link è valido 7 giorni.",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Ruolo",
+    "language": "Lingua del portale e delle email",
+    "submit": "Aggiungi e invia invito",
+    "submitting": "Aggiunta in corso…",
+    "cancel": "Annulla",
+    "invited": "Utente aggiunto. Abbiamo inviato a {email} un'email per creare la password.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Vede il catalogo ed effettua ordini.",
+      "PARTNER_CONSULTA": "Vede catalogo e ordini, ma non può ordinare.",
+      "PARTNER_ADMIN": "Effettua ordini e può aggiungere altri utenti dell'azienda."
+    }
+  },
+  "equipo": {
+    "title": "Utenti della tua azienda",
+    "subtitle": "Chi può accedere al portale per conto della tua azienda. Per cambiare il ruolo di qualcuno o rimuoverlo, scrivi a IoT FENSTER.",
+    "loading": "Caricamento utenti…",
+    "loadError": "Impossibile caricare gli utenti.",
+    "active": "Attivo",
+    "inactive": "Inattivo"
   },
   "registro": {
     "title": "Registra la tua azienda",

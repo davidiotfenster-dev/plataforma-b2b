@@ -198,6 +198,31 @@ export function cuerpoResetPassword(idioma: Idioma, enlace: string): string {
   return cuerpos[idioma];
 }
 
+export function asuntoInvitacionUsuario(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Tu acceso al portal de pedidos de IoT FENSTER',
+    EN: 'Your access to the IoT FENSTER ordering portal',
+    DE: 'Ihr Zugang zum Bestellportal von IoT FENSTER',
+    IT: 'Il tuo accesso al portale ordini di IoT FENSTER',
+    PT: 'O seu acesso ao portal de encomendas da IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+/// Usuario nuevo dado de alta por IoT FENSTER o por el administrador de su
+/// empresa: el enlace es el de restablecer contraseña, con 7 días de plazo.
+export function cuerpoInvitacionUsuario(idioma: Idioma, enlace: string, razonSocial: string): string {
+  const empresa = escaparHtml(razonSocial);
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Te han dado acceso al portal de pedidos de IoT FENSTER como usuario de ${empresa}. Crea tu contraseña con este enlace (caduca en 7 días):</p><p><a href="${enlace}">${enlace}</a></p><p>Después podrás entrar con este email y la contraseña que elijas. Si no esperabas este correo, puedes ignorarlo.</p>`,
+    EN: `<p>You have been given access to the IoT FENSTER ordering portal as a user of ${empresa}. Create your password with this link (it expires in 7 days):</p><p><a href="${enlace}">${enlace}</a></p><p>You can then log in with this email and the password you choose. If you weren't expecting this email, you can ignore it.</p>`,
+    DE: `<p>Sie haben Zugang zum Bestellportal von IoT FENSTER als Benutzer von ${empresa} erhalten. Erstellen Sie Ihr Passwort über diesen Link (gültig für 7 Tage):</p><p><a href="${enlace}">${enlace}</a></p><p>Danach können Sie sich mit dieser E-Mail-Adresse und Ihrem Passwort anmelden. Falls Sie diese E-Mail nicht erwartet haben, können Sie sie ignorieren.</p>`,
+    IT: `<p>Ti è stato dato accesso al portale ordini di IoT FENSTER come utente di ${empresa}. Crea la tua password con questo link (scade tra 7 giorni):</p><p><a href="${enlace}">${enlace}</a></p><p>Poi potrai accedere con questa email e la password che scegli. Se non ti aspettavi questa email, puoi ignorarla.</p>`,
+    PT: `<p>Recebeu acesso ao portal de encomendas da IoT FENSTER como utilizador de ${empresa}. Crie a sua palavra-passe com este link (expira em 7 dias):</p><p><a href="${enlace}">${enlace}</a></p><p>Depois poderá entrar com este email e a palavra-passe que escolher. Se não esperava este email, pode ignorá-lo.</p>`,
+  };
+  return cuerpos[idioma];
+}
+
 export function asuntoVerificacionEmail(idioma: Idioma): string {
   const asuntos: Record<Idioma, string> = {
     ES: 'Confirma tu correo en IoT FENSTER',

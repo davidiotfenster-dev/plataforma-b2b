@@ -32,6 +32,7 @@
     "catalogo": "Catálogo",
     "carrito": "Carrinho",
     "pedidos": "Encomendas",
+    "usuarios": "Utilizadores",
     "partners": "Empresas",
     "logout": "Sair",
     "login": "Iniciar sessão",
@@ -115,6 +116,32 @@
     "resendSubmitting": "A enviar…",
     "resendDone": "Se existir um registo pendente de verificação com esse email, enviámos-lhe uma nova ligação. Verifique também a pasta de spam.",
     "tooManyRequests": "Demasiadas tentativas seguidas. Aguarde um minuto e tente novamente."
+  },
+  "nuevoUsuario": {
+    "add": "Adicionar utilizador",
+    "title": "Novo utilizador",
+    "help": "Receberá um email para criar a sua palavra-passe. O link é válido durante 7 dias.",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Função",
+    "language": "Idioma do portal e dos emails",
+    "submit": "Adicionar e enviar convite",
+    "submitting": "A adicionar…",
+    "cancel": "Cancelar",
+    "invited": "Utilizador adicionado. Enviámos a {email} um email para criar a palavra-passe.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Vê o catálogo e faz encomendas.",
+      "PARTNER_CONSULTA": "Vê o catálogo e as encomendas, mas não pode encomendar.",
+      "PARTNER_ADMIN": "Faz encomendas e pode adicionar outros utilizadores da empresa."
+    }
+  },
+  "equipo": {
+    "title": "Utilizadores da sua empresa",
+    "subtitle": "Quem pode entrar no portal em nome da sua empresa. Para alterar a função de alguém ou removê-lo, contacte a IoT FENSTER.",
+    "loading": "A carregar utilizadores…",
+    "loadError": "Não foi possível carregar os utilizadores.",
+    "active": "Ativo",
+    "inactive": "Inativo"
   },
   "registro": {
     "title": "Registar a minha empresa",

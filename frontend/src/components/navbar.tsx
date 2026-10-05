@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { BarChart3, Boxes, CircleUser, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, type LucideIcon } from "lucide-react";
+import { BarChart3, Boxes, CircleUser, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, Users, type LucideIcon } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
 import { api } from "@/lib/api";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -107,6 +107,7 @@ export function Navbar() {
                   <NavLink href="/catalogo" icono={LayoutGrid}>{t("catalogo")}</NavLink>
                   <NavLink href="/carrito" icono={ShoppingCart}>{t("carrito")}</NavLink>
                   <NavLink href="/pedidos" icono={Package}>{t("pedidos")}</NavLink>
+                  {perfil.rol === "PARTNER_ADMIN" && <NavLink href="/equipo" icono={Users}>{t("usuarios")}</NavLink>}
                 </>
               )}
               {(perfil.rol === "ADMIN_FENSTER" || perfil.rol === "COMERCIAL") && (

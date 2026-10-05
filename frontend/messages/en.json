@@ -32,6 +32,7 @@
     "catalogo": "Catalog",
     "carrito": "Cart",
     "pedidos": "Orders",
+    "usuarios": "Users",
     "partners": "Companies",
     "logout": "Log out",
     "login": "Log in",
@@ -115,6 +116,32 @@
     "resendSubmitting": "Sending…",
     "resendDone": "If there is a registration awaiting verification with that email, we have sent you a new link. Please also check your spam folder.",
     "tooManyRequests": "Too many attempts in a row. Wait a minute and try again."
+  },
+  "nuevoUsuario": {
+    "add": "Add user",
+    "title": "New user",
+    "help": "They will receive an email to create their password. The link is valid for 7 days.",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "language": "Language for the portal and emails",
+    "submit": "Add and send invitation",
+    "submitting": "Adding…",
+    "cancel": "Cancel",
+    "invited": "User added. We have sent {email} an email to create their password.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Sees the catalogue and places orders.",
+      "PARTNER_CONSULTA": "Sees the catalogue and orders, but cannot order.",
+      "PARTNER_ADMIN": "Places orders and can also add other users of the company."
+    }
+  },
+  "equipo": {
+    "title": "Your company's users",
+    "subtitle": "Who can log in to the portal on behalf of your company. To change someone's role or remove them, contact IoT FENSTER.",
+    "loading": "Loading users…",
+    "loadError": "The users could not be loaded.",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "registro": {
     "title": "Register your company",
