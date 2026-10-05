@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { Resend } from 'resend';
+import { envolverCorreo } from './plantillas-email.js';
 
 export interface AdjuntoEmail {
   filename: string;
@@ -126,7 +127,7 @@ export class EmailService {
     }
 
     try {
-      await this.enviador({ destinatario, asunto, html: cuerpoHtml, texto: htmlATexto(cuerpoHtml), adjuntos });
+      await this.enviador({ destinatario, asunto, html: envolverCorreo(cuerpoHtml), texto: htmlATexto(cuerpoHtml), adjuntos });
     } catch (error) {
       /// Un fallo de envío de email nunca debe romper el flujo de negocio
       /// que lo disparó (confirmación de pedido, cambio de estado): se

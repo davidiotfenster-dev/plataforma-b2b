@@ -45,6 +45,8 @@ describe('EmailService', () => {
     expect(input.FromEmailAddress).toBe('pedidos@iotfenster.com');
     expect(input.Destination.ToAddresses).toEqual(['cliente@empresa.com']);
     expect(input.ReplyToAddresses).toEqual(['comercial@iotfenster.com']);
+    expect(input.Content.Simple.Body.Html.Data).toContain('<p>Su pedido <strong>PED-1</strong> ha sido recibido.</p>');
+    expect(input.Content.Simple.Body.Html.Data).toContain('FENSTER');
     expect(input.Content.Simple.Body.Text.Data).toBe('Su pedido PED-1 ha sido recibido.');
     expect(input.Content.Simple.Attachments[0]).toMatchObject({ FileName: 'PED-1.pdf', ContentType: 'application/pdf' });
     expect(resendSend).not.toHaveBeenCalled();
@@ -53,7 +55,7 @@ describe('EmailService', () => {
   it('sin SES y con RESEND_API_KEY envía por Resend, también con versión en texto', async () => {
     await servicio({ resendApiKey: 're_x' }).enviar('a@b.com', 'Asunto', '<p>Hola</p>');
 
-    expect(resendSend).toHaveBeenCalledWith(expect.objectContaining({ to: 'a@b.com', html: '<p>Hola</p>', text: 'Hola' }));
+    expect(resendSend).toHaveBeenCalledWith(expect.objectContaining({ to: 'a@b.com', html: expect.stringContaining('<p>Hola</p>'), text: 'Hola' }));
     expect(sesSend).not.toHaveBeenCalled();
   });
 
@@ -70,6 +72,15 @@ describe('EmailService', () => {
 
     resendSend.mockResolvedValue({ data: null, error: { message: 'dominio no verificado' } });
     await expect(servicio({ resendApiKey: 're_x' }).enviar('a@b.com', 'A', '<p>x</p>')).resolves.toBeUndefined();
+  });
+});
+
+describe('botón', () => {
+  it('sale como botón en el HTML y como "texto: enlace" en la versión de texto plano', async () => {
+    const { boton } = await import('./plantillas-email.js');
+    const html = `<p>Confirma:</p>${boton('https://x.com/a?b=1&c=2', 'Confirmar mi correo')}`;
+    expect(html).toContain('href="https://x.com/a?b=1&amp;c=2"');
+    expect(htmlATexto(html)).toBe('Confirma:\nConfirmar mi correo: https://x.com/a?b=1&c=2');
   });
 });
 
