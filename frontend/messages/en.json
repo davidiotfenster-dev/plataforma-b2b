@@ -510,7 +510,13 @@
     "orderCount": "{cantidad} order(s)",
     "cancelReason": "Cancellation reason: {motivo}",
     "searchPlaceholder": "Search partner…",
-    "noResults": "No partners match your search."
+    "noResults": "No partners match your search.",
+    "byCompany": "By company",
+    "allOrders": "All orders",
+    "filterByStatus": "Filter by status",
+    "allStatuses": "All statuses",
+    "searchOrdersPlaceholder": "Search by PED, PO or company…",
+    "noOrdersFound": "No order matches the search."
   },
   "cancelarPedido": {
     "cancel": "Cancel order",

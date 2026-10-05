@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { api } from "@/lib/api";
-import type { Order, Paginado } from "@/lib/types";
+import { ESTADOS_PEDIDO, type EstadoPedido, type Order, type Paginado } from "@/lib/types";
 import { EstadoBadge } from "@/components/estado-badge";
 import { AvanzarEstado } from "@/components/avanzar-estado";
 import { CancelarPedido } from "@/components/cancelar-pedido";
@@ -84,7 +84,7 @@ function TarjetaPartner({ resumen }: { resumen: ResumenPartner }) {
   );
 }
 
-export default function AdminPedidosPage() {
+function VistaPorEmpresa() {
   const t = useTranslations("adminPedidos");
   const [busqueda, setBusqueda] = useState("");
   const [page, setPage] = useState(1);
@@ -102,8 +102,7 @@ export default function AdminPedidosPage() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-neutral-900">{t("title")}</h1>
+      <div className="mb-4 flex justify-end">
         <div className="relative">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
           <input
@@ -134,6 +133,128 @@ export default function AdminPedidosPage() {
       {respuesta && (
         <Paginacion page={respuesta.page} limit={respuesta.limit} total={respuesta.total} onPageChange={setPage} />
       )}
+    </div>
+  );
+}
+
+const FILTROS_ESTADO: (EstadoPedido | "")[] = ["", ...ESTADOS_PEDIDO, "CANCELADO"];
+
+/// Todos los pedidos en una sola lista: para dar con uno por su código, su PO o
+/// la empresa sin saber en qué tarjeta está, o ver todo lo que está en un estado.
+function VistaTodos() {
+  const t = useTranslations("adminPedidos");
+  const tEstados = useTranslations("estados");
+  const router = useRouter();
+  const locale = useLocale();
+  const precio = usePrecio();
+  const [busqueda, setBusqueda] = useState("");
+  const [estado, setEstado] = useState<EstadoPedido | "">("");
+  const [page, setPage] = useState(1);
+  const busquedaDebounced = useDebouncedValue(busqueda);
+
+  const { data: respuesta, isLoading } = useQuery<Paginado<Order>>({
+    queryKey: ["admin-pedidos-lista", page, busquedaDebounced, estado],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page), limit: String(LIMITE_POR_PAGINA) });
+      if (busquedaDebounced.trim()) params.set("busqueda", busquedaDebounced.trim());
+      if (estado) params.set("estado", estado);
+      return api.get<Paginado<Order>>(`/pedidos/admin/lista?${params}`);
+    },
+    placeholderData: (anterior) => anterior,
+  });
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <select
+          value={estado}
+          onChange={(e) => {
+            setEstado(e.target.value as EstadoPedido | "");
+            setPage(1);
+          }}
+          aria-label={t("filterByStatus")}
+          className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700"
+        >
+          {FILTROS_ESTADO.map((e) => (
+            <option key={e} value={e}>
+              {e ? tEstados(e) : t("allStatuses")}
+            </option>
+          ))}
+        </select>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
+          <input
+            value={busqueda}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPage(1);
+            }}
+            placeholder={t("searchOrdersPlaceholder")}
+            className="w-72 rounded-md border border-neutral-200 py-1.5 pl-8 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {isLoading ? (
+        <p className="text-neutral-500">{t("loading")}</p>
+      ) : (
+        <ul className="space-y-2">
+          {respuesta?.data.map((order) => (
+            <li
+              key={order.id}
+              onClick={() => router.push(`/admin/pedidos/${order.id}`)}
+              className="cursor-pointer rounded-md border border-neutral-200 bg-white p-3 hover:border-neutral-300"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium text-neutral-900">
+                    {order.codigoPed} <span className="font-normal text-neutral-500">· {order.partner?.razonSocial}</span>
+                  </p>
+                  <p className="text-xs text-neutral-400">
+                    PO {order.poNumber} · {precio(order.totalNeto)} · {new Date(order.createdAt).toLocaleDateString(locale)}
+                  </p>
+                </div>
+                <EstadoBadge estado={order.estado} />
+              </div>
+            </li>
+          ))}
+          {respuesta?.total === 0 && (
+            <p className="text-neutral-500">{busquedaDebounced.trim() || estado ? t("noOrdersFound") : t("empty")}</p>
+          )}
+        </ul>
+      )}
+      {respuesta && (
+        <Paginacion page={respuesta.page} limit={respuesta.limit} total={respuesta.total} onPageChange={setPage} />
+      )}
+    </div>
+  );
+}
+
+export default function AdminPedidosPage() {
+  const t = useTranslations("adminPedidos");
+  const [vista, setVista] = useState<"empresa" | "todos">("empresa");
+  const opciones = [
+    { id: "empresa", etiqueta: t("byCompany") },
+    { id: "todos", etiqueta: t("allOrders") },
+  ] as const;
+
+  return (
+    <div>
+      <h1 className="mb-4 text-2xl font-semibold text-neutral-900">{t("title")}</h1>
+      <div role="tablist" className="mb-4 inline-flex rounded-md border border-neutral-200 bg-white p-0.5 text-sm">
+        {opciones.map((o) => (
+          <button
+            key={o.id}
+            role="tab"
+            aria-selected={vista === o.id}
+            onClick={() => setVista(o.id)}
+            className={`rounded px-3 py-1.5 ${vista === o.id ? "bg-neutral-900 font-medium text-white" : "text-neutral-600 hover:bg-neutral-50"}`}
+          >
+            {o.etiqueta}
+          </button>
+        ))}
+      </div>
+      {vista === "empresa" ? <VistaPorEmpresa /> : <VistaTodos />}
     </div>
   );
 }

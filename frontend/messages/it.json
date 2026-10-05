@@ -510,7 +510,13 @@
     "orderCount": "{cantidad} ordine/i",
     "cancelReason": "Motivo di annullamento: {motivo}",
     "searchPlaceholder": "Cerca partner…",
-    "noResults": "Nessun partner corrisponde alla ricerca."
+    "noResults": "Nessun partner corrisponde alla ricerca.",
+    "byCompany": "Per azienda",
+    "allOrders": "Tutti gli ordini",
+    "filterByStatus": "Filtra per stato",
+    "allStatuses": "Tutti gli stati",
+    "searchOrdersPlaceholder": "Cerca per PED, PO o azienda…",
+    "noOrdersFound": "Nessun ordine corrisponde alla ricerca."
   },
   "cancelarPedido": {
     "cancel": "Annulla ordine",

@@ -510,7 +510,13 @@
     "orderCount": "{cantidad} encomenda(s)",
     "cancelReason": "Motivo de cancelamento: {motivo}",
     "searchPlaceholder": "Pesquisar parceiro…",
-    "noResults": "Nenhum parceiro corresponde à pesquisa."
+    "noResults": "Nenhum parceiro corresponde à pesquisa.",
+    "byCompany": "Por empresa",
+    "allOrders": "Todas as encomendas",
+    "filterByStatus": "Filtrar por estado",
+    "allStatuses": "Todos os estados",
+    "searchOrdersPlaceholder": "Pesquisar por PED, PO ou empresa…",
+    "noOrdersFound": "Nenhuma encomenda corresponde à pesquisa."
   },
   "cancelarPedido": {
     "cancel": "Cancelar encomenda",

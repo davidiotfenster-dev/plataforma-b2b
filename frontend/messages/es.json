@@ -504,13 +504,19 @@
     "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?"
   },
   "adminPedidos": {
-    "title": "Fulfillment de pedidos",
+    "title": "Gestión de pedidos",
     "loading": "Cargando pedidos…",
     "empty": "No hay pedidos todavía.",
     "orderCount": "{cantidad} pedido(s)",
     "cancelReason": "Motivo de cancelación: {motivo}",
     "searchPlaceholder": "Buscar partner…",
-    "noResults": "Ningún partner coincide con la búsqueda."
+    "noResults": "Ningún partner coincide con la búsqueda.",
+    "byCompany": "Por empresa",
+    "allOrders": "Todos los pedidos",
+    "filterByStatus": "Filtrar por estado",
+    "allStatuses": "Todos los estados",
+    "searchOrdersPlaceholder": "Buscar por PED, PO o empresa…",
+    "noOrdersFound": "Ningún pedido coincide con la búsqueda."
   },
   "cancelarPedido": {
     "cancel": "Cancelar pedido",

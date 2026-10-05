@@ -9,7 +9,7 @@ import { EstadoPedido, Idioma, RolUsuario } from '../generated/prisma/enums.js';
 import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
-import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
+import type { ListarPedidosAdminQueryDto, ListarTodosPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
 import { calcularPrecioNeto } from '../common/precio-neto.js';
@@ -482,6 +482,37 @@ export class PedidosService {
       page,
       limit,
     };
+  }
+
+  /// Lista plana y paginada de todos los pedidos (los más recientes primero). La
+  /// búsqueda cubre el código PED, el PO Number y la razón social. Un COMERCIAL solo
+  /// ve los de las empresas que él dio de alta.
+  async listarTodosAdmin(query: ListarTodosPedidosAdminQueryDto, restringirCreadoPorId?: string) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const busqueda = query.busqueda?.trim();
+    const where: Prisma.OrderWhereInput = {
+      ...(query.estado && { estado: query.estado }),
+      ...(restringirCreadoPorId !== undefined && { partner: { creadoPorUsuarioId: restringirCreadoPorId } }),
+      ...(busqueda && {
+        OR: [
+          { codigoPed: { contains: busqueda, mode: 'insensitive' } },
+          { poNumber: { contains: busqueda, mode: 'insensitive' } },
+          { partner: { razonSocial: { contains: busqueda, mode: 'insensitive' } } },
+        ],
+      }),
+    };
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { partner: { select: { razonSocial: true } } },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+    return { data, total, page, limit };
   }
 
   /// Pedidos de un único partner, vista admin (todos los estados, sin

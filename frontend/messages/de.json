@@ -510,7 +510,13 @@
     "orderCount": "{cantidad} Bestellung(en)",
     "cancelReason": "Stornierungsgrund: {motivo}",
     "searchPlaceholder": "Partner suchen…",
-    "noResults": "Kein Partner entspricht der Suche."
+    "noResults": "Kein Partner entspricht der Suche.",
+    "byCompany": "Nach Unternehmen",
+    "allOrders": "Alle Bestellungen",
+    "filterByStatus": "Nach Status filtern",
+    "allStatuses": "Alle Status",
+    "searchOrdersPlaceholder": "Nach PED, PO oder Unternehmen suchen…",
+    "noOrdersFound": "Keine Bestellung entspricht der Suche."
   },
   "cancelarPedido": {
     "cancel": "Bestellung stornieren",
