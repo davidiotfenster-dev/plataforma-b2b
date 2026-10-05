@@ -732,7 +732,10 @@
     "trackingUrlPlaceholder": "URL de tracking",
     "markAsShipped": "Marcar como enviado",
     "advanceError": "Error al actualizar el estado",
-    "advanceTo": "Avanzar a {estado}"
+    "advanceTo": "Avanzar a {estado}",
+    "confirmTitle": "Avanzar el pedido {codigo}",
+    "confirmText": "El pedido pasará de «{desde}» a «{hasta}» y el cliente recibirá un correo avisándole. Si te equivocas, solo se podrá volver atrás con la corrección manual.",
+    "confirmYes": "Sí, pasar a {estado}"
   },
   "forzarEstado": {
     "title": "Corrección manual de estado",

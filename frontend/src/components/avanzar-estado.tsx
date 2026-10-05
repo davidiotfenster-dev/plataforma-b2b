@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { api, ApiError } from "@/lib/api";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { EstadoPedido, Order } from "@/lib/types";
 
 const SIGUIENTE_ESTADO: Record<EstadoPedido, EstadoPedido | null> = {
@@ -25,6 +26,7 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
   const [numeroExpedicion, setNumeroExpedicion] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [confirmando, setConfirmando] = useState(false);
 
   const avanzar = useMutation({
     mutationFn: () =>
@@ -37,6 +39,7 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
     onSuccess: () => {
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       setMostrarExpedicion(false);
+      setConfirmando(false);
     },
     onError: (err) => setError(err instanceof ApiError ? err.message : t("advanceError")),
   });
@@ -82,20 +85,41 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
     );
   }
 
+  // Cada cambio de estado avisa por correo a quien hizo el pedido y no se deshace
+  // con otro clic: por eso se pide confirmación antes de avanzar.
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        if (siguiente === "ENVIADO") {
-          setMostrarExpedicion(true);
-        } else {
-          avanzar.mutate();
-        }
-      }}
-      disabled={avanzar.isPending}
-      className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
-    >
-      {t("advanceTo", { estado: tEstados(siguiente) })}
-    </button>
+    <>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setError(null);
+          if (siguiente === "ENVIADO") {
+            setMostrarExpedicion(true);
+          } else {
+            setConfirmando(true);
+          }
+        }}
+        disabled={avanzar.isPending}
+        className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+      >
+        {t("advanceTo", { estado: tEstados(siguiente) })}
+      </button>
+      {confirmando && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <ConfirmDialog
+            titulo={t("confirmTitle", { codigo: order.codigoPed })}
+            descripcion={t("confirmText", { desde: tEstados(order.estado), hasta: tEstados(siguiente) })}
+            confirmar={t("confirmYes", { estado: tEstados(siguiente) })}
+            cargando={avanzar.isPending}
+            error={error}
+            onConfirmar={() => {
+              setError(null);
+              avanzar.mutate();
+            }}
+            onCancelar={() => setConfirmando(false)}
+          />
+        </div>
+      )}
+    </>
   );
 }

@@ -732,7 +732,10 @@
     "trackingUrlPlaceholder": "Tracking-URL",
     "markAsShipped": "Als versendet markieren",
     "advanceError": "Fehler beim Aktualisieren des Status",
-    "advanceTo": "Weiter zu {estado}"
+    "advanceTo": "Weiter zu {estado}",
+    "confirmTitle": "Bestellung {codigo} weiterschalten",
+    "confirmText": "Die Bestellung wechselt von „{desde}“ zu „{hasta}“ und der Kunde erhält eine E-Mail. Bei einem Fehler lässt sich das nur über die manuelle Korrektur zurücknehmen.",
+    "confirmYes": "Ja, auf {estado} setzen"
   },
   "forzarEstado": {
     "title": "Manuelle Statuskorrektur",

@@ -35,9 +35,10 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
   });
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-      <p className="mb-2 text-sm font-medium text-amber-900">{t("title")}</p>
-      <p className="mb-3 text-xs text-amber-700">{t("description")}</p>
+    // Es una herramienta excepcional: va plegada para que no compita con el flujo normal.
+    <details className="group rounded-lg border border-amber-200 bg-amber-50/60 px-4 py-2.5" open={confirmando || undefined}>
+      <summary className="cursor-pointer text-sm font-medium text-amber-900">{t("title")}</summary>
+      <p className="mb-3 mt-2 text-xs text-amber-700">{t("description")}</p>
       <div className="flex flex-wrap items-center gap-2">
         <select
           value={seleccionado}
@@ -112,6 +113,6 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
           </div>
         </div>
       )}
-    </div>
+    </details>
   );
 }

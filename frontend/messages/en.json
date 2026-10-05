@@ -732,7 +732,10 @@
     "trackingUrlPlaceholder": "Tracking URL",
     "markAsShipped": "Mark as shipped",
     "advanceError": "Error updating the status",
-    "advanceTo": "Advance to {estado}"
+    "advanceTo": "Advance to {estado}",
+    "confirmTitle": "Advance order {codigo}",
+    "confirmText": "The order will move from “{desde}” to “{hasta}” and the customer will be emailed. If you get it wrong, it can only be undone with the manual correction.",
+    "confirmYes": "Yes, move to {estado}"
   },
   "forzarEstado": {
     "title": "Manual status correction",
