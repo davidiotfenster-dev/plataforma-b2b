@@ -24,10 +24,7 @@
         "gtin": "8437025278503"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 90,
     "imagen": "/imagenes/default-connect-1.png"
   },
   {
@@ -55,10 +52,7 @@
         "gtin": "8437025278510"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 90,
     "imagen": "/imagenes/default-connect-1.png"
   },
   {
@@ -86,10 +80,7 @@
         "gtin": "8437025278527"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 100,
     "imagen": "/imagenes/default-connect-1.png"
   },
   {
@@ -117,10 +108,7 @@
         "gtin": "8437025278534"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 100,
     "imagen": "/imagenes/default-connect-1.png"
   },
   {
@@ -148,10 +136,7 @@
         "gtin": "8437025278541"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 164,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -179,10 +164,7 @@
         "gtin": "8437025278558"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 164,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -210,10 +192,7 @@
         "gtin": "8437025278565"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 174,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -241,10 +220,7 @@
         "gtin": "8437025278572"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 174,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -266,10 +242,7 @@
         "gtin": "8437025278589"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 130,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -291,10 +264,7 @@
         "gtin": "8437025278596"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 130,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -532,10 +502,7 @@
         "gtin": "8437025278480"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 108,
     "imagen": "/imagenes/default-pulsar.png"
   },
   {
@@ -569,10 +536,7 @@
         "gtin": "8437025278497"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 108,
     "imagen": "/imagenes/default-pulsar.png"
   },
   {
@@ -764,10 +728,7 @@
         "gtin": "8437025278343"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 82,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
@@ -783,10 +744,7 @@
         "gtin": "8437025278367"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 82,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
@@ -802,10 +760,7 @@
         "gtin": "8437025278350"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 82,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
@@ -1252,10 +1207,7 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 108,
     "imagen": "/imagenes/default-pulsar.png"
   },
   {
@@ -1272,10 +1224,7 @@
       }
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 108,
     "imagen": "/imagenes/default-pulsar.png"
   }
 ]

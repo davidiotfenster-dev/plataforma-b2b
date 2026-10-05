@@ -77,6 +77,26 @@ export class CatalogoMarcaService {
     return { anadidos: nuevos.length, sincronizacion };
   }
 
+  /// Pone a los productos de la marca el PVP de la tarifa (`ProductoBase.pvpTarifa`)
+  /// cuando no coinciden, y sincroniza sus empresas. `rellenar` solo copia el PVP al
+  /// añadir un producto, así que esto es lo que hace llegar un cambio de tarifa a un
+  /// catálogo ya cargado. Con `aplicar` a false solo devuelve lo que cambiaría.
+  async aplicarTarifa(marca: MarcaCatalogo, aplicar: boolean) {
+    const productos = await this.prisma.productoMarca.findMany({
+      where: { marca, productoBase: { pvpTarifa: { not: null } } },
+      include: { productoBase: { select: { pvpTarifa: true } } },
+      orderBy: { skuComercial: 'asc' },
+    });
+    const cambios = productos
+      .filter((p) => !p.pvpBase.equals(p.productoBase.pvpTarifa!))
+      .map((p) => ({ id: p.id, skuComercial: p.skuComercial, antes: p.pvpBase, despues: p.productoBase.pvpTarifa! }));
+    if (!aplicar || cambios.length === 0) return { cambios, sincronizacion: null };
+    await this.prisma.$transaction(
+      cambios.map((c) => this.prisma.productoMarca.update({ where: { id: c.id }, data: { pvpBase: c.despues } })),
+    );
+    return { cambios, sincronizacion: await this.sincronizarMarca(marca) };
+  }
+
   private async obtenerOFallar(id: string) {
     const producto = await this.prisma.productoMarca.findUnique({
       where: { id },

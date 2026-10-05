@@ -135,3 +135,40 @@ describe('CatalogoMarcaService.listar — recuento de empresas por tipo', () => 
     expect((await servicio.listar('VBH')).empresas).toEqual({ partners: 1, distribuidores: 0 });
   });
 });
+
+describe('CatalogoMarcaService.aplicarTarifa — PVP de tarifa a la marca', () => {
+  const pm = (id: string, sku: string, pvp: number, tarifa: number) => ({
+    id,
+    skuComercial: sku,
+    pvpBase: new Prisma.Decimal(pvp),
+    productoBase: { pvpTarifa: new Prisma.Decimal(tarifa) },
+  });
+
+  const crear = () => {
+    const prisma = {
+      productoMarca: {
+        findMany: vi.fn().mockResolvedValue([pm('a', 'W1B', 50, 90), pm('b', 'C-WALL', 82, 82)]),
+        update: vi.fn((arg) => arg),
+      },
+      $transaction: vi.fn().mockResolvedValue([]),
+      partner: { findMany: vi.fn().mockResolvedValue([]) },
+    };
+    return { prisma, servicio: new CatalogoMarcaService(prisma as unknown as PrismaService) };
+  };
+
+  it('sin aplicar solo enseña los productos cuyo PVP no es el de la tarifa', async () => {
+    const { prisma, servicio } = crear();
+    const r = await servicio.aplicarTarifa('VBH', false);
+    expect(r.cambios.map((c) => [c.skuComercial, c.antes.toNumber(), c.despues.toNumber()])).toEqual([['W1B', 50, 90]]);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('al aplicar actualiza el PVP de la marca y sincroniza sus empresas', async () => {
+    const { prisma, servicio } = crear();
+    const r = await servicio.aplicarTarifa('VBH', true);
+    expect(prisma.productoMarca.update).toHaveBeenCalledTimes(1);
+    expect(prisma.productoMarca.update.mock.calls[0][0]).toEqual({ where: { id: 'a' }, data: { pvpBase: new Prisma.Decimal(90) } });
+    expect(prisma.partner.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { marcaCatalogo: 'VBH', archivadoEn: null } }));
+    expect(r.sincronizacion).toEqual({ creados: 0, actualizados: 0, retirados: 0, conflictos: [] });
+  });
+});
