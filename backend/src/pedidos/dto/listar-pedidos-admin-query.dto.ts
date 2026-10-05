@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { EstadoPedido } from '../../generated/prisma/enums.js';
 import { PaginacionQueryDto } from '../../common/dto/paginacion.dto.js';
 
@@ -6,6 +6,7 @@ export class ListarPedidosAdminQueryDto extends PaginacionQueryDto {
   /// Busca por razón social del partner (coincidencia parcial).
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   busqueda?: string;
 }
 
@@ -14,6 +15,7 @@ export class ListarPedidosAdminQueryDto extends PaginacionQueryDto {
 export class ListarTodosPedidosAdminQueryDto extends PaginacionQueryDto {
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   busqueda?: string;
 
   @IsOptional()

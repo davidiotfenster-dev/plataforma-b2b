@@ -382,10 +382,6 @@ export class AuthService {
     /// mostrarlo traducido.
     const cuentaNoDisponible = (codigo: string, mensaje: string) => new UnauthorizedException({ message: mensaje, codigo });
 
-    if (!user.activo) {
-      throw cuentaNoDisponible(CODIGOS_LOGIN.DESACTIVADA, 'Tu usuario está desactivado. Contacta con IoT FENSTER.');
-    }
-
     /// Rol COMERCIAL apagado por ahora (`COMERCIAL_ACTIVO`): se avisa con un mensaje
     /// claro, y solo tras acertar la contraseña, para no revelar qué emails son de comerciales.
     if (user.rol === RolUsuario.COMERCIAL && !this.configService.get<boolean>('comercialActivo')) {
@@ -412,6 +408,12 @@ export class AuthService {
       if (user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
         throw cuentaNoDisponible(CODIGOS_LOGIN.EMPRESA_SUSPENDIDA, 'El acceso de tu empresa está suspendido. Contacta con IoT FENSTER.');
       }
+    }
+
+    /// Va al final: el administrador de una empresa recién registrada está inactivo hasta
+    /// que se aprueba, y debe ver «pendiente de aprobación» (o «verifica tu correo»), no «desactivado».
+    if (!user.activo) {
+      throw cuentaNoDisponible(CODIGOS_LOGIN.DESACTIVADA, 'Tu usuario está desactivado. Contacta con IoT FENSTER.');
     }
 
     return { id: user.id, partnerId: user.partnerId, rol: user.rol };
@@ -594,7 +596,12 @@ export class AuthService {
       return;
     }
     if (!sub) return;
-    await this.prisma.user.updateMany({ where: { id: sub }, data: { sesionInvalidadaEn: new Date() } });
+    try {
+      await this.prisma.user.updateMany({ where: { id: sub }, data: { sesionInvalidadaEn: new Date() } });
+    } catch (error) {
+      // Salir nunca debe fallar: la cookie se borra igual y el fallo queda en el log.
+      this.logger.error(`No se pudo invalidar la sesión de ${sub}: ${(error as Error).message}`);
+    }
   }
 
   /// Invalida cualquier JWT de sesión emitido antes de este momento para el

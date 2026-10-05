@@ -1,4 +1,5 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Max, Min, MaxLength } from 'class-validator';
+import { PVP_MAXIMO } from '../../catalogo-marca/dto/catalogo-marca.dto.js';
 
 export class AsignarMasivoDto {
   /// Si se omite (o va vacío), se aplica a todos los partners ACTIVO que
@@ -19,8 +20,9 @@ export class AsignarMasivoDto {
   @MaxLength(200)
   nombreComercial!: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(PVP_MAXIMO)
   pvpBase!: number;
 
   @IsOptional()

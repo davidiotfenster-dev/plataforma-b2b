@@ -279,7 +279,7 @@ export class PartnersService {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new ConflictException(mensajeDuplicado(error));
       }
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (dto.actualizadoEn && error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         throw new ConflictException({
           message: 'Otra persona ha modificado esta ficha mientras la editabas. Recárgala para ver sus cambios.',
           codigo: 'FICHA_CAMBIADA',

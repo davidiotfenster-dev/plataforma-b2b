@@ -72,8 +72,8 @@ function TarjetaPartner({ resumen }: { resumen: ResumenPartner }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <EstadoBadge estado={order.estado} />
-                  <AvanzarEstado order={order} invalidateKeys={[["admin-pedidos-por-partner", resumen.partnerId]]} />
-                  <CancelarPedido order={order} invalidateKeys={[["admin-pedidos-por-partner", resumen.partnerId]]} />
+                  <AvanzarEstado order={order} invalidateKeys={[["admin-pedidos-por-partner", resumen.partnerId], ["admin-pedidos-resumen"], ["admin-pedidos-lista"]]} />
+                  <CancelarPedido order={order} invalidateKeys={[["admin-pedidos-por-partner", resumen.partnerId], ["admin-pedidos-resumen"], ["admin-pedidos-lista"]]} />
                 </div>
               </div>
             </div>

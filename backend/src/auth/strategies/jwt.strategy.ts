@@ -56,6 +56,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
+    /// Los tokens de un solo uso (verificar correo, restablecer contraseña) llevan `tipo`
+    /// y se firman con el mismo secreto: no valen como sesión.
+    if ((payload as { tipo?: unknown }).tipo !== undefined) {
+      throw new UnauthorizedException();
+    }
+
     /// Verificación en BD en cada request (no solo firma/expiración): permite
     /// que desactivar un usuario, forzar su cierre de sesión, cambiarle el rol
     /// o suspender a su partner desde el panel admin tenga efecto inmediato,

@@ -76,11 +76,11 @@ export default function AdminPedidoDetallePage() {
 
       {/* El botón de avanzar va bajo la línea de progreso, que ya enseña en qué paso está. */}
       <div className="-mt-3 mb-6 text-right empty:hidden">
-        <AvanzarEstado order={order} invalidateKeys={[["admin-pedidos", params.id], ["admin-pedidos"]]} />
+        <AvanzarEstado order={order} invalidateKeys={[["admin-pedidos", params.id], ["admin-pedidos"], ["admin-pedidos-resumen"], ["admin-pedidos-lista"], ["admin-pedidos-por-partner"]]} />
       </div>
 
       <div className="mb-6">
-        <ForzarEstado order={order} invalidateKeys={[["admin-pedidos", params.id], ["admin-pedidos"]]} />
+        <ForzarEstado order={order} invalidateKeys={[["admin-pedidos", params.id], ["admin-pedidos"], ["admin-pedidos-resumen"], ["admin-pedidos-lista"], ["admin-pedidos-por-partner"]]} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

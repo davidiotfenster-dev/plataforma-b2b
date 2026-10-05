@@ -24,7 +24,8 @@ export class AuditoriaFilter extends BaseExceptionFilter {
     const status = exception.getStatus();
     if (host.getType() === 'http' && RECHAZOS_AUDITABLES.has(status)) {
       const request = host.switchToHttp().getRequest<Request>();
-      this.auditoria.registrar(request, status, this.datosDelIntento(request));
+      // Las 429 solo van al log: guardarlas todas dejaría que quien satura el límite llene la tabla.
+      this.auditoria.registrar(request, status, this.datosDelIntento(request), status !== 429);
     }
     super.catch(exception, host);
   }
@@ -32,7 +33,8 @@ export class AuditoriaFilter extends BaseExceptionFilter {
   /// En un login fallido interesa saber a qué cuenta se intentó entrar (nunca la contraseña).
   private datosDelIntento(request: Request): Record<string, unknown> {
     const email = (request.body as { email?: unknown } | undefined)?.email;
-    if (request.path === '/auth/login' && typeof email === 'string') {
+    // Solo si parece un correo: si alguien pega su contraseña en ese campo, no se guarda.
+    if (request.path === '/auth/login' && typeof email === 'string' && email.includes('@')) {
       return { emailIntentado: email.trim().toLowerCase().slice(0, 254) };
     }
     return {};

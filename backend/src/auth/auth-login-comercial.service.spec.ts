@@ -75,6 +75,16 @@ describe('AuthService.validarCredenciales — rol COMERCIAL', () => {
       expect(respuesta?.message).toBe('Credenciales inválidas');
     });
 
+    // El administrador de una empresa recién registrada está inactivo hasta que se aprueba:
+    // debe ver el motivo real (verificar / esperar aprobación), no «usuario desactivado».
+    it.each([
+      ['pendiente de aprobación', () => partnerUser('PENDIENTE_APROBACION', { activo: false }), 'CUENTA_PENDIENTE_APROBACION'],
+      ['sin verificar', () => partnerUser('PENDIENTE_VERIFICACION_EMAIL', { activo: false, emailVerificadoEn: null }), 'CUENTA_EMAIL_SIN_VERIFICAR'],
+      ['rechazada', () => partnerUser('RECHAZADO', { activo: false }), 'CUENTA_RECHAZADA'],
+    ])('un administrador de alta nueva (inactivo) ve el motivo real: %s', async (_caso, encontrado, codigo) => {
+      expect((await codigoDe(encontrado()))?.codigo).toBe(codigo);
+    });
+
     it('una empresa activa y verificada entra', async () => {
       findUnique.mockResolvedValue(partnerUser('ACTIVO'));
       await expect(service.validarCredenciales('x@y.com', PASSWORD)).resolves.toMatchObject({ partnerId: 'p1' });

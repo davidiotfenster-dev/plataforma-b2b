@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -123,6 +123,7 @@ export default function CatalogoPage() {
   // Mientras no se sabe el rol no se enseña el botón: así no parpadea a quien solo consulta.
   const puedeComprar = perfil ? puedeComprarRol(perfil.rol) : false;
   const [mensaje, setMensaje] = useState<string | null>(null);
+  const temporizadorMensaje = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const agregar = useMutation({
     mutationFn: (representacionPartnerId: string) =>
@@ -131,7 +132,9 @@ export default function CatalogoPage() {
       queryClient.setQueryData(["carrito"], resumen);
       const producto = productos?.find((p) => p.id === representacionPartnerId);
       setMensaje(t("addedToCart", { producto: producto?.nombreComercial ?? "" }));
-      setTimeout(() => setMensaje(null), 2500);
+      // Un aviso nuevo reinicia la cuenta: si no, el anterior lo borraría antes de tiempo.
+      if (temporizadorMensaje.current) clearTimeout(temporizadorMensaje.current);
+      temporizadorMensaje.current = setTimeout(() => setMensaje(null), 2500);
     },
   });
 

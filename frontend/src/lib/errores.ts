@@ -81,9 +81,14 @@ function idiomaActual(): Locale {
   return esLocaleValida(lang) ? lang : defaultLocale;
 }
 
+const MENSAJE_POR_DEFECTO = /^(forbidden( resource)?|not found|unauthorized|internal server error|bad gateway|service unavailable|gateway timeout|too many requests|throttlerexception.*|error de red|)$/i;
+
 /// El texto del error en el idioma de la pantalla, o el del servidor si no hay uno propio.
 export function mensajeDeError(status: number, codigo: string | undefined, mensajeServidor: string): string {
-  const clave = codigo && MENSAJES[codigo] ? codigo : status >= 500 ? "HTTP_5XX" : codigo ? null : `HTTP_${status}`;
+  // Con el mensaje por defecto de Nest («Forbidden resource»…) no hay nada que explicar y se usa el
+  // texto genérico; si el servidor da una razón concreta («Tu usuario es de solo consulta…»), se conserva.
+  const generico = status === 404 || MENSAJE_POR_DEFECTO.test(mensajeServidor);
+  const clave = codigo && MENSAJES[codigo] ? codigo : codigo || !generico ? null : status >= 500 ? "HTTP_5XX" : `HTTP_${status}`;
   const textos = clave ? MENSAJES[clave] : undefined;
   return textos ? textos[idiomaActual()] : mensajeServidor;
 }
@@ -137,7 +142,7 @@ const REGLAS: { patron: RegExp; textos: (m: RegExpMatchArray) => Textos }[] = [
     }),
   },
   {
-    patron: /^(\w+) must be a (positive )?(number|integer number|string)\b.*$/,
+    patron: /^(\w+) must be an? (positive )?(number|integer number|string)\b.*$/,
     textos: () => ({
       es: "no tiene un valor válido", en: "does not have a valid value", de: "hat keinen gültigen Wert",
       it: "non ha un valore valido", pt: "não tem um valor válido",

@@ -13,6 +13,7 @@ import {
   ValidateNested,
   MaxLength,
 } from 'class-validator';
+import { PVP_MAXIMO } from '../../catalogo-marca/dto/catalogo-marca.dto.js';
 
 class ItemAsignarProductoDto {
   @IsUUID()
@@ -28,8 +29,9 @@ class ItemAsignarProductoDto {
   @MaxLength(200)
   nombreComercial!: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(PVP_MAXIMO)
   pvpBase!: number;
 
   /// Descuento específico para este producto en este partner. Si se omite,

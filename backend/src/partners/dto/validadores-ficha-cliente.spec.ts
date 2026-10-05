@@ -14,6 +14,13 @@ describe('CIF', () => {
   });
 });
 
+describe('CIF normalizado', () => {
+  it('se guarda en mayúsculas y sin espacios ni puntos', () => {
+    const dto = plainToInstance(CrearPartnerDto, { cif: ' b 12.345.678 ' });
+    expect(dto.cif).toBe('B12345678');
+  });
+});
+
 describe('dominios de correo gratuito', () => {
   it('detecta los habituales sin importar mayúsculas', () => {
     expect(esDominioGratuito('gmail.com')).toBe(true);

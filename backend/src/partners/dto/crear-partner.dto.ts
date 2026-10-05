@@ -5,6 +5,7 @@ import {
   CODIGO_POSTAL_REGEX,
   CIF_MENSAJE,
   CIF_REGEX,
+  NormalizarCif,
   DominioCorporativo,
   DOMINIO_MENSAJE,
   DOMINIO_REGEX,
@@ -23,7 +24,7 @@ export class CrearPartnerDto {
   @MaxLength(200)
   razonSocial!: string;
 
-  @Recortar()
+  @NormalizarCif()
   @IsString()
   @IsNotEmpty()
   @Matches(CIF_REGEX, { message: CIF_MENSAJE })

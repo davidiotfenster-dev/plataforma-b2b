@@ -15,7 +15,7 @@ export class AuditoriaService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  registrar(peticion: Request, statusCode: number, extra: Record<string, unknown> = {}): void {
+  registrar(peticion: Request, statusCode: number, extra: Record<string, unknown> = {}, persistir = true): void {
     const request = peticion as unknown as PeticionAuditable;
     /// Una petición se registra una sola vez aunque pase por interceptor y filtro.
     if (request.auditada) return;
@@ -29,14 +29,16 @@ export class AuditoriaService {
       userId: usuario?.userId ?? (usuario as { id?: string } | undefined)?.id ?? null,
       partnerId: usuario?.partnerId ?? null,
       ipAddress: request.ip ?? null,
-      userAgent: request.get('user-agent') ?? null,
-      endpoint: request.originalUrl,
+      userAgent: request.get('user-agent')?.slice(0, 300) ?? null,
+      /// Sin la query string: ahí viajan tokens de un solo uso (`?token=`) que no deben quedar guardados.
+      endpoint: request.originalUrl.split('?')[0].slice(0, 300),
       method: request.method,
       statusCode,
       payload: extra,
     };
 
     this.logger.log(JSON.stringify(entrada));
+    if (!persistir) return;
 
     /// Fire-and-forget: un fallo al escribir auditoría nunca debe afectar
     /// la respuesta HTTP ya resuelta.

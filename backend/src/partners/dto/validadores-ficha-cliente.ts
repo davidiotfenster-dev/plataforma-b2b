@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { ValidateBy } from 'class-validator';
 
 /// Patrones de validación reutilizados por `CrearPartnerDto` y
@@ -47,6 +48,14 @@ export function DominioCorporativo(): PropertyDecorator {
 /// exigir un algoritmo distinto por país, pero rechaza cadenas sueltas como "1".
 export const CIF_REGEX = /^[A-Za-z0-9][A-Za-z0-9 .\-/]{2,18}[A-Za-z0-9]$/;
 export const CIF_MENSAJE = 'Debe ser un CIF/NIF válido (de 4 a 20 letras o dígitos, p. ej. B12345678)';
+
+/// El CIF se guarda en mayúsculas y sin espacios ni puntos: «b 12345678» y «B12345678»
+/// son la misma empresa y no deben poder darse de alta dos veces.
+export function NormalizarCif(): PropertyDecorator {
+  return Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.replace(/[\s.]/g, '').toUpperCase() : value,
+  );
+}
 
 /// Código postal: alfanumérico corto (cubre los formatos de ES/DE/IT/PT).
 export const CODIGO_POSTAL_REGEX = /^[A-Za-z0-9\s-]{3,10}$/;

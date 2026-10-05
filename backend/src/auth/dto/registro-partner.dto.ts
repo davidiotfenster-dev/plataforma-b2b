@@ -10,7 +10,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { Recortar } from '../../common/dto/recortar.js';
-import { CIF_MENSAJE, CIF_REGEX, DOMINIO_REGEX, DominioCorporativo } from '../../partners/dto/validadores-ficha-cliente.js';
+import { CIF_MENSAJE, CIF_REGEX, NormalizarCif, DOMINIO_REGEX, DominioCorporativo } from '../../partners/dto/validadores-ficha-cliente.js';
 import { Idioma } from '../../generated/prisma/enums.js';
 
 export class RegistroPartnerDto {
@@ -19,7 +19,7 @@ export class RegistroPartnerDto {
   @MaxLength(200)
   razonSocial!: string;
 
-  @Recortar()
+  @NormalizarCif()
   @IsString()
   @IsNotEmpty()
   @Matches(CIF_REGEX, { message: CIF_MENSAJE })

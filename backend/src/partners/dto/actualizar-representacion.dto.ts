@@ -1,4 +1,5 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, Min, MaxLength } from 'class-validator';
+import { PVP_MAXIMO } from '../../catalogo-marca/dto/catalogo-marca.dto.js';
 
 export class ActualizarRepresentacionDto {
   @IsOptional()
@@ -14,8 +15,9 @@ export class ActualizarRepresentacionDto {
   nombreComercial?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(PVP_MAXIMO)
   pvpBase?: number;
 
   /// `null` explícito borra el override y vuelve a aplicar el descuento

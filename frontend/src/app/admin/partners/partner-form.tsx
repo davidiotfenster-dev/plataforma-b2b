@@ -156,12 +156,10 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
   const [error, setError] = useState<string | null>(null);
   const [guardado, setGuardado] = useState(false);
   const [copiada, setCopiada] = useState(false);
-  // Versión de la ficha que se está editando (bloqueo optimista). Se renueva al guardar para que
-  // un segundo guardado seguido no choque con el primero mientras la ficha se vuelve a leer.
+  // Versión de la ficha con la que se abrió el formulario (bloqueo optimista). Solo se renueva
+  // al guardar uno mismo: si siguiera a cada relectura, los cambios de otra persona que llegan
+  // mientras se edita pasarían por propios y se pisarían sin aviso.
   const versionFicha = useRef(partner?.updatedAt);
-  useEffect(() => {
-    versionFicha.current = partner?.updatedAt;
-  }, [partner?.updatedAt]);
 
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
