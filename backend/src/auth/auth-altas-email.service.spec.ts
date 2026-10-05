@@ -49,6 +49,7 @@ describe('AuthService — correos del alta de empresas', () => {
       nombreAdmin: 'Ana',
       emailAdmin: 'ana@nueva.com',
       passwordAdmin: 'clave-muy-larga-123',
+      aceptaCondiciones: true,
       idioma,
     }) as RegistroPartnerDto;
 
@@ -106,6 +107,11 @@ describe('AuthService — correos del alta de empresas', () => {
     it('sin idioma usa español', async () => {
       await service.registrarPartner(alta());
       expect(email.enviar.mock.calls[0][1]).toBe(asuntoVerificacionEmail(Idioma.ES));
+    });
+
+    it('guarda cuándo se aceptaron las condiciones de uso y la privacidad', async () => {
+      await service.registrarPartner(alta());
+      expect(prisma.user.create.mock.calls[0][0].data.condicionesAceptadasEn).toBeInstanceOf(Date);
     });
   });
 

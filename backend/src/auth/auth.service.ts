@@ -93,6 +93,7 @@ export class AuthService {
             partnerId: partner.id,
             /// Inactivo hasta que el Administrador IoT FENSTER apruebe el partner.
             activo: false,
+            condicionesAceptadasEn: new Date(),
           },
         });
 

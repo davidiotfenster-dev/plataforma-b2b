@@ -109,7 +109,9 @@
     "submitting": "Submitting…",
     "submit": "Register company",
     "doneTitle": "Registration received",
-    "doneBody": "Check the corporate email address you provided to verify the account. Once verified, an IoT FENSTER administrator will review and approve the registration."
+    "doneBody": "Check the corporate email address you provided to verify the account. Once verified, an IoT FENSTER administrator will review and approve the registration.",
+    "aceptoCondiciones": "I have read and accept the <condiciones>terms of use</condiciones> and the <privacidad>privacy policy</privacidad>.",
+    "infoPrivacidad": "IoT FENSTER will process this data to manage your company's registration and its orders. You can exercise your rights as described in the <privacidad>privacy policy</privacidad>."
   },
   "catalogo": {
     "title": "Authorized catalog",
@@ -951,5 +953,13 @@
         "mensaje": "Hello, I would like to report an issue."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Legal",
+    "avisoLegal": "Legal notice",
+    "privacidad": "Privacy",
+    "cookies": "Cookies",
+    "condiciones": "Terms of use",
+    "soloEspanol": "The legal texts are available in Spanish, which is the version that prevails."
   }
 }

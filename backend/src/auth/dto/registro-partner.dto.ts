@@ -1,4 +1,5 @@
 import {
+  Equals,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -46,6 +47,11 @@ export class RegistroPartnerDto {
   @IsString()
   @IsNotEmpty()
   nombreAdmin!: string;
+
+  /// Casilla obligatoria "He leído y acepto las condiciones de uso y la
+  /// política de privacidad". Sin ella no se admite el registro.
+  @Equals(true, { message: 'Debe aceptar las condiciones de uso y la política de privacidad' })
+  aceptaCondiciones!: boolean;
 
   /// Idioma preferido del administrador registrado: interfaz + emails
   /// transaccionales. Por defecto ES si no se indica.

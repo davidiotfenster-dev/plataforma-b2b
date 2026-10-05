@@ -109,7 +109,9 @@
     "submitting": "Invio in corso…",
     "submit": "Registra azienda",
     "doneTitle": "Registrazione ricevuta",
-    "doneBody": "Controlla l'email aziendale indicata per verificare l'account. Dopo la verifica, un amministratore di IoT FENSTER esaminerà e approverà la registrazione."
+    "doneBody": "Controlla l'email aziendale indicata per verificare l'account. Dopo la verifica, un amministratore di IoT FENSTER esaminerà e approverà la registrazione.",
+    "aceptoCondiciones": "Ho letto e accetto le <condiciones>condizioni d'uso</condiciones> e l'<privacidad>informativa sulla privacy</privacidad>.",
+    "infoPrivacidad": "IoT FENSTER tratterà questi dati per gestire la registrazione della tua azienda e i suoi ordini. Puoi esercitare i tuoi diritti come indicato nell'<privacidad>informativa sulla privacy</privacidad>."
   },
   "catalogo": {
     "title": "Catalogo autorizzato",
@@ -951,5 +953,13 @@
         "mensaje": "Buongiorno, vorrei segnalare un problema."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Note legali",
+    "avisoLegal": "Note legali",
+    "privacidad": "Privacy",
+    "cookies": "Cookie",
+    "condiciones": "Condizioni d'uso",
+    "soloEspanol": "I testi legali sono disponibili in spagnolo, che è la versione che prevale."
   }
 }

@@ -109,7 +109,9 @@
     "submitting": "Wird gesendet…",
     "submit": "Unternehmen registrieren",
     "doneTitle": "Registrierung eingegangen",
-    "doneBody": "Bitte prüfen Sie die angegebene geschäftliche E-Mail-Adresse, um das Konto zu bestätigen. Nach der Bestätigung prüft ein Administrator von IoT FENSTER die Registrierung und schaltet sie frei."
+    "doneBody": "Bitte prüfen Sie die angegebene geschäftliche E-Mail-Adresse, um das Konto zu bestätigen. Nach der Bestätigung prüft ein Administrator von IoT FENSTER die Registrierung und schaltet sie frei.",
+    "aceptoCondiciones": "Ich habe die <condiciones>Nutzungsbedingungen</condiciones> und die <privacidad>Datenschutzerklärung</privacidad> gelesen und akzeptiere sie.",
+    "infoPrivacidad": "IoT FENSTER verarbeitet diese Daten, um die Registrierung Ihres Unternehmens und seine Bestellungen abzuwickeln. Ihre Rechte können Sie wie in der <privacidad>Datenschutzerklärung</privacidad> beschrieben ausüben."
   },
   "catalogo": {
     "title": "Freigegebener Katalog",
@@ -951,5 +953,13 @@
         "mensaje": "Hallo, ich möchte eine Störung melden."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Rechtliches",
+    "avisoLegal": "Impressum",
+    "privacidad": "Datenschutz",
+    "cookies": "Cookies",
+    "condiciones": "Nutzungsbedingungen",
+    "soloEspanol": "Die Rechtstexte sind auf Spanisch verfügbar; die spanische Fassung ist maßgeblich."
   }
 }
