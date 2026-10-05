@@ -69,7 +69,14 @@
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "noAccount": "Ihr Unternehmen hat noch keinen Zugang?",
-    "register": "Zugang anfragen"
+    "register": "Zugang anfragen",
+    "errors": {
+      "CUENTA_EMAIL_SIN_VERIFICAR": "Ihre E-Mail-Adresse ist noch nicht bestätigt. Öffnen Sie den Link aus der E-Mail bei der Registrierung; ist er abgelaufen, fordern Sie dort einen neuen an.",
+      "CUENTA_PENDIENTE_APROBACION": "Ihre Registrierung wartet auf Freigabe. IoT FENSTER benachrichtigt Sie per E-Mail, sobald Sie sich anmelden können.",
+      "CUENTA_RECHAZADA": "Ihre Registrierungsanfrage wurde nicht genehmigt. Wenn Sie einen Irrtum vermuten, wenden Sie sich an IoT FENSTER.",
+      "CUENTA_EMPRESA_SUSPENDIDA": "Der Zugang Ihres Unternehmens ist gesperrt. Wenden Sie sich an IoT FENSTER.",
+      "CUENTA_DESACTIVADA": "Ihr Benutzer ist deaktiviert. Wenden Sie sich an den Administrator Ihres Unternehmens oder an IoT FENSTER."
+    }
   },
   "roles": {
     "PARTNER_ADMIN": "Administrator",

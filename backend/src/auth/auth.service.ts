@@ -35,6 +35,17 @@ import type { JwtPayload } from './strategies/jwt.strategy.js';
 import type { UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
 
 const SALT_ROUNDS = 12;
+/// Códigos de negocio del login (cuerpo `codigo` de la respuesta 401), para que el
+/// frontend muestre el motivo en el idioma del usuario.
+export const CODIGOS_LOGIN = {
+  DESACTIVADA: 'CUENTA_DESACTIVADA',
+  EMAIL_SIN_VERIFICAR: 'CUENTA_EMAIL_SIN_VERIFICAR',
+  PENDIENTE_APROBACION: 'CUENTA_PENDIENTE_APROBACION',
+  RECHAZADA: 'CUENTA_RECHAZADA',
+  EMPRESA_SUSPENDIDA: 'CUENTA_EMPRESA_SUSPENDIDA',
+} as const;
+/// Tiempo mínimo entre dos correos de «olvidé mi contraseña» para la misma cuenta.
+const ESPERA_ENTRE_REENVIOS_RESET_MS = 2 * 60 * 1000;
 /// Validez del enlace de invitación de un usuario nuevo (`invitarUsuario`).
 const PLAZO_INVITACION = '7d';
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002';
@@ -347,8 +358,14 @@ export class AuthService {
       throw credencialesInvalidas();
     }
 
+    /// Con la contraseña ya acertada, el motivo concreto solo se lo enseña a quien
+    /// conoce la contraseña: el resto (cuenta inexistente, contraseña mala) sigue
+    /// viendo el mismo «Credenciales inválidas». El `codigo` deja a la pantalla
+    /// mostrarlo traducido.
+    const cuentaNoDisponible = (codigo: string, mensaje: string) => new UnauthorizedException({ message: mensaje, codigo });
+
     if (!user.activo) {
-      throw credencialesInvalidas();
+      throw cuentaNoDisponible(CODIGOS_LOGIN.DESACTIVADA, 'Tu usuario está desactivado. Contacta con IoT FENSTER.');
     }
 
     /// Rol COMERCIAL apagado por ahora (`COMERCIAL_ACTIVO`): se avisa con un mensaje
@@ -362,8 +379,20 @@ export class AuthService {
     /// email verificado.
     const esPersonalInterno = user.rol === RolUsuario.ADMIN_FENSTER || user.rol === RolUsuario.COMERCIAL;
     if (!esPersonalInterno) {
-      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
+      if (!user.partner) {
         throw credencialesInvalidas();
+      }
+      if (!user.emailVerificadoEn || user.partner.estado === EstadoPartner.PENDIENTE_VERIFICACION_EMAIL) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.EMAIL_SIN_VERIFICAR, 'Verifica tu correo con el enlace que te enviamos al registrarte.');
+      }
+      if (user.partner.estado === EstadoPartner.PENDIENTE_APROBACION) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.PENDIENTE_APROBACION, 'Tu alta está pendiente de aprobación por IoT FENSTER.');
+      }
+      if (user.partner.estado === EstadoPartner.RECHAZADO) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.RECHAZADA, 'Tu solicitud de alta no ha sido aprobada. Contacta con IoT FENSTER.');
+      }
+      if (user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.EMPRESA_SUSPENDIDA, 'El acceso de tu empresa está suspendido. Contacta con IoT FENSTER.');
       }
     }
 
@@ -453,6 +482,16 @@ export class AuthService {
     if (!usuario || !usuario.activo) {
       return;
     }
+    /// Un correo cada pocos minutos por cuenta: sin esto, repetir la petición
+    /// llenaría el buzón de un cliente. Se mira cuándo se firmó el último enlace
+    /// (su `iat`), así no hace falta guardar nada más. Se responde igual que si
+    /// se hubiera enviado, para no dar pistas.
+    if (usuario.tokenResetPassword) {
+      const { iat } = this.jwtService.decode<{ iat?: number } | null>(usuario.tokenResetPassword) ?? {};
+      if (iat && Date.now() - iat * 1000 < ESPERA_ENTRE_REENVIOS_RESET_MS) {
+        return;
+      }
+    }
     await this.generarYEnviarTokenReset(usuario);
   }
 
@@ -501,6 +540,25 @@ export class AuthService {
   /// el enlace para crear su contraseña.
   async invitarUsuario(usuario: { id: string; email: string; idioma: Idioma }, razonSocial: string): Promise<void> {
     await this.generarYEnviarTokenReset(usuario, { razonSocial });
+  }
+
+  /// «Salir»: además de borrar la cookie del navegador (lo hace el controller), el
+  /// token deja de valer en el servidor, así que una copia suya (otro equipo, un
+  /// portátil compartido) ya no entra. Usa el mismo mecanismo que `forzarLogout`,
+  /// por lo que también cierra las demás sesiones abiertas de ese usuario. Un token
+  /// ausente, caducado o falso se ignora: salir nunca debe fallar.
+  async cerrarSesion(token: string | undefined): Promise<void> {
+    if (!token) return;
+    let sub: string | undefined;
+    try {
+      ({ sub } = await this.jwtService.verifyAsync<{ sub?: string }>(token, {
+        secret: this.configService.get<string>('jwtSecret'),
+      }));
+    } catch {
+      return;
+    }
+    if (!sub) return;
+    await this.prisma.user.updateMany({ where: { id: sub }, data: { sesionInvalidadaEn: new Date() } });
   }
 
   /// Invalida cualquier JWT de sesión emitido antes de este momento para el

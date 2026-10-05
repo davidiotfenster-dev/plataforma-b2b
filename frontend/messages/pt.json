@@ -69,7 +69,14 @@
     "showPassword": "Mostrar palavra-passe",
     "hidePassword": "Ocultar palavra-passe",
     "noAccount": "A sua empresa ainda não tem acesso?",
-    "register": "Pedir acesso"
+    "register": "Pedir acesso",
+    "errors": {
+      "CUENTA_EMAIL_SIN_VERIFICAR": "O seu email ainda não está verificado. Abra o link que enviámos ao registar-se; se expirou, peça um novo a partir dessa página.",
+      "CUENTA_PENDIENTE_APROBACION": "O seu registo está pendente de aprovação. A IoT FENSTER avisá-lo-á por email quando puder entrar.",
+      "CUENTA_RECHAZADA": "O seu pedido de registo não foi aprovado. Se acha que é um erro, contacte a IoT FENSTER.",
+      "CUENTA_EMPRESA_SUSPENDIDA": "O acesso da sua empresa está suspenso. Contacte a IoT FENSTER.",
+      "CUENTA_DESACTIVADA": "O seu utilizador está desativado. Contacte o administrador da sua empresa ou a IoT FENSTER."
+    }
   },
   "roles": {
     "PARTNER_ADMIN": "Administrador",

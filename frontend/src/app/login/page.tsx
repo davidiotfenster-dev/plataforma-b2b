@@ -47,7 +47,13 @@ function Login() {
       router.push(destinoTrasLogin(next, perfil.rol));
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : tCommon("unexpectedError"));
+      setError(
+        err instanceof ApiError
+          ? err.code && t.has(`errors.${err.code}`)
+            ? t(`errors.${err.code}`)
+            : err.message
+          : tCommon("unexpectedError"),
+      );
     } finally {
       setCargando(false);
     }
