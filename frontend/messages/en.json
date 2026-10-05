@@ -57,6 +57,8 @@
   },
   "login": {
     "title": "Log in",
+    "sessionExpired": "Your session has expired or was closed. Log in again to continue.",
+    "loginToContinue": "Log in to see this page.",
     "email": "Email",
     "password": "Password",
     "submitting": "Logging in…",

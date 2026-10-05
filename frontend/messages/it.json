@@ -57,6 +57,8 @@
   },
   "login": {
     "title": "Accedi",
+    "sessionExpired": "La tua sessione è scaduta o è stata chiusa. Accedi di nuovo per continuare.",
+    "loginToContinue": "Accedi per vedere questa pagina.",
     "email": "Email",
     "password": "Password",
     "submitting": "Accesso in corso…",

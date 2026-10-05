@@ -57,6 +57,8 @@
   },
   "login": {
     "title": "Anmelden",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen oder wurde beendet. Melden Sie sich erneut an, um fortzufahren.",
+    "loginToContinue": "Melden Sie sich an, um diese Seite zu sehen.",
     "email": "E-Mail",
     "password": "Passwort",
     "submitting": "Anmeldung läuft…",

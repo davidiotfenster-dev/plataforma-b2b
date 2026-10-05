@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Navbar } from "@/components/navbar";
+import { ControlAcceso } from "@/components/control-acceso";
 import { Marca } from "@/components/marca";
 import { AyudaBurbuja } from "@/components/ayuda/ayuda-burbuja";
 import Link from "next/link";
@@ -39,7 +40,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <NextIntlClientProvider>
           <Providers>
             <Navbar />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
+            <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">
+              <ControlAcceso>{children}</ControlAcceso>
+            </main>
             <footer className="border-t border-neutral-200 bg-white">
               <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-6 py-4 text-sm text-neutral-500">
                 <Marca subtitulo={tNav("subtitle")} className="!text-sm" />

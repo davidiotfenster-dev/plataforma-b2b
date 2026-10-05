@@ -57,6 +57,8 @@
   },
   "login": {
     "title": "Iniciar sesión",
+    "sessionExpired": "Tu sesión ha caducado o se ha cerrado. Vuelve a iniciar sesión para continuar.",
+    "loginToContinue": "Inicia sesión para ver esta página.",
     "email": "Email",
     "password": "Contraseña",
     "submitting": "Entrando…",

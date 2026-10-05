@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowRight, FileText, PackageCheck, Truck } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
+import { paginaInicio } from "@/lib/acceso";
 
 export default function HomePage() {
   const { data: perfil, isLoading } = useMe();
@@ -17,13 +18,7 @@ export default function HomePage() {
   useEffect(() => {
     if (isLoading) return;
     if (!perfil) return;
-    if (perfil.rol === "ADMIN_FENSTER") {
-      router.replace("/admin/pedidos");
-    } else if (perfil.rol === "COMERCIAL") {
-      router.replace("/admin/partners");
-    } else {
-      router.replace("/catalogo");
-    }
+    router.replace(paginaInicio(perfil.rol));
   }, [perfil, isLoading, router]);
 
   if (isLoading) {

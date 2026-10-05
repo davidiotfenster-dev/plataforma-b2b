@@ -57,6 +57,8 @@
   },
   "login": {
     "title": "Iniciar sessão",
+    "sessionExpired": "A sua sessão expirou ou foi encerrada. Inicie sessão novamente para continuar.",
+    "loginToContinue": "Inicie sessão para ver esta página.",
     "email": "Email",
     "password": "Palavra-passe",
     "submitting": "A entrar…",

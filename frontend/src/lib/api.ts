@@ -12,6 +12,21 @@ export class ApiError extends Error {
   }
 }
 
+/// Un 401 en cualquier llamada que no sea el propio login significa que la sesión
+/// ya no vale: caducó (8 h), se cerró desde el panel o se suspendió la empresa.
+/// Quien lo escucha (el control de acceso del layout) manda al login.
+let alPerderSesion: (() => void) | null = null;
+
+export function escucharSesionPerdida(escucha: (() => void) | null): void {
+  alPerderSesion = escucha;
+}
+
+function comprobarSesion(res: Response, path: string): void {
+  if (res.status === 401 && path !== "/auth/login") {
+    alPerderSesion?.();
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -24,6 +39,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
+    comprobarSesion(res, path);
     const body = await res.json().catch(() => ({ message: res.statusText }));
     // Nest devuelve una lista de textos cuando falla la validación de varios campos.
     const mensaje = Array.isArray(body.message) ? body.message.join(" · ") : body.message;
@@ -53,6 +69,7 @@ export const api = {
 export async function descargarArchivo(path: string, nombre: string): Promise<void> {
   const res = await fetch(`${API_URL}${path}`, { credentials: "include" });
   if (!res.ok) {
+    comprobarSesion(res, path);
     const body = await res.json().catch(() => ({ message: res.statusText }));
     throw new ApiError(res.status, body.message ?? "Error de red", body.codigo);
   }
