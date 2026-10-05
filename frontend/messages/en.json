@@ -235,6 +235,7 @@
     "totalLabel": "Total: €{total}",
     "back": "My orders",
     "placedOn": "Placed on {fecha}",
+    "placedBy": "Placed by {nombre} ({email})",
     "downloadPdf": "Download PDF",
     "downloading": "Downloading…",
     "downloadError": "The PDF could not be downloaded. Please try again.",

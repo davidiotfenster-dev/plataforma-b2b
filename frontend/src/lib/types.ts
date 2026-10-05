@@ -91,8 +91,10 @@ export interface Order {
   updatedAt: string;
   items?: OrderItem[];
   partner?: { razonSocial: string };
-  /// Solo en el detalle del cliente: cuándo entró el pedido en cada estado.
+  /// Solo en el detalle (del cliente y del admin): cuándo entró el pedido en cada estado.
   historial?: HistorialEstado[];
+  /// Solo en el detalle del admin: quién hizo el pedido.
+  usuario?: { nombre: string; email: string };
 }
 
 export interface HistorialEstado {

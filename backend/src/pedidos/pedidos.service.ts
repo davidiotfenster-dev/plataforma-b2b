@@ -394,6 +394,38 @@ export class PedidosService {
       throw NO_ENCONTRADO();
     }
 
+    return this.pdfDePedido(order, userId, idioma);
+  }
+
+  /// El mismo PDF para IoT FENSTER desde su ficha del pedido. Un COMERCIAL solo
+  /// llega a los pedidos de las empresas que dio de alta (como en `obtenerAdmin`).
+  async generarPdfAdmin(
+    id: string,
+    userId: string,
+    idioma?: Idioma,
+    restringirCreadoPorId?: string,
+  ): Promise<{ codigoPed: string; contenido: Buffer }> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: { items: true, partner: { select: { razonSocial: true, creadoPorUsuarioId: true } } },
+    });
+
+    if (
+      !order ||
+      (restringirCreadoPorId !== undefined && order.partner.creadoPorUsuarioId !== restringirCreadoPorId)
+    ) {
+      throw new NotFoundException('Pedido no encontrado');
+    }
+
+    return this.pdfDePedido(order, userId, idioma);
+  }
+
+  /// Si quien descarga no elige idioma, el que tiene guardado en su perfil.
+  private async pdfDePedido(
+    order: Prisma.OrderGetPayload<{ include: { items: true; partner: { select: { razonSocial: true } } } }>,
+    userId: string,
+    idioma?: Idioma,
+  ): Promise<{ codigoPed: string; contenido: Buffer }> {
     const idiomaPdf =
       idioma ?? (await this.prisma.user.findUnique({ where: { id: userId }, select: { idioma: true } }))?.idioma ?? Idioma.ES;
     const contenido = await this.pedidoPdfService.generar(this.datosPdf(order, order.partner.razonSocial, idiomaPdf));
@@ -689,7 +721,13 @@ export class PedidosService {
   async obtenerAdmin(id: string, restringirCreadoPorId?: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { items: true, partner: { select: { razonSocial: true, creadoPorUsuarioId: true } } },
+      include: {
+        items: true,
+        partner: { select: { razonSocial: true, creadoPorUsuarioId: true } },
+        /// Quién lo hizo y cuándo pasó por cada estado, lo mismo que ve el cliente.
+        usuario: { select: { nombre: true, email: true } },
+        historial: { select: { estado: true, createdAt: true }, orderBy: { createdAt: 'asc' } },
+      },
     });
 
     if (

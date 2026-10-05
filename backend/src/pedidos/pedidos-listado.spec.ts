@@ -197,4 +197,33 @@ describe('PedidosService — Mis pedidos del cliente', () => {
       expect(pdfService.generar).not.toHaveBeenCalled();
     });
   });
+
+  describe('generarPdfAdmin', () => {
+    it('IoT FENSTER descarga el PDF de un pedido de cualquier empresa, en su idioma', async () => {
+      prisma.order.findUnique.mockResolvedValue({
+        ...pedido({ partnerId: 'otro' }),
+        items: [],
+        partner: { razonSocial: 'Cliente S.L.', creadoPorUsuarioId: null },
+      });
+
+      const { codigoPed } = await service.generarPdfAdmin('o1', 'admin-1');
+
+      expect(codigoPed).toBe('PED-000001');
+      expect(prisma.user.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'admin-1' } }));
+      expect(pdfService.generar.mock.calls[0][0]).toMatchObject({ razonSocialPartner: 'Cliente S.L.', idioma: 'DE' });
+    });
+
+    it('un comercial no descarga pedidos de empresas que no dio de alta', async () => {
+      prisma.order.findUnique.mockResolvedValue({
+        ...pedido(),
+        items: [],
+        partner: { razonSocial: 'X', creadoPorUsuarioId: 'otro-comercial' },
+      });
+
+      await expect(service.generarPdfAdmin('o1', 'comercial-1', 'ES', 'comercial-1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(pdfService.generar).not.toHaveBeenCalled();
+    });
+  });
 });

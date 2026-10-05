@@ -109,6 +109,29 @@ export class PedidosController {
     return this.pedidosService.obtenerAdmin(id, this.restriccion(usuario));
   }
 
+  /// El PDF del resumen del pedido, el mismo que recibe el cliente.
+  @Get('admin/:id/pdf')
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async descargarPdfAdmin(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query() query: DescargarPdfQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { codigoPed, contenido } = await this.pedidosService.generarPdfAdmin(
+      id,
+      usuario.userId,
+      query.idioma,
+      this.restriccion(usuario),
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${codigoPed}.pdf"`,
+    });
+    return new StreamableFile(contenido);
+  }
+
   @Get(':id')
   async obtener(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
     const [partnerId] = this.identificar(usuario);
