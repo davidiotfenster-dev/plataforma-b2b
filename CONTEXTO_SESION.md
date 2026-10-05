@@ -260,8 +260,8 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
 - **Contacto** (2026-10-05, datos de David): al pie de la ayuda, solo para clientes y
   visitantes. Comercial (información, precios y ofertas): info@iotfenster.com.
   Incidencias: soporte@iotfenster.com. Cada uno con botón de WhatsApp y un mensaje ya
-  escrito; el número va en `frontend/src/components/ayuda/contacto.ts` (`WHATSAPP`) y,
-  mientras esté vacío, los botones no salen. David aún no ha dado el número.
+  escrito. WhatsApp: +34 660 804 391, el mismo para los dos (constante `WHATSAPP` en
+  `frontend/src/components/ayuda/contacto.ts`; vacía, los botones no salen).
 - Dos respuestas suponen que los emails funcionan (recuperar contraseña y verificar
   correo); revisarlas al activar los emails del registro (ver pendientes).
 

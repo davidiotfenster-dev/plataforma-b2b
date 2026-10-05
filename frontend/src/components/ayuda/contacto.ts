@@ -7,4 +7,4 @@ export const CONTACTOS = [
 
 /// Número de WhatsApp para los dos contactos: prefijo del país y número, sin "+"
 /// ni espacios (por ejemplo "34600000000"). Vacío, no se enseñan los botones.
-export const WHATSAPP = "";
+export const WHATSAPP = "34660804391";
