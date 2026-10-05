@@ -17,7 +17,7 @@ export interface Perfil {
   rol: RolUsuario;
   idioma: Idioma;
   partnerId: string | null;
-  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner } | null;
+  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner; direccionEnvio: string | null } | null;
 }
 
 export interface Producto {

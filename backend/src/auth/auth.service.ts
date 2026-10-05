@@ -56,6 +56,21 @@ export interface UsuarioValidado {
   rol: RolUsuario;
 }
 
+/// Dirección de envío de la ficha de la empresa en líneas (calle / CP y localidad /
+/// provincia y país), o `null` si no tiene calle guardada.
+export function direccionEnvioPorDefecto(f: {
+  direccionEnvioDefecto: string | null;
+  codigoPostalEnvio: string | null;
+  localidadEnvio: string | null;
+  provinciaEnvio: string | null;
+  paisEnvio: string | null;
+}): string | null {
+  const calle = f.direccionEnvioDefecto?.trim();
+  if (!calle) return null;
+  const unir = (...partes: (string | null)[]) => partes.map((p) => p?.trim()).filter(Boolean).join(' ');
+  return [calle, unir(f.codigoPostalEnvio, f.localidadEnvio), unir(f.provinciaEnvio, f.paisEnvio)].filter(Boolean).join('\n');
+}
+
 function dominioDeEmail(email: string): string {
   return email.slice(email.lastIndexOf('@') + 1).toLowerCase();
 }
@@ -412,10 +427,28 @@ export class AuthService {
         rol: true,
         idioma: true,
         partnerId: true,
-        partner: { select: { razonSocial: true, marcaComercial: true, estado: true } },
+        partner: {
+          select: {
+            razonSocial: true,
+            marcaComercial: true,
+            estado: true,
+            direccionEnvioDefecto: true,
+            codigoPostalEnvio: true,
+            localidadEnvio: true,
+            provinciaEnvio: true,
+            paisEnvio: true,
+          },
+        },
       },
     });
-    return user;
+    const { partner, ...resto } = user;
+    if (!partner) return { ...resto, partner: null };
+    const { direccionEnvioDefecto, codigoPostalEnvio, localidadEnvio, provinciaEnvio, paisEnvio, ...datosEmpresa } = partner;
+    return {
+      ...resto,
+      // La dirección de envío de la ficha, ya escrita en líneas, para precargar el checkout.
+      partner: { ...datosEmpresa, direccionEnvio: direccionEnvioPorDefecto({ direccionEnvioDefecto, codigoPostalEnvio, localidadEnvio, provinciaEnvio, paisEnvio }) },
+    };
   }
 
   async actualizarIdioma(userId: string, idioma: Idioma): Promise<void> {
