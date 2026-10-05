@@ -649,6 +649,11 @@
       "billed": "Umsatz",
       "product": "Produkt",
       "units": "Stk."
+    },
+    "export": {
+      "button": "Excel herunterladen",
+      "downloading": "Wird vorbereitet…",
+      "hint": "Lädt die Zahlen mit den aktuellen Filtern als Excel herunter, dazu die Liste der Bestellungen im Zeitraum"
     }
   },
   "avanzarEstado": {

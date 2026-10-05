@@ -11,7 +11,8 @@ import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
-import { calcularPeriodo, tramosDelPeriodo } from './estadisticas-periodo.js';
+import { calcularPeriodo, tramosDelPeriodo, type PeriodoEstadisticas } from './estadisticas-periodo.js';
+import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
   asuntoCambioEstado,
   asuntoConfirmacionPedido,
@@ -31,6 +32,8 @@ const NO_ENCONTRADO = () => new NotFoundException('Recurso no encontrado');
 /// carga de página a medida que crece el volumen de pedidos.
 const ESTADISTICAS_CACHE_TTL_SEGUNDOS = 120;
 const ESTADISTICAS_CACHE_KEY = 'pedidos:estadisticas-admin';
+/// Filas de los rankings que se ven en pantalla (el Excel los lleva completos).
+const LIMITE_RANKING = 10;
 
 /// Máquina de estados lineal: solo se permite avanzar un paso, nunca saltar
 /// ni retroceder (ver CLAUDE.md requisito 4).
@@ -438,14 +441,56 @@ export class PedidosService {
     const cacheKey = [ESTADISTICAS_CACHE_KEY, periodo.desde, periodo.hasta, query.marca ?? '*', query.partnerId ?? '*'].join(':');
     const cacheado = await this.redis.get(cacheKey);
     if (cacheado) {
-      return JSON.parse(cacheado);
+      return JSON.parse(cacheado) as Awaited<ReturnType<PedidosService['calcularEstadisticas']>>;
     }
+    const resultado = await this.calcularEstadisticas(query, periodo, LIMITE_RANKING);
+    await this.redis.setEx(cacheKey, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
+    return resultado;
+  }
+
+  /// Las mismas estadísticas en un Excel, con los rankings completos y una hoja
+  /// con cada pedido del periodo (cancelados incluidos, marcados como tales).
+  async exportarEstadisticas(query: EstadisticasQueryDto): Promise<{ nombre: string; contenido: Buffer }> {
+    const periodo = calcularPeriodo(query.desde, query.hasta);
+    const [datos, pedidos] = await Promise.all([
+      this.calcularEstadisticas(query, periodo),
+      this.prisma.order.findMany({
+        where: this.filtroEstadisticas(query, periodo),
+        orderBy: { createdAt: 'asc' },
+        select: {
+          codigoPed: true,
+          createdAt: true,
+          estado: true,
+          poNumber: true,
+          totalNeto: true,
+          partner: { select: { razonSocial: true, marcaCatalogo: true } },
+          _count: { select: { items: true } },
+        },
+      }),
+    ]);
+    const contenido = await generarExcelEstadisticas(datos, pedidos, {
+      marca: query.marca,
+      empresa: query.partnerId ? (datos.empresas.find((e) => e.id === query.partnerId)?.razonSocial ?? query.partnerId) : undefined,
+    });
+    return { nombre: `estadisticas_${periodo.desde}_${periodo.hasta}.xlsx`, contenido };
+  }
+
+  private filtroEstadisticas(query: EstadisticasQueryDto, periodo: PeriodoEstadisticas): Prisma.OrderWhereInput {
+    return {
+      ...(query.partnerId ? { partnerId: query.partnerId } : {}),
+      ...(query.marca ? { partner: { marcaCatalogo: query.marca } } : {}),
+      createdAt: { gte: periodo.inicio, lt: periodo.fin },
+    };
+  }
+
+  /// Sin `limite`, los rankings de empresas y productos van completos.
+  private async calcularEstadisticas(query: EstadisticasQueryDto, periodo: PeriodoEstadisticas, limite?: number) {
 
     const filtroEmpresa: Prisma.OrderWhereInput = {
       ...(query.partnerId ? { partnerId: query.partnerId } : {}),
       ...(query.marca ? { partner: { marcaCatalogo: query.marca } } : {}),
     };
-    const enPeriodo: Prisma.OrderWhereInput = { ...filtroEmpresa, createdAt: { gte: periodo.inicio, lt: periodo.fin } };
+    const enPeriodo = this.filtroEstadisticas(query, periodo);
     const validos: Prisma.OrderWhereInput = { ...enPeriodo, estado: { not: EstadoPedido.CANCELADO } };
 
     const condicionesSql = [
@@ -490,7 +535,7 @@ export class PedidosService {
         where: { order: { is: validos } },
         _sum: { cantidad: true, totalLinea: true },
         orderBy: { _sum: { totalLinea: 'desc' } },
-        take: 10,
+        take: limite,
       }),
       /// Empresas con algún pedido, para el desplegable del filtro.
       this.prisma.partner.findMany({
@@ -557,7 +602,7 @@ export class PedidosService {
       porMarca: [...porMarca.values()]
         .map((m) => ({ ...m, facturado: centimos(m.facturado) }))
         .sort((a, b) => b.facturado - a.facturado),
-      topEmpresas: ranking.slice(0, 10),
+      topEmpresas: ranking.slice(0, limite),
       topProductos: productos.map((p) => ({
         sku: p.skuComercial,
         nombre: p.nombreProducto,
@@ -567,7 +612,6 @@ export class PedidosService {
       empresas: empresas.map((e) => ({ id: e.id, razonSocial: e.razonSocial, marca: e.marcaCatalogo })),
     };
 
-    await this.redis.setEx(cacheKey, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
     return resultado;
   }
 

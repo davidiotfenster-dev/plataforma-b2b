@@ -63,6 +63,19 @@ export class PedidosController {
     return this.pedidosService.estadisticas(query);
   }
 
+  /// Las mismas estadísticas (con los filtros activos) en un Excel descargable.
+  @Get('admin/estadisticas/excel')
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.ADMIN_FENSTER)
+  async exportarEstadisticas(@Query() query: EstadisticasQueryDto, @Res({ passthrough: true }) res: Response) {
+    const { nombre, contenido } = await this.pedidosService.exportarEstadisticas(query);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="${nombre}"`,
+    });
+    return new StreamableFile(contenido);
+  }
+
   /// Panel de fulfillment escalable: un partner por fila (paginado,
   /// buscable), en vez de traer todos los pedidos de todos los partners de
   /// golpe (ver `listarTodos` más abajo, que se mantiene por compatibilidad).

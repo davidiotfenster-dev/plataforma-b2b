@@ -649,6 +649,11 @@
       "billed": "Faturado",
       "product": "Produto",
       "units": "Un."
+    },
+    "export": {
+      "button": "Descarregar Excel",
+      "downloading": "A preparar…",
+      "hint": "Descarrega em Excel os valores com os filtros atuais, mais a lista de encomendas do período"
     }
   },
   "avanzarEstado": {

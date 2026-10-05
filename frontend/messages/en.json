@@ -649,6 +649,11 @@
       "billed": "Revenue",
       "product": "Product",
       "units": "Units"
+    },
+    "export": {
+      "button": "Download Excel",
+      "downloading": "Preparing…",
+      "hint": "Downloads the figures with the current filters as Excel, plus the list of orders in the period"
     }
   },
   "avanzarEstado": {

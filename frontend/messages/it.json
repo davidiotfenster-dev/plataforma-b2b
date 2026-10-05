@@ -649,6 +649,11 @@
       "billed": "Fatturato",
       "product": "Prodotto",
       "units": "Pz."
+    },
+    "export": {
+      "button": "Scarica Excel",
+      "downloading": "Preparazione…",
+      "hint": "Scarica in Excel le cifre con i filtri attuali, più l'elenco degli ordini del periodo"
     }
   },
   "avanzarEstado": {

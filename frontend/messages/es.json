@@ -649,6 +649,11 @@
       "billed": "Facturado",
       "product": "Producto",
       "units": "Uds."
+    },
+    "export": {
+      "button": "Descargar Excel",
+      "downloading": "Preparando…",
+      "hint": "Descarga en Excel las cifras con los filtros actuales, más el listado de pedidos del periodo"
     }
   },
   "avanzarEstado": {

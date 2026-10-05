@@ -5,7 +5,8 @@ import Link from "next/link";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { api } from "@/lib/api";
+import { api, descargarArchivo } from "@/lib/api";
+import { Download } from "lucide-react";
 import type { Estadisticas, GranularidadEstadisticas, MarcaCatalogo } from "@/lib/types";
 import { InsigniaMarca, MARCA_INFO, MARCAS_CATALOGO } from "@/lib/marcas";
 import { SoloAdmin } from "@/components/solo-admin";
@@ -43,6 +44,8 @@ function AdminDashboardPageContenido() {
   const [marca, setMarca] = useState<MarcaCatalogo | "">("");
   const [partnerId, setPartnerId] = useState("");
   const [medida, setMedida] = useState<"facturado" | "pedidos">("facturado");
+  const [descargando, setDescargando] = useState(false);
+  const [errorDescarga, setErrorDescarga] = useState<string | null>(null);
 
   const params = new URLSearchParams({ desde: rango.desde, hasta: rango.hasta });
   if (marca) params.set("marca", marca);
@@ -70,6 +73,18 @@ function AdminDashboardPageContenido() {
     setRango(rangoDePreset(p));
   };
 
+  const descargarExcel = async () => {
+    setDescargando(true);
+    setErrorDescarga(null);
+    try {
+      await descargarArchivo(`/pedidos/admin/estadisticas/excel?${params}`, `estadisticas_${rango.desde}_${rango.hasta}.xlsx`);
+    } catch (e) {
+      setErrorDescarga((e as Error).message);
+    } finally {
+      setDescargando(false);
+    }
+  };
+
   const hayFiltros = preset !== "30d" || marca !== "" || partnerId !== "";
 
   return (
@@ -83,8 +98,21 @@ function AdminDashboardPageContenido() {
             </p>
           )}
         </div>
-        {isFetching && !isLoading && <span className="text-xs text-neutral-400">{t("updating")}</span>}
+        <div className="flex items-center gap-3">
+          {isFetching && !isLoading && <span className="text-xs text-neutral-400">{t("updating")}</span>}
+          <button
+            type="button"
+            onClick={descargarExcel}
+            disabled={descargando || !data}
+            title={t("export.hint")}
+            className="inline-flex items-center gap-2 rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
+          >
+            <Download className="size-4" aria-hidden />
+            {descargando ? t("export.downloading") : t("export.button")}
+          </button>
+        </div>
       </div>
+      {errorDescarga && <p className="text-sm text-red-600">{errorDescarga}</p>}
 
       {/* Filtros: una sola fila encima de todo, afectan a toda la página. */}
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3">
