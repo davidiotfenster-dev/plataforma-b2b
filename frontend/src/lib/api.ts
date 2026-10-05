@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { CODIGOS_PEDIDO_CAMBIADO, mensajeDeError } from "@/lib/errores";
+import { CODIGOS_PEDIDO_CAMBIADO, mensajeDeError, mensajeDeValidacion } from "@/lib/errores";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3010";
 
@@ -45,7 +45,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     comprobarSesion(res, path);
     const body = await res.json().catch(() => ({ message: res.statusText }));
     // Nest devuelve una lista de textos cuando falla la validación de varios campos.
-    const mensaje = Array.isArray(body.message) ? body.message.join(" · ") : body.message;
+    const mensaje = Array.isArray(body.message) ? body.message.map(mensajeDeValidacion).join(" · ") : typeof body.message === "string" ? mensajeDeValidacion(body.message) : body.message;
     throw new ApiError(res.status, mensajeDeError(res.status, body.codigo, mensaje ?? "Error de red"), body.codigo);
   }
 

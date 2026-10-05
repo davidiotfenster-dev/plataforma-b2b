@@ -1,4 +1,4 @@
-import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MaxLength } from 'class-validator';
+import { IsEmail, IsISO8601, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MaxLength } from 'class-validator';
 import { Recortar } from '../../common/dto/recortar.js';
 import {
   CODIGO_POSTAL_MENSAJE,
@@ -14,6 +14,12 @@ import {
 } from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
+  /// `updatedAt` de la ficha tal como la tenía quien edita (bloqueo optimista): si otra
+  /// persona la ha guardado desde entonces, el cambio se rechaza en vez de pisarla.
+  @IsOptional()
+  @IsISO8601()
+  actualizadoEn?: string;
+
   @IsOptional()
   @IsString()
   @IsNotEmpty()

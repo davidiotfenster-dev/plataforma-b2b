@@ -36,6 +36,13 @@ const MENSAJES: Record<string, Textos> = {
     it: "L'ordine era già in quello stato: qualcuno è stato più veloce. Abbiamo caricato lo stato attuale.",
     pt: "A encomenda já estava nesse estado: alguém se adiantou. Carregámos o estado atual.",
   },
+  FICHA_CAMBIADA: {
+    es: "Otra persona ha modificado esta ficha mientras la editabas. Recarga la página para ver sus cambios y vuelve a hacer los tuyos.",
+    en: "Someone else changed this record while you were editing it. Reload the page to see their changes and redo yours.",
+    de: "Jemand anderes hat diesen Datensatz geändert, während Sie ihn bearbeitet haben. Laden Sie die Seite neu, um die Änderungen zu sehen, und wiederholen Sie Ihre.",
+    it: "Qualcun altro ha modificato questa scheda mentre la modificavi. Ricarica la pagina per vedere le sue modifiche e rifai le tue.",
+    pt: "Outra pessoa alterou esta ficha enquanto a editava. Recarregue a página para ver as alterações e refaça as suas.",
+  },
   HTTP_403: {
     es: "No tienes permiso para hacer esto.",
     en: "You do not have permission to do this.",
@@ -79,4 +86,90 @@ export function mensajeDeError(status: number, codigo: string | undefined, mensa
   const clave = codigo && MENSAJES[codigo] ? codigo : status >= 500 ? "HTTP_5XX" : codigo ? null : `HTTP_${status}`;
   const textos = clave ? MENSAJES[clave] : undefined;
   return textos ? textos[idiomaActual()] : mensajeServidor;
+}
+
+/// Reglas de validación del servidor (class-validator), que llegan en inglés técnico:
+/// «trackingUrl must be a URL address», «nombre should not be empty»…
+const REGLAS: { patron: RegExp; textos: (m: RegExpMatchArray) => Textos }[] = [
+  {
+    patron: /^(\w+) should not be empty$/,
+    textos: () => ({
+      es: "es obligatorio", en: "is required", de: "ist erforderlich", it: "è obbligatorio", pt: "é obrigatório",
+    }),
+  },
+  {
+    patron: /^(\w+) must be a URL address$/,
+    textos: () => ({
+      es: "debe ser una dirección web válida (con https://)", en: "must be a valid web address (with https://)",
+      de: "muss eine gültige Webadresse sein (mit https://)", it: "deve essere un indirizzo web valido (con https://)",
+      pt: "deve ser um endereço web válido (com https://)",
+    }),
+  },
+  {
+    patron: /^(\w+) must be an email$/,
+    textos: () => ({
+      es: "debe ser un correo electrónico válido", en: "must be a valid email address",
+      de: "muss eine gültige E-Mail-Adresse sein", it: "deve essere un indirizzo email valido", pt: "deve ser um e-mail válido",
+    }),
+  },
+  {
+    patron: /^(\w+) must be longer than or equal to (\d+) characters$/,
+    textos: (m) => ({
+      es: `debe tener al menos ${m[2]} caracteres`, en: `must have at least ${m[2]} characters`,
+      de: `muss mindestens ${m[2]} Zeichen haben`, it: `deve avere almeno ${m[2]} caratteri`, pt: `deve ter pelo menos ${m[2]} caracteres`,
+    }),
+  },
+  {
+    patron: /^(\w+) must be shorter than or equal to (\d+) characters$/,
+    textos: (m) => ({
+      es: `no puede pasar de ${m[2]} caracteres`, en: `cannot exceed ${m[2]} characters`,
+      de: `darf ${m[2]} Zeichen nicht überschreiten`, it: `non può superare ${m[2]} caratteri`, pt: `não pode ultrapassar ${m[2]} caracteres`,
+    }),
+  },
+  {
+    patron: /^(\w+) must not be (greater|less) than (\S+)$/,
+    textos: (m) => ({
+      es: `no puede ser ${m[2] === "greater" ? "mayor" : "menor"} que ${m[3]}`,
+      en: `cannot be ${m[2] === "greater" ? "greater" : "less"} than ${m[3]}`,
+      de: `darf nicht ${m[2] === "greater" ? "größer" : "kleiner"} als ${m[3]} sein`,
+      it: `non può essere ${m[2] === "greater" ? "maggiore" : "minore"} di ${m[3]}`,
+      pt: `não pode ser ${m[2] === "greater" ? "maior" : "menor"} que ${m[3]}`,
+    }),
+  },
+  {
+    patron: /^(\w+) must be a (positive )?(number|integer number|string)\b.*$/,
+    textos: () => ({
+      es: "no tiene un valor válido", en: "does not have a valid value", de: "hat keinen gültigen Wert",
+      it: "non ha un valore valido", pt: "não tem um valor válido",
+    }),
+  },
+  {
+    patron: /^(\w+) must be one of the following values: .*$/,
+    textos: () => ({
+      es: "no es una opción válida", en: "is not a valid option", de: "ist keine gültige Option",
+      it: "non è un'opzione valida", pt: "não é uma opção válida",
+    }),
+  },
+];
+
+/// «trackingUrl» → «Tracking url»: lo más legible sin un diccionario de campos.
+function nombreDeCampo(clave: string): string {
+  const palabras = clave.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+  return palabras.charAt(0).toUpperCase() + palabras.slice(1);
+}
+
+/// Traduce un aviso de validación del servidor si es de los genéricos; si no, lo deja igual
+/// (los que escribimos nosotros, como «CIF/NIF no válido», ya llegan en español).
+export function mensajeDeValidacion(mensaje: string): string {
+  if (/file too large/i.test(mensaje)) {
+    return {
+      es: "El archivo es demasiado grande.", en: "The file is too large.", de: "Die Datei ist zu groß.",
+      it: "Il file è troppo grande.", pt: "O ficheiro é demasiado grande.",
+    }[idiomaActual()];
+  }
+  for (const { patron, textos } of REGLAS) {
+    const m = mensaje.match(patron);
+    if (m) return `${nombreDeCampo(m[1])} ${textos(m)[idiomaActual()]}`;
+  }
+  return mensaje;
 }

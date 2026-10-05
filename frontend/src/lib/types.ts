@@ -260,6 +260,7 @@ export interface CatalogoMarcaAdmin {
 
 export interface Partner {
   id: string;
+  updatedAt?: string;
   razonSocial: string;
   cif: string;
   direccionFiscal: string;

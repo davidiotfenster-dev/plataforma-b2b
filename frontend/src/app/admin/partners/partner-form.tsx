@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -156,6 +156,12 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
   const [error, setError] = useState<string | null>(null);
   const [guardado, setGuardado] = useState(false);
   const [copiada, setCopiada] = useState(false);
+  // Versión de la ficha que se está editando (bloqueo optimista). Se renueva al guardar para que
+  // un segundo guardado seguido no choque con el primero mientras la ficha se vuelve a leer.
+  const versionFicha = useRef(partner?.updatedAt);
+  useEffect(() => {
+    versionFicha.current = partner?.updatedAt;
+  }, [partner?.updatedAt]);
 
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
@@ -212,6 +218,8 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         pais: texto("pais"),
         descuentoPorcentaje: Number(valores.descuentoPorcentaje || 0),
         iva: numero("iva"),
+        // La versión de la ficha que se está editando: si otra persona la guarda antes, no se pisa.
+        actualizadoEn: versionFicha.current,
       };
       // CIF y dominio se validan al cambiarlos: una ficha antigua con un dato que hoy
       // no pasaría la validación sigue pudiéndose editar sin tocar esos campos.
@@ -232,6 +240,7 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         queryClient.invalidateQueries({ queryKey: ["admin-partner", partner!.id] });
         // Se muestra lo que el servidor ha guardado (ya recortado y normalizado), sin dejar el botón activo.
         setValores(valoresIniciales(resultado));
+        versionFicha.current = resultado.updatedAt;
         setGuardado(true);
       }
     },
