@@ -804,7 +804,12 @@
     "canAddHelp": "Sie haben einen Namen in dieser Marke, sind aber nicht im Katalog. Name, SKU und Preis prüfen und hinzufügen.",
     "nothingToAdd": "Nichts fehlt.",
     "hideOthers": "Produkte anderer Marken ausblenden",
-    "showOthers": "Produkt einer anderen Marke hinzufügen ({n})"
+    "showOthers": "Produkt einer anderen Marke hinzufügen ({n})",
+    "pvpInvalid": "Der UVP muss größer als 0 sein und darf {max} nicht überschreiten.",
+    "pvpConfirmTitle": "UVP von „{name}“ ändern",
+    "pvpConfirmText": "Der UVP ändert sich von {antes} auf {despues}. Die Änderung gilt sofort für die {n} Unternehmen dieser Marke; bestehende Bestellungen behalten ihren Preis.",
+    "pvpConfirmSuspicious": "Der UVP ändert sich von {antes} auf {despues}, eine sehr große Änderung: Prüfen Sie, ob es ein Tippfehler ist. Sie gilt sofort für die {n} Unternehmen dieser Marke; bestehende Bestellungen behalten ihren Preis.",
+    "pvpConfirmYes": "Ja, für {n} Unternehmen ändern"
   },
   "ayuda": {
     "boton": "Hilfe",

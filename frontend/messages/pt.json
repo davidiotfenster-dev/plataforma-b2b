@@ -804,7 +804,12 @@
     "canAddHelp": "Têm nome nesta marca mas não estão no seu catálogo. Reveja nome, SKU e preço e adicione-os.",
     "nothingToAdd": "Não falta nenhum.",
     "hideOthers": "Ocultar produtos de outras marcas",
-    "showOthers": "Adicionar um produto de outra marca ({n})"
+    "showOthers": "Adicionar um produto de outra marca ({n})",
+    "pvpInvalid": "O PVP tem de ser superior a 0 e não ultrapassar {max}.",
+    "pvpConfirmTitle": "Alterar o PVP de «{name}»",
+    "pvpConfirmText": "O PVP passa de {antes} para {despues}. A alteração chega de imediato às {n} empresas desta marca; as encomendas já feitas mantêm o preço.",
+    "pvpConfirmSuspicious": "O PVP passa de {antes} para {despues}, uma alteração muito grande: confirma que não é um erro de digitação. Chegará de imediato às {n} empresas desta marca; as encomendas já feitas mantêm o preço.",
+    "pvpConfirmYes": "Sim, alterar para {n} empresas"
   },
   "ayuda": {
     "boton": "Ajuda",

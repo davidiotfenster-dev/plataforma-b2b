@@ -804,7 +804,12 @@
     "canAddHelp": "They have a name in this brand but are not in its catalogue. Check name, SKU and price and add them.",
     "nothingToAdd": "Nothing missing.",
     "hideOthers": "Hide products from other brands",
-    "showOthers": "Add a product from another brand ({n})"
+    "showOthers": "Add a product from another brand ({n})",
+    "pvpInvalid": "The RRP must be above 0 and no more than {max}.",
+    "pvpConfirmTitle": "Change the RRP of “{name}”",
+    "pvpConfirmText": "The RRP goes from {antes} to {despues}. The change reaches the {n} companies of this brand straight away; existing orders keep their price.",
+    "pvpConfirmSuspicious": "The RRP goes from {antes} to {despues}, a very large change: check it is not a typo. It reaches the {n} companies of this brand straight away; existing orders keep their price.",
+    "pvpConfirmYes": "Yes, change for {n} companies"
   },
   "ayuda": {
     "boton": "Help",

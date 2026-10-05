@@ -804,7 +804,12 @@
     "canAddHelp": "Hanno un nome in questo marchio ma non sono nel suo catalogo. Controlla nome, SKU e prezzo e aggiungili.",
     "nothingToAdd": "Non manca nulla.",
     "hideOthers": "Nascondi prodotti di altri marchi",
-    "showOthers": "Aggiungi un prodotto di un altro marchio ({n})"
+    "showOthers": "Aggiungi un prodotto di un altro marchio ({n})",
+    "pvpInvalid": "Il prezzo di listino deve essere maggiore di 0 e non superare {max}.",
+    "pvpConfirmTitle": "Cambia il prezzo di listino di «{name}»",
+    "pvpConfirmText": "Il prezzo di listino passa da {antes} a {despues}. La modifica arriva subito alle {n} aziende di questo marchio; gli ordini già effettuati mantengono il prezzo.",
+    "pvpConfirmSuspicious": "Il prezzo di listino passa da {antes} a {despues}, una variazione molto grande: controlla che non sia un errore di battitura. Arriverà subito alle {n} aziende di questo marchio; gli ordini già effettuati mantengono il prezzo.",
+    "pvpConfirmYes": "Sì, cambia per {n} aziende"
   },
   "ayuda": {
     "boton": "Aiuto",
