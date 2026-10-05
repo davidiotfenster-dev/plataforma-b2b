@@ -28,7 +28,7 @@ Sacado de la oferta VBH (PVP − 50 %), así que PVP = el doble del precio de la
 | Connect-1+ / Wave-1+ / Icon1+ (blanco, negro) | W1P-* | 100 € | Hoja VBH 50 € |
 | Connect-2 / Wave-2 / Icon2 (blanco, negro) | W2-* | 164 € | Hoja VBH 82 € |
 | Connect-2+ / Wave-2+ / Icon2+ (blanco, negro) | W2P-* | 174 € | Hoja VBH 87 € |
-| Connect-2 Security / Wave2S (blanco, negro) | W2S-* | 130 € | Hoja VBH 65 € |
+| Connect-2 Security / Wave2S (blanco, negro) | W2S-* | 130 € | Hoja VBH 65 € («WAVE-2 SECURITY»; David confirma Wave2S = Connect-2 Security) |
 | Pulsar+ / Wave-4+ / Icon Mini+ (inox, negro) | PULSARP-* | 108 € | Hoja VBH 54 € |
 | Pulsar+ con cable 1,6 m (inox, negro) | PULSARP-C16-* | 108 € | Igual que el Pulsar+ |
 | Wave3 Air (blanco, inox, negro) | WALLAIR-* | 82 € | Tabla de equivalencias: Wave3 Air = C-WALL |
