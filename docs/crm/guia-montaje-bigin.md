@@ -10,6 +10,8 @@ Tiempo estimado: una mañana para la base y otra para las mejoras.
 
 > **Plan gratuito.** La cuenta de prueba figura con el *plan de suscripción gratuito* (aviso de arriba, con el botón *Actualizar*). El plan gratuito de Bigin tiene **1 usuario, 1 pipeline y 3 automatizaciones**, y no tiene roles ni perfiles. Con él se pueden hacer los pasos 1, 2, 4 (vistas), 5 y 6, pero **no** el 3 (usuarios y roles por país) ni todas las automatizaciones. Para esos pasos hay que pasar a **Premier** (o activar su prueba gratuita si Zoho la ofrece). Conviene decidirlo antes de montar, para no rehacer nada.
 
+> **Qué plan elegir (precios en euros de la tienda de Zoho, 2026-10-05).** Gratuito 0 €; Express 7 € (9 € mes a mes); **Premier 12 € (15 € mes a mes)**; Bigin 360 18 € (21 € mes a mes), siempre por usuario y mes, anual salvo indicación. **Premier es el mínimo recomendado:** Express solo permite 10 campos propios por módulo y las oportunidades necesitan 11 (5 de la base y 6 de las mejoras). Premier trae 25 campos, 50 automatizaciones, 5 pipelines, campos de fórmula, limpieza de duplicados y **reglas de transición de etapa** (sirven para exigir la próxima acción y su fecha al cambiar de etapa; con ellas se resuelve la funcionalidad 5 con certeza).
+
 1. Entrar en la cuenta y mirar **arriba a la izquierda**: debe poner Bigin. Anotar el plan (Free, Express o Premier) y la fecha en que caduca la prueba.
 2. Mirar la dirección de la página: debe acabar en `.eu` (centro de datos europeo). Si acaba en `.com`, avisar antes de cargar datos de clientes.
 3. Hacerlo todo con una cuenta de administrador. Hasta que se confirme el plan, no cargar datos reales de clientes.
