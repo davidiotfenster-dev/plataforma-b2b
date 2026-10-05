@@ -175,7 +175,9 @@
     "empty": "O seu catálogo autorizado ainda não tem produtos.",
     "addedToCart": "{producto} adicionado ao carrinho",
     "addError": "Erro ao adicionar ao carrinho",
-    "addToCart": "Adicionar ao carrinho"
+    "addToCart": "Adicionar ao carrinho",
+    "yourPrice": "O seu preço",
+    "pvpDiscount": "PVP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "A carregar produto…",

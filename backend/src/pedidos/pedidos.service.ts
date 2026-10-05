@@ -12,6 +12,7 @@ import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
+import { calcularPrecioNeto } from '../common/precio-neto.js';
 import { calcularPeriodo, tramosDelPeriodo, type PeriodoEstadisticas } from './estadisticas-periodo.js';
 import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
@@ -74,11 +75,6 @@ export class PedidosService {
     private readonly configService: ConfigService,
   ) {}
 
-  private calcularPrecioNeto(pvpBase: Prisma.Decimal, descuentoPorcentaje: Prisma.Decimal): Prisma.Decimal {
-    const factor = new Prisma.Decimal(1).minus(descuentoPorcentaje.dividedBy(100));
-    return pvpBase.times(factor).toDecimalPlaces(2);
-  }
-
   async confirmar(partnerId: string, userId: string, dto: ConfirmarPedidoDto) {
     const orden = await this.prisma.$transaction(async (tx) => {
       const cart = await tx.cart.findUnique({
@@ -120,7 +116,7 @@ export class PedidosService {
         /// El descuento específico del producto (si existe) prevalece sobre
         /// el descuento general del partner.
         const descuentoAplicado = rep.descuentoOverride ?? partner.descuentoPorcentaje;
-        const precioNetoUnitario = this.calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
+        const precioNetoUnitario = calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
         const totalLinea = precioNetoUnitario.times(item.cantidad);
         totalNeto = totalNeto.plus(totalLinea);
 

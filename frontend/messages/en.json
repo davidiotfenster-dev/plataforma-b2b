@@ -175,7 +175,9 @@
     "empty": "Your authorized catalog doesn't have any products yet.",
     "addedToCart": "{producto} added to cart",
     "addError": "Error adding to cart",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "yourPrice": "Your price",
+    "pvpDiscount": "RRP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "Loading product…",

@@ -175,7 +175,9 @@
     "empty": "Ihr freigegebener Katalog enthält noch keine Produkte.",
     "addedToCart": "{producto} wurde in den Warenkorb gelegt",
     "addError": "Fehler beim Hinzufügen zum Warenkorb",
-    "addToCart": "In den Warenkorb"
+    "addToCart": "In den Warenkorb",
+    "yourPrice": "Ihr Preis",
+    "pvpDiscount": "UVP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "Produkt wird geladen…",

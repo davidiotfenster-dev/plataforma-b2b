@@ -8,7 +8,7 @@ import { Cpu, ShoppingCart } from "lucide-react";
 import { api, ApiError, urlImagen } from "@/lib/api";
 import { muestraDeColor } from "@/lib/catalogo-admin";
 import type { Producto, ResumenCarrito } from "@/lib/types";
-import { usePrecio } from "@/lib/formato";
+import { PrecioProducto } from "@/components/precio-producto";
 
 interface Modelo {
   clave: string;
@@ -46,7 +46,6 @@ function TarjetaModelo({
   ocupado: boolean;
 }) {
   const t = useTranslations("catalogo");
-  const precio = usePrecio();
   const router = useRouter();
   const [elegido, setElegido] = useState(modelo.variantes[0].id);
   const producto = modelo.variantes.find((v) => v.id === elegido) ?? modelo.variantes[0];
@@ -91,7 +90,7 @@ function TarjetaModelo({
         )}
       </div>
       <div className="mt-auto pt-4">
-        <p className="text-2xl font-semibold text-neutral-900">{precio(producto.pvpBase)}</p>
+        <PrecioProducto producto={producto} />
         <button
           onClick={(e) => {
             e.stopPropagation();

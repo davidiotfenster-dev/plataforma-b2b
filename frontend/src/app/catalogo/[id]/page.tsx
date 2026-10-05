@@ -6,14 +6,13 @@ import { useTranslations } from "next-intl";
 import { ArrowLeft, FileText, ShoppingCart } from "lucide-react";
 import { api, ApiError, urlImagen } from "@/lib/api";
 import type { ProductoDetalle, ResumenCarrito } from "@/lib/types";
-import { usePrecio } from "@/lib/formato";
+import { PrecioProducto } from "@/components/precio-producto";
 
 export default function ProductoDetallePage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
   const t = useTranslations("catalogoDetalle");
-  const precio = usePrecio();
   const { data: producto, isLoading } = useQuery<ProductoDetalle>({
     queryKey: ["catalogo", params.id],
     queryFn: () => api.get<ProductoDetalle>(`/catalogo/${params.id}`),
@@ -51,7 +50,9 @@ export default function ProductoDetallePage() {
         <div>
           <p className="text-xs uppercase tracking-wide text-neutral-400">{producto.skuComercial}</p>
           <h1 className="mt-1 text-2xl font-semibold text-neutral-900">{producto.nombreComercial}</h1>
-          <p className="mt-3 text-2xl font-semibold text-neutral-900">{precio(producto.pvpBase)}</p>
+          <div className="mt-3">
+            <PrecioProducto producto={producto} />
+          </div>
 
           {agregar.isError && (
             <div className="mt-3 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">

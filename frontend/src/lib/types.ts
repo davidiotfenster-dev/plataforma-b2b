@@ -27,6 +27,9 @@ export interface Producto {
   imagenUrl: string | null;
   documentacionUrl: string | null;
   pvpBase: string;
+  /// Descuento (%) y precio neto unitario de la empresa del usuario, calculados en el servidor.
+  descuentoPorcentaje: string;
+  precioNeto: string;
   activo: boolean;
   /// Color y modelo (identificador opaco) para agrupar las variantes de color; solo en el listado.
   color?: string | null;
