@@ -30,7 +30,6 @@
       "Bash(docker exec:*)"
     ],
     "deny": [
-      "Bash(git push:*)",
       "Bash(rm -rf /:*)",
       "Bash(sudo:*)",
       "Bash(npm install -g:*)",
