@@ -1,10 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RedisService } from '../common/redis/redis.service.js';
 import { PedidoPdfService, type DatosPedidoPdf } from '../common/pdf/pedido-pdf.service.js';
 import { EmailService } from '../common/email/email.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { EstadoPedido, Idioma } from '../generated/prisma/enums.js';
+import { EstadoPedido, Idioma, RolUsuario } from '../generated/prisma/enums.js';
 import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
@@ -16,8 +17,10 @@ import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
   asuntoCambioEstado,
   asuntoConfirmacionPedido,
+  asuntoPedidoNuevo,
   cuerpoCambioEstado,
   cuerpoConfirmacionPedido,
+  cuerpoPedidoNuevo,
 } from '../common/email/plantillas-email.js';
 
 /// Código que el frontend reconoce para traducir el aviso de "los precios han cambiado".
@@ -68,6 +71,7 @@ export class PedidosService {
     private readonly redis: RedisService,
     private readonly pedidoPdfService: PedidoPdfService,
     private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
   private calcularPrecioNeto(pvpBase: Prisma.Decimal, descuentoPorcentaje: Prisma.Decimal): Prisma.Decimal {
@@ -184,6 +188,7 @@ export class PedidosService {
     });
 
     await this.notificarConfirmacion(orden.order, orden.razonSocialPartner);
+    await this.avisarPedidoNuevo(orden.order, orden.razonSocialPartner);
 
     /// El objeto `usuario` (aunque solo trae el email) es un detalle interno
     /// para el envío de la confirmación: nunca se expone en la respuesta HTTP.
@@ -210,6 +215,45 @@ export class PedidosService {
       );
     } catch (error) {
       this.logger.error(`Error generando/enviando la confirmación del pedido ${order.codigoPed}: ${(error as Error).message}`);
+    }
+  }
+
+  /// Aviso interno a los administradores de IoT FENSTER, en español y con el PDF
+  /// en español. Igual que la confirmación al cliente, nunca rompe el pedido.
+  private async avisarPedidoNuevo(
+    order: Prisma.OrderGetPayload<{
+      include: { items: true; usuario: { select: { email: true; idioma: true } } };
+    }>,
+    razonSocialPartner: string,
+  ): Promise<void> {
+    try {
+      const admins = await this.prisma.user.findMany({
+        where: { rol: RolUsuario.ADMIN_FENSTER, activo: true },
+        select: { email: true },
+      });
+      if (admins.length === 0) return;
+
+      const pdfBuffer = await this.pedidoPdfService.generar(this.datosPdf(order, razonSocialPartner, Idioma.ES));
+      const enlace = `${this.configService.get<string>('frontendUrl')}/admin/pedidos/${order.id}`;
+      const asunto = asuntoPedidoNuevo(order.codigoPed, razonSocialPartner);
+      const cuerpo = cuerpoPedidoNuevo({
+        codigoPed: order.codigoPed,
+        razonSocial: razonSocialPartner,
+        emailUsuario: order.usuario.email,
+        poNumber: order.poNumber,
+        totalNeto: order.totalNeto.toString(),
+        lineas: order.items.length,
+        direccionEnvio: order.direccionEnvio,
+        notas: order.notas,
+        enlace,
+      });
+      await Promise.all(
+        admins.map((admin) =>
+          this.emailService.enviar(admin.email, asunto, cuerpo, [{ filename: `${order.codigoPed}.pdf`, content: pdfBuffer }]),
+        ),
+      );
+    } catch (error) {
+      this.logger.error(`No se pudo avisar a IoT FENSTER del pedido ${order.codigoPed}: ${(error as Error).message}`);
     }
   }
 

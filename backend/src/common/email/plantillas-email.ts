@@ -2,11 +2,11 @@ import { EstadoPedido, Idioma } from '../../generated/prisma/enums.js';
 
 /// Traducciones de los emails transaccionales (confirmación de pedido, cambio
 /// de estado, restablecer contraseña y alta de empresas: verificación,
-/// aprobada, rechazada), en el idioma preferido del destinatario
+/// aprobada, rechazada; bienvenida a una empresa dada de alta por IoT FENSTER), en el idioma preferido del destinatario
 /// (`User.idioma`). Deliberadamente separado de `EmailService` (que solo
 /// sabe enviar, no de negocio) para mantener el servicio de envío agnóstico
-/// del idioma. El aviso interno de nueva solicitud va siempre en español: lo
-/// reciben los administradores de IoT FENSTER.
+/// del idioma. Los avisos internos (nueva solicitud, pedido nuevo) van siempre
+/// en español: los reciben los administradores de IoT FENSTER.
 
 /// Los datos que escribe el usuario (razón social, país) acaban dentro del HTML
 /// de un correo: se escapan para que no puedan inyectar etiquetas.
@@ -125,7 +125,7 @@ export function cuerpoCambioEstado(
       IT: 'Motivo',
       PT: 'Motivo',
     };
-    return cuerpos[idioma] + `<p>${etiquetaMotivo[idioma]}: ${motivoCancelacion}</p>`;
+    return cuerpos[idioma] + `<p>${etiquetaMotivo[idioma]}: ${escaparHtml(motivoCancelacion)}</p>`;
   }
 
   if (estado !== EstadoPedido.ENVIADO) {
@@ -140,11 +140,12 @@ export function cuerpoCambioEstado(
     PT: { transportista: 'Transportadora', numeroExpedicion: 'Nº de expedição', seguimiento: 'Rastreio' },
   };
   const etiqueta = etiquetas[idioma];
+  const trackingUrl = datosExpedicion.trackingUrl ?? '';
 
   const tracking =
-    `<p>${etiqueta.transportista}: ${datosExpedicion.transportista}<br/>` +
-    `${etiqueta.numeroExpedicion}: ${datosExpedicion.numeroExpedicion}<br/>` +
-    `${etiqueta.seguimiento}: <a href="${datosExpedicion.trackingUrl}">${datosExpedicion.trackingUrl}</a></p>`;
+    `<p>${etiqueta.transportista}: ${escaparHtml(datosExpedicion.transportista ?? '')}<br/>` +
+    `${etiqueta.numeroExpedicion}: ${escaparHtml(datosExpedicion.numeroExpedicion ?? '')}<br/>` +
+    `${etiqueta.seguimiento}: <a href="${escaparHtml(trackingUrl)}">${escaparHtml(trackingUrl)}</a></p>`;
 
   return cuerpos[idioma] + tracking;
 }
@@ -248,4 +249,63 @@ export function cuerpoNuevaSolicitud(razonSocial: string, pais: string, enlace: 
     `<p>La empresa <strong>${escaparHtml(razonSocial)}</strong> (${escaparHtml(pais)}) ha verificado su correo y espera aprobación.</p>` +
     `<p><a href="${enlace}">Revisar la solicitud</a></p>`
   );
+}
+
+/// Aviso interno (siempre en español) a los administradores de que ha entrado un
+/// pedido. Los datos los escribe el cliente: se escapan.
+export interface DatosAvisoPedidoNuevo {
+  codigoPed: string;
+  razonSocial: string;
+  emailUsuario: string;
+  poNumber: string;
+  totalNeto: string;
+  lineas: number;
+  direccionEnvio: string;
+  notas: string | null;
+  enlace: string;
+}
+
+export function asuntoPedidoNuevo(codigoPed: string, razonSocial: string): string {
+  return `Nuevo pedido ${codigoPed}: ${razonSocial.replace(/[\r\n]+/g, ' ')}`;
+}
+
+export function cuerpoPedidoNuevo(d: DatosAvisoPedidoNuevo): string {
+  const total = Number(d.totalNeto).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+  return (
+    `<p>La empresa <strong>${escaparHtml(d.razonSocial)}</strong> ha confirmado el pedido <strong>${d.codigoPed}</strong>. Adjuntamos el resumen en PDF.</p>` +
+    `<p>Hecho por: ${escaparHtml(d.emailUsuario)}<br/>` +
+    `Su referencia (PO): ${escaparHtml(d.poNumber)}<br/>` +
+    `Líneas: ${d.lineas}<br/>` +
+    `Total neto: ${total}<br/>` +
+    `Dirección de envío: ${escaparHtml(d.direccionEnvio)}` +
+    (d.notas ? `<br/>Notas: ${escaparHtml(d.notas)}` : '') +
+    `</p>` +
+    `<p><a href="${d.enlace}">Ver el pedido</a></p>`
+  );
+}
+
+/// Bienvenida al primer usuario de una empresa que da de alta directamente IoT
+/// FENSTER (sin pasar por el registro). No lleva la contraseña: si no la conoce,
+/// la crea desde "He olvidado mi contraseña".
+export function asuntoBienvenidaEmpresa(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Bienvenido a la plataforma de pedidos de IoT FENSTER',
+    EN: 'Welcome to the IoT FENSTER ordering platform',
+    DE: 'Willkommen auf der Bestellplattform von IoT FENSTER',
+    IT: 'Benvenuto nella piattaforma ordini di IoT FENSTER',
+    PT: 'Bem-vindo à plataforma de encomendas da IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoBienvenidaEmpresa(idioma: Idioma, email: string, enlaceLogin: string, enlaceRecuperar: string): string {
+  const e = escaparHtml(email);
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>IoT FENSTER ha dado de alta a tu empresa en su plataforma de pedidos. Puedes entrar con tu correo <strong>${e}</strong>:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p><p>Si no conoces tu contraseña, crea una nueva aquí: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    EN: `<p>IoT FENSTER has registered your company on its ordering platform. You can sign in with your email <strong>${e}</strong>:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p><p>If you don't know your password, create a new one here: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    DE: `<p>IoT FENSTER hat Ihr Unternehmen auf seiner Bestellplattform registriert. Sie können sich mit Ihrer E-Mail-Adresse <strong>${e}</strong> anmelden:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p><p>Wenn Sie Ihr Passwort nicht kennen, legen Sie hier ein neues fest: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    IT: `<p>IoT FENSTER ha registrato la tua azienda sulla sua piattaforma ordini. Puoi accedere con la tua email <strong>${e}</strong>:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p><p>Se non conosci la tua password, creane una nuova qui: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    PT: `<p>A IoT FENSTER registou a sua empresa na plataforma de encomendas. Pode entrar com o seu email <strong>${e}</strong>:</p><p><a href="${enlaceLogin}">${enlaceLogin}</a></p><p>Se não sabe a sua palavra-passe, crie uma nova aqui: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+  };
+  return cuerpos[idioma];
 }

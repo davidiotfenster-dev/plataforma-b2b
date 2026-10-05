@@ -6,6 +6,7 @@ import type { PrismaService } from '../prisma/prisma.service.js';
 import type { RedisService } from '../common/redis/redis.service.js';
 import type { PedidoPdfService } from '../common/pdf/pedido-pdf.service.js';
 import type { EmailService } from '../common/email/email.service.js';
+import type { ConfigService } from '@nestjs/config';
 
 const PARTNER_ID = 'partner-1';
 
@@ -59,6 +60,7 @@ describe('PedidosService — Mis pedidos del cliente', () => {
       {} as RedisService,
       pdfService as unknown as PedidoPdfService,
       {} as EmailService,
+      {} as ConfigService,
     );
   });
 
