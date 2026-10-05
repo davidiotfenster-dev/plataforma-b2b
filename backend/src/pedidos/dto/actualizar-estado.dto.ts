@@ -1,5 +1,6 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl, ValidateIf } from 'class-validator';
 import { EstadoPedido } from '../../generated/prisma/enums.js';
+import { Recortar } from '../../common/dto/recortar.js';
 
 export class ActualizarEstadoDto {
   @IsEnum(EstadoPedido)
@@ -13,22 +14,26 @@ export class ActualizarEstadoDto {
   forzar?: boolean;
 
   /// Obligatorios únicamente al transicionar a ENVIADO.
+  @Recortar()
   @ValidateIf((dto: ActualizarEstadoDto) => dto.estado === EstadoPedido.ENVIADO)
   @IsString()
   @IsNotEmpty()
   transportista?: string;
 
+  @Recortar()
   @ValidateIf((dto: ActualizarEstadoDto) => dto.estado === EstadoPedido.ENVIADO)
   @IsString()
   @IsNotEmpty()
   numeroExpedicion?: string;
 
+  @Recortar()
   @ValidateIf((dto: ActualizarEstadoDto) => dto.estado === EstadoPedido.ENVIADO)
   @IsUrl()
   trackingUrl?: string;
 
   /// Obligatorio únicamente al transicionar a CANCELADO: motivo/feedback de
   /// por qué el pedido no se completa.
+  @Recortar()
   @ValidateIf((dto: ActualizarEstadoDto) => dto.estado === EstadoPedido.CANCELADO)
   @IsString()
   @IsNotEmpty()

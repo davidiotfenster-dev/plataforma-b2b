@@ -32,6 +32,7 @@
     "catalogo": "Katalog",
     "carrito": "Warenkorb",
     "pedidos": "Bestellungen",
+    "usuarios": "Benutzer",
     "partners": "Unternehmen",
     "logout": "Abmelden",
     "login": "Anmelden",
@@ -57,6 +58,8 @@
   },
   "login": {
     "title": "Anmelden",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen oder wurde beendet. Melden Sie sich erneut an, um fortzufahren.",
+    "loginToContinue": "Melden Sie sich an, um diese Seite zu sehen.",
     "email": "E-Mail",
     "password": "Passwort",
     "submitting": "Anmeldung läuft…",
@@ -94,6 +97,52 @@
     "backToLogin": "Zur Anmeldung",
     "genericError": "Fehler beim Zurücksetzen des Passworts"
   },
+  "verificarEmail": {
+    "verifying": "Ihre E-Mail-Adresse wird bestätigt…",
+    "doneTitle": "E-Mail-Adresse bestätigt",
+    "doneBody": "Vielen Dank. Ihre Registrierung wartet jetzt auf Freigabe: IoT FENSTER prüft die Daten Ihres Unternehmens und benachrichtigt Sie per E-Mail, sobald Sie sich anmelden können.",
+    "goToLogin": "Zur Anmeldung",
+    "alreadyTitle": "Diese E-Mail-Adresse war bereits bestätigt",
+    "alreadyBody": "Sie müssen nichts weiter tun. Wenn Ihre Registrierung freigegeben ist, können Sie sich anmelden; andernfalls benachrichtigen wir Sie per E-Mail.",
+    "expiredTitle": "Der Link ist abgelaufen",
+    "expiredBody": "Bestätigungslinks sind 24 Stunden gültig. Fordern Sie mit der E-Mail-Adresse, mit der Sie Ihr Unternehmen registriert haben, einen neuen an.",
+    "invalidTitle": "Dieser Link funktioniert nicht",
+    "invalidBody": "Möglicherweise wurde er bereits verwendet oder ist unvollständig. Wenn Sie Ihre E-Mail-Adresse bereits bestätigt haben, müssen Sie nichts weiter tun; andernfalls fordern Sie einen neuen Link an.",
+    "genericError": "Ihre E-Mail-Adresse konnte nicht bestätigt werden. Versuchen Sie es in einigen Minuten erneut oder fordern Sie einen neuen Link an.",
+    "missingTokenTitle": "Dem Link fehlt ein Teil",
+    "missingTokenBody": "Öffnen Sie den vollständigen Link aus der E-Mail oder fordern Sie einen neuen an.",
+    "resendLabel": "Brauchen Sie einen neuen Link? Geben Sie die E-Mail-Adresse ein, mit der Sie Ihr Unternehmen registriert haben",
+    "resendSubmit": "Neuen Link senden",
+    "resendSubmitting": "Wird gesendet…",
+    "resendDone": "Falls zu dieser E-Mail-Adresse eine Registrierung auf Bestätigung wartet, haben wir Ihnen einen neuen Link gesendet. Prüfen Sie auch Ihren Spam-Ordner.",
+    "tooManyRequests": "Zu viele Versuche hintereinander. Warten Sie eine Minute und versuchen Sie es erneut."
+  },
+  "nuevoUsuario": {
+    "add": "Benutzer hinzufügen",
+    "title": "Neuer Benutzer",
+    "help": "Er erhält eine E-Mail, um sein Passwort zu erstellen. Der Link ist 7 Tage gültig.",
+    "name": "Name",
+    "email": "E-Mail",
+    "role": "Rolle",
+    "language": "Sprache für Portal und E-Mails",
+    "submit": "Hinzufügen und Einladung senden",
+    "submitting": "Wird hinzugefügt…",
+    "cancel": "Abbrechen",
+    "invited": "Benutzer hinzugefügt. Wir haben {email} eine E-Mail zum Erstellen des Passworts gesendet.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Sieht den Katalog und gibt Bestellungen auf.",
+      "PARTNER_CONSULTA": "Sieht Katalog und Bestellungen, kann aber nicht bestellen.",
+      "PARTNER_ADMIN": "Gibt Bestellungen auf und kann weitere Benutzer des Unternehmens hinzufügen."
+    }
+  },
+  "equipo": {
+    "title": "Benutzer Ihres Unternehmens",
+    "subtitle": "Wer sich im Namen Ihres Unternehmens im Portal anmelden kann. Um die Rolle einer Person zu ändern oder sie zu entfernen, wenden Sie sich an IoT FENSTER.",
+    "loading": "Benutzer werden geladen…",
+    "loadError": "Die Benutzer konnten nicht geladen werden.",
+    "active": "Aktiv",
+    "inactive": "Inaktiv"
+  },
   "registro": {
     "title": "Unternehmen registrieren",
     "razonSocial": "Firmenname",
@@ -109,7 +158,9 @@
     "submitting": "Wird gesendet…",
     "submit": "Unternehmen registrieren",
     "doneTitle": "Registrierung eingegangen",
-    "doneBody": "Bitte prüfen Sie die angegebene geschäftliche E-Mail-Adresse, um das Konto zu bestätigen. Nach der Bestätigung prüft ein Administrator von IoT FENSTER die Registrierung und schaltet sie frei."
+    "doneBody": "Bitte prüfen Sie die angegebene geschäftliche E-Mail-Adresse, um das Konto zu bestätigen. Nach der Bestätigung prüft ein Administrator von IoT FENSTER die Registrierung und schaltet sie frei.",
+    "aceptoCondiciones": "Ich habe die <condiciones>Nutzungsbedingungen</condiciones> und die <privacidad>Datenschutzerklärung</privacidad> gelesen und akzeptiere sie.",
+    "infoPrivacidad": "IoT FENSTER verarbeitet diese Daten, um die Registrierung Ihres Unternehmens und seine Bestellungen abzuwickeln. Ihre Rechte können Sie wie in der <privacidad>Datenschutzerklärung</privacidad> beschrieben ausüben."
   },
   "catalogo": {
     "title": "Freigegebener Katalog",
@@ -140,7 +191,7 @@
     "quantity": "Menge",
     "total": "Gesamt",
     "removeLine": "Position entfernen",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "continueToCheckout": "Weiter zur Kasse"
   },
   "checkout": {
@@ -155,9 +206,10 @@
     "confirming": "Wird bestätigt…",
     "confirm": "Bestellung bestätigen",
     "disclaimer": "Mit der Bestätigung wird die Bestellung mit eingefrorenen Preisen erfasst. Es erfolgt keine Online-Zahlung: die Abwicklung erfolgt gegen den angegebenen Bestellauftrag.",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "confirmError": "Fehler beim Bestätigen der Bestellung",
-    "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut."
+    "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut.",
+    "requiredFields": "Geben Sie die Lieferadresse und die PO-Nummer ein, um die Bestellung zu bestätigen."
   },
   "pedidos": {
     "title": "Meine Bestellungen",
@@ -207,9 +259,10 @@
     "quantity": "Menge",
     "netPrice": "Nettopreis",
     "total": "Gesamt",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "back": "Meine Bestellungen",
     "placedOn": "Bestellt am {fecha}",
+    "placedBy": "Aufgegeben von {nombre} ({email})",
     "downloadPdf": "PDF herunterladen",
     "downloading": "Wird heruntergeladen…",
     "downloadError": "Das PDF konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.",
@@ -221,13 +274,13 @@
     "goToCart": "Zum Warenkorb",
     "reorderUnavailable": "Nicht mehr verfügbar und nicht hinzugefügt: {productos}.",
     "reorderPriceChanges": "Der Preis hat sich geändert bei:",
-    "reorderPriceLine": "{nombre}: vorher {anterior} €, jetzt {actual} €",
+    "reorderPriceLine": "{nombre}: vorher {anterior}, jetzt {actual}",
     "timelineLabel": "Bestellfortschritt",
     "cancelledTitle": "Bestellung storniert",
     "cancelledOn": "Storniert am {fecha}",
     "cancelReason": "Grund: {motivo}",
-    "unitPrice": "{precio} € / Stk.",
-    "pvpDiscount": "UVP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / Stk.",
+    "pvpDiscount": "UVP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "Sprache des PDFs"
   },
   "adminPartners": {
@@ -598,12 +651,66 @@
   "adminDashboard": {
     "title": "Statistik-Übersicht",
     "loading": "Statistiken werden geladen…",
-    "totalOrders": "Bestellungen gesamt",
-    "totalBilled": "Gesamtumsatz",
+    "updating": "Wird aktualisiert…",
+    "periodSummary": "{desde} bis {hasta}, verglichen mit dem gleich langen Vorzeitraum",
+    "noData": "Keine Bestellungen in diesem Zeitraum.",
+    "filters": {
+      "period": "Zeitraum",
+      "from": "Von",
+      "to": "Bis",
+      "brand": "Marke",
+      "allBrands": "Alle Marken",
+      "company": "Unternehmen",
+      "allCompanies": "Alle Unternehmen",
+      "reset": "Filter entfernen"
+    },
+    "presets": {
+      "7d": "7 Tage",
+      "30d": "30 Tage",
+      "90d": "90 Tage",
+      "ytd": "Dieses Jahr",
+      "12m": "12 Monate"
+    },
+    "kpis": {
+      "billed": "Umsatz",
+      "orders": "Bestellungen",
+      "avgOrder": "Ø Bestellung",
+      "pending": "Nicht versendet",
+      "cancelled": "{n, plural, =0 {Keine Stornierungen} one {# storniert (zählt nicht)} other {# storniert (zählen nicht)}}",
+      "units": "Verkaufte Stück"
+    },
+    "vsPrevious": {
+      "label": "ggü. Vorzeitraum",
+      "none": "Keine Daten für den Vorzeitraum"
+    },
+    "evolution": {
+      "day": "Verlauf pro Tag",
+      "week": "Verlauf pro Woche",
+      "month": "Verlauf pro Monat"
+    },
+    "measure": {
+      "facturado": "Umsatz",
+      "pedidos": "Bestellungen",
+      "unidades": "Stück"
+    },
     "byStatus": "Bestellungen nach Status",
-    "last30Days": "Bestellungen pro Tag (letzte 30 Tage)",
-    "topPartners": "Partner mit den meisten Bestellungen",
-    "noData": "Noch nicht genügend Daten."
+    "byBrand": "Umsatz nach Marke",
+    "topCompanies": "Unternehmen mit dem meisten Umsatz",
+    "topProducts": "Meistverkaufte Produkte",
+    "ordersN": "{n, plural, one {# Bestellung} other {# Bestellungen}}",
+    "cols": {
+      "company": "Unternehmen",
+      "orders": "Bestellungen",
+      "billed": "Umsatz",
+      "product": "Produkt",
+      "units": "Stk."
+    },
+    "export": {
+      "button": "Excel herunterladen",
+      "downloading": "Wird vorbereitet…",
+      "hint": "Lädt die Zahlen mit den aktuellen Filtern als Excel herunter, dazu die Liste der Bestellungen im Zeitraum"
+    },
+    "unitsN": "{n, plural, one {# Stk.} other {# Stk.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Spediteur",
@@ -690,8 +797,7 @@
     "enEstaPantalla": "Auf dieser Seite",
     "preguntasGenerales": "Allgemeine Fragen",
     "masInfo": "Mehr Informationen",
-    "contacto": "Nicht gefunden, was Sie suchen?",
-    "escribirSoporte": "Support schreiben",
+    "contacto": "Nicht gefunden, was Sie suchen? Schreiben Sie uns",
     "temas": {
       "inicio": "Startseite",
       "login": "Anmelden",
@@ -706,7 +812,10 @@
       "adminMarcas": "Marken",
       "adminProductos": "Produkte",
       "adminPedidos": "Bestellungen",
-      "adminDashboard": "Statistiken"
+      "adminDashboard": "Statistiken",
+      "adminAlta": "Neues Unternehmen",
+      "adminCatalogoEmpresa": "Katalog des Unternehmens",
+      "adminUsuarios": "Benutzer des Unternehmens"
     },
     "puntual": {
       "estados": "Eingegangen, Bestätigt, In Vorbereitung, Bereit und Versendet sind die Schritte einer Bestellung, in dieser Reihenfolge. Storniert bedeutet, dass sie annulliert wurde.",
@@ -841,7 +950,7 @@
       },
       "cifrasCanceladas": {
         "p": "Was zählen die Zahlen?",
-        "r": "Der fakturierte Gesamtbetrag und die Diagramme nach Unternehmen und Tag enthalten keine stornierten Bestellungen."
+        "r": "Nur Bestellungen aus dem gewählten Zeitraum, für die gefilterte Marke und das gefilterte Unternehmen. Stornierte Bestellungen zählen nicht zu Umsatz, Bestellungen, Verlauf und Ranglisten: Sie erscheinen nur unter „Bestellungen nach Status“. Der Prozentwert vergleicht mit dem gleich langen Vorzeitraum."
       },
       "cambiarIdioma": {
         "p": "Wie ändere ich die Sprache?",
@@ -850,7 +959,58 @@
       "miCuenta": {
         "p": "Mit welchem Konto bin ich angemeldet?",
         "r": "Oben rechts, über der Leiste, sehen Sie „Angemeldet als“ mit der E-Mail des verwendeten Kontos."
+      },
+      "altaDirecta": {
+        "p": "Was ist der Unterschied zur Registrierung?",
+        "r": "Das Unternehmen ist sofort mit seinem ersten Benutzer aktiv: ohne E-Mail-Bestätigung und ohne Freigabe. Es erhält den Katalog seiner Marke direkt beim Anlegen."
+      },
+      "contrasenaInicial": {
+        "p": "Wie erhält der Benutzer das Passwort?",
+        "r": "Geben Sie eines ein oder klicken Sie auf „Erzeugen“ für ein sicheres. Das Portal versendet es nicht: Geben Sie es dem Benutzer selbst über einen sicheren Kanal weiter."
+      },
+      "descuentoProducto": {
+        "p": "Kann ich einem einzelnen Produkt einen anderen Rabatt geben?",
+        "r": "Ja. Tragen Sie den Prozentsatz im Rabattfeld dieses Produkts ein und speichern Sie: Es gilt dann statt des allgemeinen Rabatts. Lassen Sie das Feld leer, um zum allgemeinen Rabatt zurückzukehren."
+      },
+      "desactivarUsuario": {
+        "p": "Deaktivieren oder Abmeldung erzwingen",
+        "r": "Deaktivieren verhindert die Anmeldung, bis Sie den Benutzer wieder aktivieren. Abmeldung erzwingen beendet nur die aktuelle Sitzung: Er kann sich wieder anmelden."
+      },
+      "verAuditoria": {
+        "p": "Was zeigt „Prüfprotokoll anzeigen“?",
+        "r": "Die für diesen Benutzer erfassten Ereignisse mit Datum, z. B. seine Anmeldungen oder die von ihm bestätigten Bestellungen."
+      },
+      "anadirUsuario": {
+        "p": "Kann ich dem Unternehmen einen weiteren Benutzer hinzufügen?",
+        "r": "Noch nicht über das Portal: Jedes Unternehmen hat den Benutzer aus der Registrierung oder der Anlage. Hier können Sie seine Rolle ändern, ihn deaktivieren oder seine Sitzung beenden."
+      }
+    },
+    "buscar": "Hilfe durchsuchen",
+    "buscarPlaceholder": "Frage suchen…",
+    "resultados": "{n, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
+    "sinResultados": "Keine Frage enthält diese Wörter. Versuchen Sie kürzere oder sehen Sie sich die Themen an.",
+    "otrosTemas": "Weitere Themen",
+    "volverPantalla": "Zurück zu dieser Seite",
+    "volver": "Zurück",
+    "contactos": {
+      "comercial": {
+        "titulo": "Vertrieb",
+        "texto": "Informationen, Preise und Angebote",
+        "mensaje": "Hallo, ich habe eine Vertriebsanfrage."
+      },
+      "incidencias": {
+        "titulo": "Störungen",
+        "texto": "Probleme mit einer Bestellung oder dem Portal",
+        "mensaje": "Hallo, ich möchte eine Störung melden."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Rechtliches",
+    "avisoLegal": "Impressum",
+    "privacidad": "Datenschutz",
+    "cookies": "Cookies",
+    "condiciones": "Nutzungsbedingungen",
+    "soloEspanol": "Die Rechtstexte sind auf Spanisch verfügbar; die spanische Fassung ist maßgeblich."
   }
 }

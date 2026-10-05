@@ -91,8 +91,10 @@ export interface Order {
   updatedAt: string;
   items?: OrderItem[];
   partner?: { razonSocial: string };
-  /// Solo en el detalle del cliente: cuándo entró el pedido en cada estado.
+  /// Solo en el detalle (del cliente y del admin): cuándo entró el pedido en cada estado.
   historial?: HistorialEstado[];
+  /// Solo en el detalle del admin: quién hizo el pedido.
+  usuario?: { nombre: string; email: string };
 }
 
 export interface HistorialEstado {
@@ -143,12 +145,20 @@ export interface Usuario {
   createdAt: string;
 }
 
+export type GranularidadEstadisticas = "day" | "week" | "month";
+
+/// Respuesta de `GET /pedidos/admin/estadisticas`. Importes en euros (número);
+/// los pedidos cancelados solo cuentan en `porEstado` y `kpis.cancelados`.
 export interface Estadisticas {
-  totalPedidos: number;
-  totalFacturado: string;
-  porEstado: { estado: EstadoPedido; cantidad: number; totalNeto: string }[];
-  porPartner: { partnerId: string; razonSocial: string; cantidad: number; totalNeto: string }[];
-  pedidosPorDia: { dia: string; cantidad: number }[];
+  periodo: { desde: string; hasta: string; granularidad: GranularidadEstadisticas };
+  kpis: { pedidos: number; facturado: number; ticketMedio: number; unidades: number; sinEnviar: number; cancelados: number };
+  periodoAnterior: { pedidos: number; facturado: number; unidades: number };
+  serie: { tramo: string; pedidos: number; unidades: number; facturado: number }[];
+  porEstado: { estado: EstadoPedido; cantidad: number; facturado: number }[];
+  porMarca: { marca: MarcaCatalogo; pedidos: number; unidades: number; facturado: number }[];
+  topEmpresas: { partnerId: string; razonSocial: string; marca: MarcaCatalogo | null; pedidos: number; unidades: number; facturado: number }[];
+  topProductos: { sku: string; nombre: string; unidades: number; facturado: number }[];
+  empresas: { id: string; razonSocial: string; marca: MarcaCatalogo }[];
 }
 
 export interface Paginado<T> {

@@ -93,6 +93,11 @@ model User {
   /// completar un reseteo de contraseña.
   sesionInvalidadaEn DateTime?
 
+  /// Momento en que el usuario aceptó las condiciones de uso y la política de
+  /// privacidad del portal (casilla obligatoria del registro de empresas).
+  /// Prueba de la aceptación; nulo para usuarios dados de alta por un admin.
+  condicionesAceptadasEn DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

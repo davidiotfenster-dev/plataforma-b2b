@@ -65,3 +65,7 @@ Este archivo registra decisiones ambiguas resueltas sin supervisión, con fecha,
 ## 2026-09-29 — La sesión toma rol, partner y estado del partner de la base de datos
 **Decisión:** `JwtStrategy.validate` lee `rol`, `partnerId` y `partner.estado` de la BD en cada petición (no del token) y rechaza a los usuarios de un partner que no esté `ACTIVO`. `PARTNER_CONSULTA` (solo lectura) ya no puede modificar el carrito ni confirmar pedidos.
 **Motivo:** suspender un partner o cambiar el rol de un usuario no tenía efecto hasta 8 h después (caducidad del JWT), y el rol solo se aplicaba en el panel de admin.
+
+## 2026-10-05 — CRM comercial con Bigin (Zoho), conectado a la plataforma solo en lo necesario
+**Decisión:** el CRM que pide la dirección comercial se monta en Bigin Premier (Zoho) sin programar; David lo configura. La plataforma será la fuente de verdad del cliente activo y empujará empresas (clave: CIF), pedidos y solicitudes de registro al CRM mediante un outbox escrito dentro de las transacciones existentes. El CRM solo devuelve la oportunidad ganada, que llega como pre-alta pendiente de aprobar. Todo el detalle en [`docs/crm/`](docs/crm/README.md).
+**Motivo:** la presentación de la dirección comercial descarta un CRM propio. Separar quién manda en cada dato evita dos fuentes de verdad, el outbox impide que una caída de Zoho bloquee pedidos, y la pre-alta respeta la decisión del 2026-10-02 de que las altas las aprueba solo el administrador.

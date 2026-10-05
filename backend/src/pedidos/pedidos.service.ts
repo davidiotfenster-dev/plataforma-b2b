@@ -1,20 +1,26 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RedisService } from '../common/redis/redis.service.js';
 import { PedidoPdfService, type DatosPedidoPdf } from '../common/pdf/pedido-pdf.service.js';
 import { EmailService } from '../common/email/email.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { EstadoPedido, Idioma } from '../generated/prisma/enums.js';
+import { EstadoPedido, Idioma, RolUsuario } from '../generated/prisma/enums.js';
 import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
+import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
+import { calcularPeriodo, tramosDelPeriodo, type PeriodoEstadisticas } from './estadisticas-periodo.js';
+import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
   asuntoCambioEstado,
   asuntoConfirmacionPedido,
+  asuntoPedidoNuevo,
   cuerpoCambioEstado,
   cuerpoConfirmacionPedido,
+  cuerpoPedidoNuevo,
 } from '../common/email/plantillas-email.js';
 
 /// Código que el frontend reconoce para traducir el aviso de "los precios han cambiado".
@@ -29,6 +35,8 @@ const NO_ENCONTRADO = () => new NotFoundException('Recurso no encontrado');
 /// carga de página a medida que crece el volumen de pedidos.
 const ESTADISTICAS_CACHE_TTL_SEGUNDOS = 120;
 const ESTADISTICAS_CACHE_KEY = 'pedidos:estadisticas-admin';
+/// Filas de los rankings que se ven en pantalla (el Excel los lleva completos).
+const LIMITE_RANKING = 10;
 
 /// Máquina de estados lineal: solo se permite avanzar un paso, nunca saltar
 /// ni retroceder (ver CLAUDE.md requisito 4).
@@ -63,6 +71,7 @@ export class PedidosService {
     private readonly redis: RedisService,
     private readonly pedidoPdfService: PedidoPdfService,
     private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
   private calcularPrecioNeto(pvpBase: Prisma.Decimal, descuentoPorcentaje: Prisma.Decimal): Prisma.Decimal {
@@ -157,7 +166,8 @@ export class PedidosService {
           userId,
           direccionEnvio: dto.direccionEnvio,
           poNumber: dto.poNumber,
-          notas: dto.notas,
+          // Una nota vacía (o solo con espacios) no es una nota.
+          notas: dto.notas || null,
           totalNeto,
           items: { createMany: { data: lineas } },
           historial: { create: { estado: EstadoPedido.RECIBIDO } },
@@ -179,6 +189,7 @@ export class PedidosService {
     });
 
     await this.notificarConfirmacion(orden.order, orden.razonSocialPartner);
+    await this.avisarPedidoNuevo(orden.order, orden.razonSocialPartner);
 
     /// El objeto `usuario` (aunque solo trae el email) es un detalle interno
     /// para el envío de la confirmación: nunca se expone en la respuesta HTTP.
@@ -205,6 +216,45 @@ export class PedidosService {
       );
     } catch (error) {
       this.logger.error(`Error generando/enviando la confirmación del pedido ${order.codigoPed}: ${(error as Error).message}`);
+    }
+  }
+
+  /// Aviso interno a los administradores de IoT FENSTER, en español y con el PDF
+  /// en español. Igual que la confirmación al cliente, nunca rompe el pedido.
+  private async avisarPedidoNuevo(
+    order: Prisma.OrderGetPayload<{
+      include: { items: true; usuario: { select: { email: true; idioma: true } } };
+    }>,
+    razonSocialPartner: string,
+  ): Promise<void> {
+    try {
+      const admins = await this.prisma.user.findMany({
+        where: { rol: RolUsuario.ADMIN_FENSTER, activo: true },
+        select: { email: true },
+      });
+      if (admins.length === 0) return;
+
+      const pdfBuffer = await this.pedidoPdfService.generar(this.datosPdf(order, razonSocialPartner, Idioma.ES));
+      const enlace = `${this.configService.get<string>('frontendUrl')}/admin/pedidos/${order.id}`;
+      const asunto = asuntoPedidoNuevo(order.codigoPed, razonSocialPartner);
+      const cuerpo = cuerpoPedidoNuevo({
+        codigoPed: order.codigoPed,
+        razonSocial: razonSocialPartner,
+        emailUsuario: order.usuario.email,
+        poNumber: order.poNumber,
+        totalNeto: order.totalNeto.toString(),
+        lineas: order.items.length,
+        direccionEnvio: order.direccionEnvio,
+        notas: order.notas,
+        enlace,
+      });
+      await Promise.all(
+        admins.map((admin) =>
+          this.emailService.enviar(admin.email, asunto, cuerpo, [{ filename: `${order.codigoPed}.pdf`, content: pdfBuffer }]),
+        ),
+      );
+    } catch (error) {
+      this.logger.error(`No se pudo avisar a IoT FENSTER del pedido ${order.codigoPed}: ${(error as Error).message}`);
     }
   }
 
@@ -344,6 +394,38 @@ export class PedidosService {
       throw NO_ENCONTRADO();
     }
 
+    return this.pdfDePedido(order, userId, idioma);
+  }
+
+  /// El mismo PDF para IoT FENSTER desde su ficha del pedido. Un COMERCIAL solo
+  /// llega a los pedidos de las empresas que dio de alta (como en `obtenerAdmin`).
+  async generarPdfAdmin(
+    id: string,
+    userId: string,
+    idioma?: Idioma,
+    restringirCreadoPorId?: string,
+  ): Promise<{ codigoPed: string; contenido: Buffer }> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: { items: true, partner: { select: { razonSocial: true, creadoPorUsuarioId: true } } },
+    });
+
+    if (
+      !order ||
+      (restringirCreadoPorId !== undefined && order.partner.creadoPorUsuarioId !== restringirCreadoPorId)
+    ) {
+      throw new NotFoundException('Pedido no encontrado');
+    }
+
+    return this.pdfDePedido(order, userId, idioma);
+  }
+
+  /// Si quien descarga no elige idioma, el que tiene guardado en su perfil.
+  private async pdfDePedido(
+    order: Prisma.OrderGetPayload<{ include: { items: true; partner: { select: { razonSocial: true } } } }>,
+    userId: string,
+    idioma?: Idioma,
+  ): Promise<{ codigoPed: string; contenido: Buffer }> {
     const idiomaPdf =
       idioma ?? (await this.prisma.user.findUnique({ where: { id: userId }, select: { idioma: true } }))?.idioma ?? Idioma.ES;
     const contenido = await this.pedidoPdfService.generar(this.datosPdf(order, order.partner.razonSocial, idiomaPdf));
@@ -427,79 +509,225 @@ export class PedidosService {
     });
   }
 
-  /// Datos agregados para el panel de estadísticas de ADMIN_FENSTER (gráficas
-  /// de pedidos por estado, por partner y por día). Solo lectura, no expone
-  /// datos de un partner a otro (uso exclusivo de ADMIN_FENSTER).
-  async estadisticas() {
-    const cacheado = await this.redis.get(ESTADISTICAS_CACHE_KEY);
+  /// Datos agregados para el panel de estadísticas de ADMIN_FENSTER, filtrados
+  /// por periodo, marca y empresa. Solo lectura y de uso exclusivo de
+  /// ADMIN_FENSTER. Un pedido cancelado no es facturación: cuenta en
+  /// `porEstado` y en `kpis.cancelados`, pero no suma en el resto.
+  async estadisticas(query: EstadisticasQueryDto = {}) {
+    const periodo = calcularPeriodo(query.desde, query.hasta);
+    const cacheKey = [ESTADISTICAS_CACHE_KEY, periodo.desde, periodo.hasta, query.marca ?? '*', query.partnerId ?? '*'].join(':');
+    const cacheado = await this.redis.get(cacheKey);
     if (cacheado) {
-      return JSON.parse(cacheado);
+      return JSON.parse(cacheado) as Awaited<ReturnType<PedidosService['calcularEstadisticas']>>;
     }
+    const resultado = await this.calcularEstadisticas(query, periodo, LIMITE_RANKING);
+    await this.redis.setEx(cacheKey, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
+    return resultado;
+  }
 
-    const [porEstado, porPartner, totalGeneral, pedidosPorDia] = await Promise.all([
+  /// Las mismas estadísticas en un Excel, con los rankings completos y una hoja
+  /// con cada pedido del periodo (cancelados incluidos, marcados como tales).
+  async exportarEstadisticas(query: EstadisticasQueryDto): Promise<{ nombre: string; contenido: Buffer }> {
+    const periodo = calcularPeriodo(query.desde, query.hasta);
+    const [datos, pedidos] = await Promise.all([
+      this.calcularEstadisticas(query, periodo),
+      this.prisma.order.findMany({
+        where: this.filtroEstadisticas(query, periodo),
+        orderBy: { createdAt: 'asc' },
+        select: {
+          codigoPed: true,
+          createdAt: true,
+          estado: true,
+          poNumber: true,
+          totalNeto: true,
+          partner: { select: { razonSocial: true, marcaCatalogo: true } },
+          items: { select: { cantidad: true } },
+        },
+      }),
+    ]);
+    const contenido = await generarExcelEstadisticas(datos, pedidos, {
+      marca: query.marca,
+      empresa: query.partnerId ? (datos.empresas.find((e) => e.id === query.partnerId)?.razonSocial ?? query.partnerId) : undefined,
+    });
+    return { nombre: `estadisticas_${periodo.desde}_${periodo.hasta}.xlsx`, contenido };
+  }
+
+  private filtroEstadisticas(query: EstadisticasQueryDto, periodo: PeriodoEstadisticas): Prisma.OrderWhereInput {
+    return {
+      ...(query.partnerId ? { partnerId: query.partnerId } : {}),
+      ...(query.marca ? { partner: { marcaCatalogo: query.marca } } : {}),
+      createdAt: { gte: periodo.inicio, lt: periodo.fin },
+    };
+  }
+
+  /// Sin `limite`, los rankings de empresas y productos van completos.
+  private async calcularEstadisticas(query: EstadisticasQueryDto, periodo: PeriodoEstadisticas, limite?: number) {
+
+    const filtroEmpresa: Prisma.OrderWhereInput = {
+      ...(query.partnerId ? { partnerId: query.partnerId } : {}),
+      ...(query.marca ? { partner: { marcaCatalogo: query.marca } } : {}),
+    };
+    const enPeriodo = this.filtroEstadisticas(query, periodo);
+    const validos: Prisma.OrderWhereInput = { ...enPeriodo, estado: { not: EstadoPedido.CANCELADO } };
+
+    const condicionesSql = [
+      Prisma.sql`o."createdAt" >= ${periodo.inicio}`,
+      Prisma.sql`o."createdAt" < ${periodo.fin}`,
+      Prisma.sql`o."estado" <> 'CANCELADO'`,
+      ...(query.partnerId ? [Prisma.sql`o."partnerId" = ${query.partnerId}::uuid`] : []),
+      ...(query.marca ? [Prisma.sql`p."marcaCatalogo" = ${query.marca}::"MarcaCatalogo"`] : []),
+    ];
+
+    const [porEstado, porEmpresa, totales, anterior, unidadesAnterior, unidadesPorEmpresa, serie, productos, empresas] = await Promise.all([
       this.prisma.order.groupBy({
         by: ['estado'],
+        where: enPeriodo,
         _count: { _all: true },
         _sum: { totalNeto: true },
       }),
       this.prisma.order.groupBy({
         by: ['partnerId'],
-        where: { estado: { not: EstadoPedido.CANCELADO } },
+        where: validos,
         _count: { _all: true },
         _sum: { totalNeto: true },
-        orderBy: { _sum: { totalNeto: 'desc' } },
-        take: 10,
       }),
-      /// Un pedido cancelado no es facturación: se cuenta en `totalPedidos` y en
-      /// `porEstado`, pero no suma en `totalFacturado` ni en el ranking.
+      this.prisma.order.aggregate({ where: validos, _count: { _all: true }, _sum: { totalNeto: true } }),
       this.prisma.order.aggregate({
-        where: { estado: { not: EstadoPedido.CANCELADO } },
+        where: { ...filtroEmpresa, estado: { not: EstadoPedido.CANCELADO }, createdAt: { gte: periodo.inicioAnterior, lt: periodo.inicio } },
         _count: { _all: true },
         _sum: { totalNeto: true },
       }),
-      this.prisma.$queryRaw<{ dia: Date; total: bigint }[]>`
-        SELECT date_trunc('day', "createdAt") AS dia, COUNT(*)::bigint AS total
-        FROM "Order"
-        WHERE "createdAt" >= NOW() - INTERVAL '30 days'
-        GROUP BY dia
-        ORDER BY dia ASC
+      this.prisma.orderItem.aggregate({
+        where: {
+          order: {
+            is: { ...filtroEmpresa, estado: { not: EstadoPedido.CANCELADO }, createdAt: { gte: periodo.inicioAnterior, lt: periodo.inicio } },
+          },
+        },
+        _sum: { cantidad: true },
+      }),
+      this.prisma.$queryRaw<{ partnerId: string; unidades: bigint }[]>`
+        SELECT o."partnerId", SUM(i."cantidad")::bigint AS unidades
+        FROM "OrderItem" i
+        JOIN "Order" o ON o."id" = i."orderId"
+        JOIN "Partner" p ON p."id" = o."partnerId"
+        WHERE ${Prisma.join(condicionesSql, ' AND ')}
+        GROUP BY o."partnerId"
       `,
+      this.prisma.$queryRaw<{ tramo: Date; pedidos: bigint; facturado: Prisma.Decimal | null; unidades: bigint | null }[]>`
+        SELECT date_trunc(${periodo.granularidad}::text, o."createdAt") AS tramo,
+               COUNT(*)::bigint AS pedidos,
+               SUM(o."totalNeto") AS facturado,
+               SUM(u."unidades")::bigint AS unidades
+        FROM "Order" o
+        JOIN "Partner" p ON p."id" = o."partnerId"
+        LEFT JOIN (
+          SELECT "orderId", SUM("cantidad") AS unidades FROM "OrderItem" GROUP BY "orderId"
+        ) u ON u."orderId" = o."id"
+        WHERE ${Prisma.join(condicionesSql, ' AND ')}
+        GROUP BY tramo
+        ORDER BY tramo ASC
+      `,
+      this.prisma.orderItem.groupBy({
+        by: ['skuComercial', 'nombreProducto'],
+        where: { order: { is: validos } },
+        _sum: { cantidad: true, totalLinea: true },
+        orderBy: { _sum: { totalLinea: 'desc' } },
+        take: limite,
+      }),
+      /// Empresas con algún pedido, para el desplegable del filtro.
+      this.prisma.partner.findMany({
+        where: { ordenes: { some: {} } },
+        select: { id: true, razonSocial: true, marcaCatalogo: true },
+        orderBy: { razonSocial: 'asc' },
+      }),
     ]);
 
-    const partners = await this.prisma.partner.findMany({
-      where: { id: { in: porPartner.map((p) => p.partnerId) } },
-      select: { id: true, razonSocial: true },
-    });
-    const nombrePartner = new Map(partners.map((p) => [p.id, p.razonSocial]));
+    const infoEmpresa = new Map(empresas.map((e) => [e.id, e]));
+    const facturadoDe = (v: Prisma.Decimal | null | undefined) => (v ? Number(v) : 0);
+    const centimos = (n: number) => Math.round(n * 100) / 100;
+
+    const unidadesDe = new Map(unidadesPorEmpresa.map((u) => [u.partnerId, Number(u.unidades)]));
+    const ranking = porEmpresa
+      .map((e) => ({
+        partnerId: e.partnerId,
+        razonSocial: infoEmpresa.get(e.partnerId)?.razonSocial ?? 'Desconocido',
+        marca: infoEmpresa.get(e.partnerId)?.marcaCatalogo ?? null,
+        pedidos: e._count._all,
+        unidades: unidadesDe.get(e.partnerId) ?? 0,
+        facturado: facturadoDe(e._sum.totalNeto),
+      }))
+      .sort((a, b) => b.facturado - a.facturado);
+
+    const porMarca = new Map<string, { marca: string; pedidos: number; unidades: number; facturado: number }>();
+    for (const e of ranking) {
+      if (!e.marca) continue;
+      const acc = porMarca.get(e.marca) ?? { marca: e.marca, pedidos: 0, unidades: 0, facturado: 0 };
+      acc.pedidos += e.pedidos;
+      acc.unidades += e.unidades;
+      acc.facturado += e.facturado;
+      porMarca.set(e.marca, acc);
+    }
+
+    const serieIndexada = new Map(serie.map((s) => [s.tramo.toISOString().slice(0, 10), s]));
+    const pedidos = totales._count._all;
+    const facturado = facturadoDe(totales._sum.totalNeto);
+    const cancelados = porEstado.find((e) => e.estado === EstadoPedido.CANCELADO)?._count._all ?? 0;
+    const sinEnviar = porEstado
+      .filter((e) => e.estado !== EstadoPedido.ENVIADO && e.estado !== EstadoPedido.CANCELADO)
+      .reduce((acc, e) => acc + e._count._all, 0);
 
     const resultado = {
-      totalPedidos: porEstado.reduce((acc, e) => acc + e._count._all, 0),
-      totalFacturado: totalGeneral._sum.totalNeto?.toString() ?? '0',
+      periodo: { desde: periodo.desde, hasta: periodo.hasta, granularidad: periodo.granularidad },
+      kpis: {
+        pedidos,
+        facturado,
+        ticketMedio: pedidos > 0 ? centimos(facturado / pedidos) : 0,
+        unidades: ranking.reduce((acc, e) => acc + e.unidades, 0),
+        sinEnviar,
+        cancelados,
+      },
+      periodoAnterior: {
+        pedidos: anterior._count._all,
+        facturado: facturadoDe(anterior._sum.totalNeto),
+        unidades: unidadesAnterior._sum.cantidad ?? 0,
+      },
+      serie: tramosDelPeriodo(periodo).map((tramo) => ({
+        tramo,
+        pedidos: Number(serieIndexada.get(tramo)?.pedidos ?? 0),
+        unidades: Number(serieIndexada.get(tramo)?.unidades ?? 0),
+        facturado: facturadoDe(serieIndexada.get(tramo)?.facturado),
+      })),
       porEstado: porEstado.map((e) => ({
         estado: e.estado,
         cantidad: e._count._all,
-        totalNeto: e._sum.totalNeto?.toString() ?? '0',
+        facturado: facturadoDe(e._sum.totalNeto),
       })),
-      porPartner: porPartner.map((p) => ({
-        partnerId: p.partnerId,
-        razonSocial: nombrePartner.get(p.partnerId) ?? 'Desconocido',
-        cantidad: p._count._all,
-        totalNeto: p._sum.totalNeto?.toString() ?? '0',
+      porMarca: [...porMarca.values()]
+        .map((m) => ({ ...m, facturado: centimos(m.facturado) }))
+        .sort((a, b) => b.facturado - a.facturado),
+      topEmpresas: ranking.slice(0, limite),
+      topProductos: productos.map((p) => ({
+        sku: p.skuComercial,
+        nombre: p.nombreProducto,
+        unidades: p._sum.cantidad ?? 0,
+        facturado: facturadoDe(p._sum.totalLinea),
       })),
-      pedidosPorDia: pedidosPorDia.map((d) => ({
-        dia: d.dia.toISOString().slice(0, 10),
-        cantidad: Number(d.total),
-      })),
+      empresas: empresas.map((e) => ({ id: e.id, razonSocial: e.razonSocial, marca: e.marcaCatalogo })),
     };
 
-    await this.redis.setEx(ESTADISTICAS_CACHE_KEY, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
     return resultado;
   }
 
   async obtenerAdmin(id: string, restringirCreadoPorId?: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { items: true, partner: { select: { razonSocial: true, creadoPorUsuarioId: true } } },
+      include: {
+        items: true,
+        partner: { select: { razonSocial: true, creadoPorUsuarioId: true } },
+        /// Quién lo hizo y cuándo pasó por cada estado, lo mismo que ve el cliente.
+        usuario: { select: { nombre: true, email: true } },
+        historial: { select: { estado: true, createdAt: true }, orderBy: { createdAt: 'asc' } },
+      },
     });
 
     if (

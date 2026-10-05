@@ -6,6 +6,8 @@ import type { CrearPartnerDto } from './dto/crear-partner.dto.js';
 import { RolUsuario } from '../generated/prisma/enums.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import type { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
+import type { EmailService } from '../common/email/email.service.js';
+import type { ConfigService } from '@nestjs/config';
 
 describe('PartnersService — distribuidor y partner (solo el admin promociona)', () => {
   const ID = 'partner-1';
@@ -22,6 +24,7 @@ describe('PartnersService — distribuidor y partner (solo el admin promociona)'
     $transaction: ReturnType<typeof vi.fn>;
   };
   let service: PartnersService;
+  let emailService: { enviar: ReturnType<typeof vi.fn> };
 
   function empresa(overrides: Record<string, unknown> = {}) {
     return {
@@ -53,7 +56,7 @@ describe('PartnersService — distribuidor y partner (solo el admin promociona)'
         update: vi.fn().mockResolvedValue({ id: ID }),
         create: vi.fn().mockResolvedValue({ id: ID }),
       },
-      user: { create: vi.fn().mockResolvedValue({}) },
+      user: { create: vi.fn().mockResolvedValue({ email: 'compras@empresa.com', idioma: 'ES' }) },
       order: { count: vi.fn().mockResolvedValue(4) },
       orderItem: { aggregate: vi.fn().mockResolvedValue({ _sum: { cantidad: 120 } }) },
       auditLog: { create: vi.fn().mockResolvedValue({}) },
@@ -62,9 +65,13 @@ describe('PartnersService — distribuidor y partner (solo el admin promociona)'
         typeof arg === 'function' ? arg(prisma) : Promise.all(arg as Promise<unknown>[]),
       ),
     };
-    service = new PartnersService(prisma as unknown as PrismaService, {
-      sincronizarEmpresa: vi.fn().mockResolvedValue({}),
-    } as unknown as CatalogoMarcaService);
+    emailService = { enviar: vi.fn().mockResolvedValue(undefined) };
+    service = new PartnersService(
+      prisma as unknown as PrismaService,
+      { sincronizarEmpresa: vi.fn().mockResolvedValue({}) } as unknown as CatalogoMarcaService,
+      emailService as unknown as EmailService,
+      { get: () => 'https://b2b.iotfenster.com' } as unknown as ConfigService,
+    );
   });
 
   afterEach(() => {
@@ -83,6 +90,22 @@ describe('PartnersService — distribuidor y partner (solo el admin promociona)'
 
       await service.crear(alta('DISTRIBUIDOR'), 'comercial-1', RolUsuario.COMERCIAL);
       expect(prisma.partner.create.mock.calls[1][0].data.tipo).toBe('DISTRIBUIDOR');
+    });
+
+    it('envía la bienvenida al primer usuario con el enlace al login y a "he olvidado mi contraseña"', async () => {
+      await service.crear(alta(), 'admin-1', RolUsuario.ADMIN_FENSTER);
+
+      expect(emailService.enviar).toHaveBeenCalledTimes(1);
+      const [para, asunto, cuerpo] = emailService.enviar.mock.calls[0];
+      expect(para).toBe('compras@empresa.com');
+      expect(asunto).toBe('Bienvenido a la plataforma de pedidos de IoT FENSTER');
+      expect(cuerpo).toContain('https://b2b.iotfenster.com/login/recuperar');
+      expect(cuerpo).not.toContain('password');
+    });
+
+    it('si falla la bienvenida, el alta sigue hecha', async () => {
+      emailService.enviar.mockRejectedValue(new Error('SES caído'));
+      await expect(service.crear(alta(), 'admin-1', RolUsuario.ADMIN_FENSTER)).resolves.toEqual({ id: ID });
     });
 
     it('un admin sí puede dar de alta un PARTNER directamente', async () => {

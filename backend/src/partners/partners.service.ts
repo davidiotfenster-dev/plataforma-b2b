@@ -1,9 +1,12 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { EmailService } from '../common/email/email.service.js';
+import { asuntoBienvenidaEmpresa, cuerpoBienvenidaEmpresa } from '../common/email/plantillas-email.js';
 import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { EstadoPartner, EstadoPedido, RolUsuario, TipoEmpresa } from '../generated/prisma/enums.js';
+import { EstadoPartner, EstadoPedido, Idioma, RolUsuario, TipoEmpresa } from '../generated/prisma/enums.js';
 import type { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
 import type { CrearPartnerDto } from './dto/crear-partner.dto.js';
 import type { AsignarProductosDto } from './dto/asignar-productos.dto.js';
@@ -31,9 +34,13 @@ const CONTADORES_PARTNER = {
 
 @Injectable()
 export class PartnersService {
+  private readonly logger = new Logger(PartnersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly catalogoMarca: CatalogoMarcaService,
+    private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
   /// Alta directa (sin registro público ni verificación de email): la usa
@@ -87,7 +94,7 @@ export class PartnersService {
           },
         });
 
-        await tx.user.create({
+        const usuario = await tx.user.create({
           data: {
             email: dto.emailUsuario,
             passwordHash,
@@ -99,17 +106,33 @@ export class PartnersService {
           },
         });
 
-        return partner;
+        return { partner, usuario };
       });
       // Nace con el catálogo de su marca ya puesto.
-      await this.catalogoMarca.sincronizarEmpresa(creado.id);
-      return creado;
+      await this.catalogoMarca.sincronizarEmpresa(creado.partner.id);
+      await this.enviarBienvenida(creado.usuario);
+      return creado.partner;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const campo = (error.meta?.target as string[] | undefined)?.join(', ') ?? 'campo único';
         throw new ConflictException(`Ya existe un partner o usuario con ese valor en: ${campo}`);
       }
       throw error;
+    }
+  }
+
+  /// Correo de bienvenida al primer usuario de una empresa dada de alta desde el
+  /// panel. Es un aviso: si falla, el alta sigue hecha.
+  private async enviarBienvenida(usuario: { email: string; idioma: Idioma }): Promise<void> {
+    try {
+      const frontendUrl = this.configService.get<string>('frontendUrl');
+      await this.emailService.enviar(
+        usuario.email,
+        asuntoBienvenidaEmpresa(usuario.idioma),
+        cuerpoBienvenidaEmpresa(usuario.idioma, usuario.email, `${frontendUrl}/login`, `${frontendUrl}/login/recuperar`),
+      );
+    } catch (error) {
+      this.logger.error(`No se pudo enviar la bienvenida a ${usuario.email}: ${(error as Error).message}`);
     }
   }
 

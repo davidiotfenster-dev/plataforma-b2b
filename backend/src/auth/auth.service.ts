@@ -16,11 +16,13 @@ import { EmailService } from '../common/email/email.service.js';
 import {
   asuntoCuentaAprobada,
   asuntoCuentaRechazada,
+  asuntoInvitacionUsuario,
   asuntoNuevaSolicitud,
   asuntoResetPassword,
   asuntoVerificacionEmail,
   cuerpoCuentaAprobada,
   cuerpoCuentaRechazada,
+  cuerpoInvitacionUsuario,
   cuerpoNuevaSolicitud,
   cuerpoResetPassword,
   cuerpoVerificacionEmail,
@@ -33,6 +35,8 @@ import type { JwtPayload } from './strategies/jwt.strategy.js';
 import type { UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
 
 const SALT_ROUNDS = 12;
+/// Validez del enlace de invitación de un usuario nuevo (`invitarUsuario`).
+const PLAZO_INVITACION = '7d';
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002';
 
 export interface UsuarioValidado {
@@ -93,6 +97,7 @@ export class AuthService {
             partnerId: partner.id,
             /// Inactivo hasta que el Administrador IoT FENSTER apruebe el partner.
             activo: false,
+            condicionesAceptadasEn: new Date(),
           },
         });
 
@@ -399,17 +404,24 @@ export class AuthService {
   /// (`olvidePassword`) y el disparo manual desde el panel admin
   /// (`dispararResetPassword`): en ambos casos el flujo posterior de canje
   /// del token es idéntico.
-  private async generarYEnviarTokenReset(usuario: {
-    id: string;
-    email: string;
-    idioma: Idioma;
-  }): Promise<void> {
+  ///
+  /// Con `invitacion` es el correo de bienvenida de un usuario nuevo: mismo
+  /// token y misma página para poner la contraseña, pero con otro texto y un
+  /// plazo más largo, porque quien lo recibe no lo estaba esperando.
+  private async generarYEnviarTokenReset(
+    usuario: {
+      id: string;
+      email: string;
+      idioma: Idioma;
+    },
+    invitacion?: { razonSocial: string },
+  ): Promise<void> {
     const token = await this.jwtService.signAsync(
       { sub: usuario.id, tipo: 'reset-password' },
       {
-        expiresIn: this.configService.get<string>(
-          'passwordResetTokenExpiresIn',
-        ) as `${number}${'s' | 'm' | 'h' | 'd'}`,
+        expiresIn: (invitacion
+          ? PLAZO_INVITACION
+          : this.configService.get<string>('passwordResetTokenExpiresIn')) as `${number}${'s' | 'm' | 'h' | 'd'}`,
       },
     );
     const { exp } = this.jwtService.decode<{ exp: number }>(token);
@@ -425,8 +437,10 @@ export class AuthService {
     const enlace = `${this.configService.get<string>('frontendUrl')}/resetear-password?token=${token}`;
     await this.emailService.enviar(
       usuario.email,
-      asuntoResetPassword(usuario.idioma),
-      cuerpoResetPassword(usuario.idioma, enlace),
+      invitacion ? asuntoInvitacionUsuario(usuario.idioma) : asuntoResetPassword(usuario.idioma),
+      invitacion
+        ? cuerpoInvitacionUsuario(usuario.idioma, enlace, invitacion.razonSocial)
+        : cuerpoResetPassword(usuario.idioma, enlace),
     );
   }
 
@@ -481,6 +495,12 @@ export class AuthService {
       throw new NotFoundException('Usuario no encontrado');
     }
     await this.generarYEnviarTokenReset(usuario);
+  }
+
+  /// Correo de bienvenida a un usuario recién dado de alta en una empresa, con
+  /// el enlace para crear su contraseña.
+  async invitarUsuario(usuario: { id: string; email: string; idioma: Idioma }, razonSocial: string): Promise<void> {
+    await this.generarYEnviarTokenReset(usuario, { razonSocial });
   }
 
   /// Invalida cualquier JWT de sesión emitido antes de este momento para el

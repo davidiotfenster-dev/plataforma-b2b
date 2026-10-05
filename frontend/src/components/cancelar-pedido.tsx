@@ -14,7 +14,7 @@ export function CancelarPedido({ order, invalidateKeys }: { order: Order; invali
   const [error, setError] = useState<string | null>(null);
 
   const cancelar = useMutation({
-    mutationFn: () => api.patch(`/pedidos/${order.id}/estado`, { estado: "CANCELADO", motivoCancelacion: motivo }),
+    mutationFn: () => api.patch(`/pedidos/${order.id}/estado`, { estado: "CANCELADO", motivoCancelacion: motivo.trim() }),
     onSuccess: () => {
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       setAbierto(false);

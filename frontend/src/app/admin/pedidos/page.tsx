@@ -12,6 +12,7 @@ import { AvanzarEstado } from "@/components/avanzar-estado";
 import { CancelarPedido } from "@/components/cancelar-pedido";
 import { Paginacion } from "@/components/paginacion";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { usePrecio } from "@/lib/formato";
 
 const LIMITE_POR_PAGINA = 20;
 
@@ -26,6 +27,7 @@ function TarjetaPartner({ resumen }: { resumen: ResumenPartner }) {
   const router = useRouter();
   const t = useTranslations("adminPedidos");
   const locale = useLocale();
+  const precio = usePrecio();
   const [abierto, setAbierto] = useState(false);
 
   const { data: pedidos, isLoading } = useQuery<Order[]>({
@@ -62,7 +64,7 @@ function TarjetaPartner({ resumen }: { resumen: ResumenPartner }) {
                 <div>
                   <p className="font-medium text-neutral-900">{order.codigoPed}</p>
                   <p className="text-xs text-neutral-400">
-                    PO {order.poNumber} · {order.totalNeto} € · {new Date(order.createdAt).toLocaleDateString(locale)}
+                    PO {order.poNumber} · {precio(order.totalNeto)} · {new Date(order.createdAt).toLocaleDateString(locale)}
                   </p>
                   {order.estado === "CANCELADO" && order.motivoCancelacion && (
                     <p className="mt-1 text-xs text-red-600">{t("cancelReason", { motivo: order.motivoCancelacion })}</p>

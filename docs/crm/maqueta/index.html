@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CRM Comercial IoT FENSTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: barra de marca + pestañas de app; contenido en una columna ancha; la ficha se abre como panel lateral (pantalla completa en móvil). Colores tomados de la presentación (azul noche y turquesa). */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --sunk: #e9eff3;
+  --line: #d6e0e7;
+  --ink: #102a43;
+  --muted: #55697c;
+  --brand: #102a43;
+  --brand-ink: #ffffff;
+  --accent: #1d9590;
+  --accent-soft: #dcf1ef;
+  --late: #c0453b;
+  --late-soft: #fbe5e2;
+  --today: #b07a0c;
+  --today-soft: #fbf0d6;
+  --ok: #2c845a;
+  --ok-soft: #dff1e6;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1824; --surface: #11243a; --sunk: #0e1e30; --line: #22384e; --ink: #e5edf4; --muted: #95a9bc;
+    --brand: #0a1a2a; --brand-ink: #e5edf4; --accent: #3cc0b9; --accent-soft: #123c40;
+    --late: #f08277; --late-soft: #3d1f1f; --today: #e6b04a; --today-soft: #3a2e14; --ok: #6cc897; --ok-soft: #173426;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1824; --surface: #11243a; --sunk: #0e1e30; --line: #22384e; --ink: #e5edf4; --muted: #95a9bc;
+  --brand: #0a1a2a; --brand-ink: #e5edf4; --accent: #3cc0b9; --accent-soft: #123c40;
+  --late: #f08277; --late-soft: #3d1f1f; --today: #e6b04a; --today-soft: #3a2e14; --ok: #6cc897; --ok-soft: #173426;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: .92em; }
+
+/* Barra superior */
+.top { background: var(--brand); color: var(--brand-ink); padding-inline: 16px; }
+.top-in { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .01em; }
+.brand-mark { width: 8px; height: 26px; background: #22a6a1; border-radius: 2px; }
+.brand small { display: block; font-weight: 500; font-size: 12px; opacity: .75; letter-spacing: .02em; }
+.viewas { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.viewas select { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.3); color: var(--brand-ink); border-radius: 8px; padding: 6px 8px; }
+.viewas select option { color: #102a43; background: #fff; }
+.tabs { max-width: 1240px; margin: 0 auto; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.tabs button { background: none; border: 0; color: var(--brand-ink); opacity: .72; padding: 10px 12px 12px; border-bottom: 3px solid transparent; white-space: nowrap; font-weight: 600; }
+.tabs button[aria-selected="true"] { opacity: 1; border-bottom-color: #22a6a1; }
+
+main { max-width: 1240px; margin: 0 auto; padding: 20px 16px 48px; display: grid; gap: 18px; }
+main > * { min-width: 0; }
+#view { display: grid; gap: 18px; }
+.note { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: var(--radius); padding: 10px 14px; font-size: 14px; }
+.note b { white-space: nowrap; }
+h1 { font-size: 22px; margin: 0; text-wrap: balance; }
+h2 { font-size: 16px; margin: 0; }
+.sub { color: var(--muted); margin: 2px 0 0; font-size: 14px; }
+.head { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; justify-content: space-between; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 600; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:hover { border-color: var(--accent); }
+.label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+
+/* Pills */
+.pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 2px 9px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.pill.late { background: var(--late-soft); color: var(--late); }
+.pill.today { background: var(--today-soft); color: var(--today); }
+.pill.future { background: var(--ok-soft); color: var(--ok); }
+.pill.none { background: var(--late); color: #fff; }
+.pill.flag { background: var(--sunk); color: var(--muted); }
+
+/* Hoy */
+.agenda { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.col { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.col-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.task { text-align: left; width: 100%; display: grid; gap: 3px; border: 1px solid var(--line); border-left-width: 4px; background: var(--surface); border-radius: 8px; padding: 10px 12px; }
+.task.late { border-left-color: var(--late); }
+.task.today { border-left-color: var(--today); }
+.task.future { border-left-color: var(--ok); }
+.task.none { border-left-color: var(--late); background: var(--late-soft); }
+.task:hover { border-color: var(--accent); }
+.task .t1 { font-weight: 600; }
+.task .t2 { font-size: 13.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 2px; }
+
+/* Pipeline */
+.board-wrap { overflow-x: auto; padding-bottom: 8px; }
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: 232px; gap: 10px; }
+.lane { background: var(--sunk); border-radius: var(--radius); padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 160px; }
+.lane.exit { background: transparent; border: 1px dashed var(--line); }
+.lane-h { display: grid; gap: 2px; padding: 2px 2px 6px; border-bottom: 1px solid var(--line); }
+.lane-h .n { font-weight: 700; font-size: 14px; display: flex; justify-content: space-between; gap: 6px; }
+.lane-h .v { font-size: 12.5px; color: var(--muted); }
+.card { text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; display: grid; gap: 4px; }
+.card:hover { border-color: var(--accent); }
+.card .c1 { font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; gap: 6px; }
+.card .c2 { font-size: 12.5px; color: var(--muted); }
+.flag-cc { font-size: 11px; font-weight: 700; letter-spacing: .05em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; align-self: start; }
+
+/* Panel */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 4px; }
+.kpi .big { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .big.late { color: var(--late); }
+.panels { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.heat { font-variant-numeric: tabular-nums; }
+.bars { display: grid; gap: 7px; }
+.bar-row { display: grid; grid-template-columns: 128px minmax(0, 1fr) 92px; gap: 10px; align-items: center; font-size: 13.5px; }
+.bar-track { height: 12px; background: var(--sunk); border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 6px; }
+.bar-row .r { text-align: right; }
+.legend { font-size: 12.5px; color: var(--muted); }
+
+/* Ficha (panel lateral) */
+.scrim { position: fixed; inset: 0; background: rgba(8, 20, 32, .45); z-index: 20; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--surface); z-index: 21; overflow-y: auto; box-shadow: -12px 0 32px rgba(8,20,32,.18); padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px); display: grid; gap: 16px; align-content: start; }
+.drawer-h { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.x { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; width: 36px; height: 36px; font-size: 18px; line-height: 1; }
+.steps { display: flex; gap: 3px; }
+.steps span { flex: 1; height: 6px; border-radius: 3px; background: var(--sunk); }
+.steps span.on { background: var(--accent); }
+fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px 14px; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+legend { padding: 0 6px; }
+.f { display: grid; gap: 4px; min-width: 0; }
+.f.wide { grid-column: 1 / -1; }
+.f label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.f input, .f select, .f textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: var(--surface); }
+.f textarea { min-height: 64px; resize: vertical; }
+.f .ro { padding: 7px 0; }
+.must label::after { content: " *"; color: var(--late); }
+.err { background: var(--late-soft); color: var(--late); border-radius: 8px; padding: 9px 12px; font-weight: 600; font-size: 14px; }
+.okmsg { background: var(--ok-soft); color: var(--ok); border-radius: 8px; padding: 9px 12px; font-weight: 600; font-size: 14px; }
+.b2b { border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 8px; }
+.b2b-h { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center; }
+.hist { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--muted); display: grid; gap: 3px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Qué hace falta */
+.needs { display: grid; gap: 10px; }
+.need { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; }
+.need .d { font-size: 13.5px; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 6px 10px; font-size: 13px; font-weight: 600; border-left: 1px solid var(--line); }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed="true"].si { background: var(--ok-soft); color: var(--ok); }
+.seg button[aria-pressed="true"].no { background: var(--sunk); color: var(--muted); }
+.seg button[aria-pressed="true"].cambiar { background: var(--today-soft); color: var(--today); }
+.need input { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; background: var(--surface); }
+.copybox { width: 100%; min-height: 160px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--surface); font-family: var(--font-data); font-size: 12.5px; }
+
+@media (max-width: 900px) {
+  .agenda { grid-template-columns: minmax(0, 1fr); }
+  .panels { grid-template-columns: minmax(0, 1fr); }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  fieldset { grid-template-columns: minmax(0, 1fr); }
+  .viewas { margin-left: 0; width: 100%; }
+  .viewas select { flex: 1; }
+  .bar-row { grid-template-columns: 96px minmax(0, 1fr) 76px; }
+  .need { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer { animation: slide .18s ease-out; }
+  @keyframes slide { from { transform: translateX(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div>CRM comercial · IoT FENSTER<small>Maqueta para la dirección comercial</small></div></div>
+    <label class="viewas" for="verComo">Ver como
+      <select id="verComo"></select>
+    </label>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" data-tab="hoy" aria-selected="true">Hoy</button>
+    <button role="tab" data-tab="pipeline" aria-selected="false">Pipeline</button>
+    <button role="tab" data-tab="panel" aria-selected="false">Panel de dirección</button>
+    <button role="tab" data-tab="falta" aria-selected="false">¿Qué hace falta?</button>
+  </nav>
+</header>
+
+<main>
+  <div class="note"><b>Maqueta</b><span>Empresas y cifras de ejemplo, no son datos reales. Sirve para ver cómo funcionaría el CRM y decidir qué hace falta. Puedes abrir fichas, cambiar fases y crear oportunidades; nada se guarda.</span></div>
+  <section id="view"></section>
+</main>
+
+<div id="drawerRoot"></div>
+
+<script>
+(function () {
+  const ETAPAS = [
+    { id: 'lead', n: 'Nuevo lead' }, { id: 'contactado', n: 'Contactado' }, { id: 'interes', n: 'Interés' },
+    { id: 'demo', n: 'Reunión / Demo' }, { id: 'muestra', n: 'Muestra enviada' }, { id: 'prueba', n: 'Prueba / Validación' },
+    { id: 'oferta', n: 'Oferta' }, { id: 'negociacion', n: 'Negociación' }, { id: 'ganado', n: 'Ganado' }
+  ];
+  const SALIDAS = [{ id: 'perdido', n: 'Perdido' }, { id: 'futuro', n: 'Seguimiento futuro' }];
+  const TODAS = ETAPAS.concat(SALIDAS);
+  const nombreEtapa = id => (TODAS.find(e => e.id === id) || {}).n || id;
+  const ABIERTAS = ['lead', 'contactado', 'interes', 'demo', 'muestra', 'prueba', 'oferta', 'negociacion'];
+  const PAISES = { ES: 'España', IT: 'Italia', FR: 'Francia', PT: 'Portugal', DE: 'Alemania' };
+  const COMERCIAL = { ES: 'Comercial España', IT: 'Agente Italia', FR: 'Agente Francia', PT: 'Agente Portugal', DE: 'Agente Alemania' };
+  const ROLES = [
+    { id: 'direccion', n: 'Dirección comercial (ve todo)', pais: null },
+    { id: 'ceo', n: 'CEO (ve todo)', pais: null },
+    { id: 'ES', n: 'Comercial España', pais: 'ES' }, { id: 'IT', n: 'Agente Italia', pais: 'IT' },
+    { id: 'FR', n: 'Agente Francia', pais: 'FR' }, { id: 'PT', n: 'Agente Portugal', pais: 'PT' },
+    { id: 'DE', n: 'Agente Alemania', pais: 'DE' }
+  ];
+  const PRODUCTOS = ['Connect (MySmartWindow)', 'EVO', 'Mando Blue', 'Wave', 'ICON'];
+  const TIPOS = ['Distribuidor', 'Fabricante de ventanas', 'Instalador', 'Partner con marca propia'];
+  const ORIGENES = ['Feria', 'Web', 'Recomendación', 'Llamada en frío', 'Portal B2B (registro)', 'Agente'];
+
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dia = off => { const d = new Date(hoy); d.setDate(d.getDate() + off); return d; };
+  const iso = d => d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` : '';
+  const deIso = s => { if (!s) return null; const [y, m, dd] = s.split('-').map(Number); return new Date(y, m - 1, dd); };
+  const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const fecha = d => d ? `${d.getDate()} ${MESES[d.getMonth()]}` : '—';
+  const eur = n => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  const eur2 = n => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(n);
+  const unid = n => new Intl.NumberFormat('es-ES').format(n);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function semilla() {
+    const o = (id, empresa, pais, contacto, tipo, producto, unidades, potencial, etapa, ultimo, accion, offAccion, origen, notas, extra) =>
+      Object.assign({ id, empresa, pais, contacto, tipo, producto, unidades, potencial, etapa, ultimo: dia(ultimo), accion, fechaAccion: offAccion == null ? null : dia(offAccion), origen, notas, hist: [] }, extra || {});
+    return [
+      o(1, 'DGV Metal', 'ES', 'Responsable de compras', 'Fabricante de ventanas', 'Connect (MySmartWindow)', 1200, 72000, 'contactado', -6, 'Llamar para agendar la demo', 0, 'Feria', 'Interesados en la versión con app.'),
+      o(2, 'Caixiave', 'PT', 'Director técnico', 'Fabricante de ventanas', 'Connect (MySmartWindow)', 2500, 150000, 'oferta', -4, 'Seguimiento de la oferta enviada', 0, 'Agente', 'Oferta enviada con descuento por volumen.'),
+      o(3, 'Boschat-Laveix', 'FR', 'Responsable de producto', 'Fabricante de ventanas', 'EVO', 1800, 99000, 'interes', -3, 'Enviar información técnica', 0, 'Web', ''),
+      o(4, 'BALTIC Fenster', 'DE', 'Einkauf', 'Distribuidor', 'Connect (MySmartWindow)', 900, 54000, 'lead', -1, 'Primer contacto por teléfono', 0, 'Feria', ''),
+      o(5, 'BIEMME', 'IT', 'Ufficio tecnico', 'Fabricante de ventanas', 'EVO', 1500, 82500, 'muestra', -9, 'Revisar la muestra con su técnico', 0, 'Agente', 'Muestra enviada con 2 unidades EVO.'),
+      o(6, 'Carpintería Levante (ejemplo)', 'ES', 'Gerente', 'Instalador', 'Mando Blue', 400, 12000, 'demo', -2, 'Demo en sus oficinas', 3, 'Recomendación', ''),
+      o(7, 'Serramenti Adriatico (ejemplo)', 'IT', 'Titolare', 'Fabricante de ventanas', 'Connect (MySmartWindow)', 1100, 66000, 'prueba', -12, 'Recoger resultados de la prueba', -2, 'Agente', 'Prueba en 3 obras.'),
+      o(8, 'Fenêtres du Rhône (ejemplo)', 'FR', 'Directeur commercial', 'Distribuidor', 'Connect (MySmartWindow)', 3000, 168000, 'negociacion', -8, 'Llamada para cerrar condiciones', -1, 'Feria', 'Piden exclusividad regional.'),
+      o(9, 'Janelas do Minho (ejemplo)', 'PT', 'Compras', 'Distribuidor', 'Mando Blue', 600, 18000, 'contactado', -2, 'Enviar catálogo', 5, 'Web', ''),
+      o(10, 'Fensterbau Weber (ejemplo)', 'DE', 'Geschäftsführer', 'Fabricante de ventanas', 'EVO', 2000, 110000, 'interes', -5, 'Videollamada de presentación', 2, 'Llamada en frío', ''),
+      o(11, 'Persianas Cantábrico (ejemplo)', 'ES', 'Director', 'Fabricante de ventanas', 'Connect (MySmartWindow)', 800, 48000, 'oferta', -3, 'Enviar oferta revisada', 1, 'Recomendación', ''),
+      o(12, 'Infissi Lombardi (ejemplo)', 'IT', 'Acquisti', 'Distribuidor', 'Connect (MySmartWindow)', 500, 30000, 'lead', 0, 'Calificar el interés', 4, 'Portal B2B (registro)', 'Llegó solo desde el registro de la plataforma.'),
+      o(13, 'Ventanas Sur (ejemplo)', 'ES', 'Compras', 'Distribuidor', 'Connect (MySmartWindow)', 1500, 90000, 'ganado', -20, 'Llamada de seguimiento del primer pedido', 7, 'Feria', 'Cliente activo en la plataforma B2B.', {
+        b2b: { codigo: 'C-0142', marca: 'MySmartWindow', tipoEmpresa: 'Distribuidor', estado: 'Activa', pedidos: [
+          { ped: 'PED-000231', po: 'VS-2026-044', fecha: dia(-6), total: 1180.5, estado: 'En preparación' },
+          { ped: 'PED-000214', po: 'VS-2026-031', fecha: dia(-19), total: 2340, estado: 'Enviado' }
+        ] } }),
+      o(14, 'Menuiserie Atlantique (ejemplo)', 'FR', 'Gérant', 'Instalador', 'Mando Blue', 300, 9000, 'futuro', -30, 'Volver a contactar después de la feria', 60, 'Feria', 'Sin presupuesto hasta el año que viene.'),
+      o(15, 'Holzfenster Bayern (ejemplo)', 'DE', 'Einkauf', 'Fabricante de ventanas', 'EVO', 700, 38500, 'perdido', -15, '', null, 'Llamada en frío', 'Eligieron otro proveedor por precio.'),
+      o(16, 'Aluminios Ebro (ejemplo)', 'ES', 'Técnico', 'Fabricante de ventanas', 'EVO', 1000, 55000, 'muestra', -10, '', null, 'Agente', 'Se envió la muestra pero nadie apuntó el siguiente paso.'),
+      o(17, 'Alu Porto (ejemplo)', 'PT', 'Gerente', 'Fabricante de ventanas', 'Connect (MySmartWindow)', 1300, 78000, 'demo', -1, 'Preparar la demo', -1, 'Agente', '')
+    ];
+  }
+
+  let opps = semilla();
+  let rol = 'direccion';
+  let tab = 'hoy';
+  const respuestas = {};
+  try { Object.assign(respuestas, JSON.parse(localStorage.getItem('crm-maqueta-respuestas') || '{}')); } catch (e) {}
+
+  const visibles = () => { const r = ROLES.find(x => x.id === rol); return r.pais ? opps.filter(o => o.pais === r.pais) : opps; };
+  const estado = o => {
+    if (!ABIERTAS.includes(o.etapa) && o.etapa !== 'ganado' && o.etapa !== 'futuro') return null;
+    if (!o.accion || !o.fechaAccion) return 'none';
+    const t = o.fechaAccion.getTime();
+    return t < hoy.getTime() ? 'late' : t === hoy.getTime() ? 'today' : 'future';
+  };
+  const pillDe = o => {
+    const s = estado(o);
+    if (s === 'none') return '<span class="pill none">Sin próxima acción</span>';
+    if (s === 'late') return `<span class="pill late">Vencida · ${fecha(o.fechaAccion)}</span>`;
+    if (s === 'today') return '<span class="pill today">Hoy</span>';
+    if (s === 'future') return `<span class="pill future">${fecha(o.fechaAccion)}</span>`;
+    return '';
+  };
+
+  // ---------- Vistas ----------
+  const view = document.getElementById('view');
+
+  function render() {
+    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+    if (tab === 'hoy') renderHoy();
+    else if (tab === 'pipeline') renderPipeline();
+    else if (tab === 'panel') renderPanel();
+    else renderFalta();
+  }
+
+  function tarea(o) {
+    const s = estado(o);
+    return `<button class="task ${s}" data-open="${o.id}">
+      <span class="t1">${esc(o.accion || 'Falta definir la próxima acción')}</span>
+      <span class="t2"><span>${esc(o.empresa)}</span><span>${PAISES[o.pais]}</span><span>${nombreEtapa(o.etapa)}</span></span>
+      <span>${pillDe(o)}</span>
+    </button>`;
+  }
+
+  function renderHoy() {
+    const v = visibles().filter(o => estado(o));
+    const sinAccion = v.filter(o => estado(o) === 'none');
+    const vencidas = v.filter(o => estado(o) === 'late').sort((a, b) => a.fechaAccion - b.fechaAccion);
+    const deHoy = v.filter(o => estado(o) === 'today');
+    const prox = v.filter(o => estado(o) === 'future').sort((a, b) => a.fechaAccion - b.fechaAccion).slice(0, 8);
+    const r = ROLES.find(x => x.id === rol);
+    view.innerHTML = `
+      <div class="head"><div><h1>Hoy, ${fecha(hoy)}</h1><p class="sub">${r.pais ? 'Tu agenda de ' + PAISES[r.pais] : 'Agenda de todo el equipo'}. Cada oportunidad abierta tiene que tener su próxima acción y su fecha.</p></div>
+      <button class="btn primary" data-new>Nueva oportunidad</button></div>
+      <div class="agenda">
+        <div class="col"><div class="col-h"><h2>Vencidas y sin acción</h2><span class="pill late">${vencidas.length + sinAccion.length}</span></div>
+          ${sinAccion.map(tarea).join('')}${vencidas.map(tarea).join('') || (sinAccion.length ? '' : '<p class="empty">Nada vencido. Bien.</p>')}</div>
+        <div class="col"><div class="col-h"><h2>Para hoy</h2><span class="pill today">${deHoy.length}</span></div>
+          ${deHoy.map(tarea).join('') || '<p class="empty">Nada para hoy.</p>'}</div>
+        <div class="col"><div class="col-h"><h2>Próximos días</h2><span class="pill future">${prox.length}</span></div>
+          ${prox.map(tarea).join('') || '<p class="empty">Sin acciones programadas.</p>'}</div>
+      </div>`;
+  }
+
+  function renderPipeline() {
+    const v = visibles();
+    const lane = (e, exit) => {
+      const items = v.filter(o => o.etapa === e.id);
+      const total = items.reduce((s, o) => s + o.potencial, 0);
+      return `<div class="lane${exit ? ' exit' : ''}">
+        <div class="lane-h"><span class="n"><span>${e.n}</span><span class="num">${items.length}</span></span><span class="v">${items.length ? eur(total) : '—'}</span></div>
+        ${items.map(o => `<button class="card" data-open="${o.id}">
+          <span class="c1"><span>${esc(o.empresa)}</span><span class="flag-cc">${o.pais}</span></span>
+          <span class="c2">${esc(o.producto)} · ${unid(o.unidades)} u/año</span>
+          <span>${pillDe(o)}</span></button>`).join('')}
+      </div>`;
+    };
+    view.innerHTML = `
+      <div class="head"><div><h1>Pipeline comercial Europa</h1><p class="sub">Un único embudo de 9 fases y dos salidas. Abre una tarjeta para ver la ficha o moverla de fase. Desliza a los lados para ver todas las fases.</p></div>
+      <button class="btn primary" data-new>Nueva oportunidad</button></div>
+      <div class="board-wrap"><div class="board">${ETAPAS.map(e => lane(e)).join('')}${SALIDAS.map(e => lane(e, true)).join('')}</div></div>`;
+  }
+
+  function renderPanel() {
+    const v = visibles();
+    const abiertas = v.filter(o => ABIERTAS.includes(o.etapa));
+    const vencidas = v.filter(o => ['late', 'none'].includes(estado(o)));
+    const deHoy = v.filter(o => estado(o) === 'today');
+    const futuras = v.filter(o => estado(o) === 'future');
+    const pot = abiertas.reduce((s, o) => s + o.potencial, 0);
+    const uds = abiertas.reduce((s, o) => s + o.unidades, 0);
+    const paises = Object.keys(PAISES).filter(p => v.some(o => o.pais === p));
+    const celda = (e, p) => { const n = v.filter(o => o.etapa === e && o.pais === p).length; return n ? `<td class="heat" style="background: color-mix(in srgb, var(--accent) ${Math.min(14 + n * 18, 60)}%, transparent)">${n}</td>` : '<td class="heat" style="color: var(--muted)">·</td>'; };
+    const maxPot = Math.max(1, ...ETAPAS.map(e => v.filter(o => o.etapa === e.id).reduce((s, o) => s + o.potencial, 0)));
+    const alcanzo = id => { const idx = ETAPAS.findIndex(e => e.id === id); return v.filter(o => { const i = ETAPAS.findIndex(e => e.id === o.etapa); return i >= idx; }).length; };
+    view.innerHTML = `
+      <div class="head"><div><h1>Panel de dirección comercial</h1><p class="sub">Dónde se atascan las oportunidades, qué agentes necesitan apoyo y qué acciones van primero.</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><span class="label">Oportunidades abiertas</span><span class="big">${abiertas.length}</span></div>
+        <div class="kpi"><span class="label">Pipeline potencial</span><span class="big">${eur(pot)}</span><span class="legend num">${unid(uds)} unidades/año</span></div>
+        <div class="kpi"><span class="label">Vencidas o sin acción</span><span class="big late">${vencidas.length}</span></div>
+        <div class="kpi"><span class="label">Acciones hoy · futuras</span><span class="big">${deHoy.length} · ${futuras.length}</span></div>
+      </div>
+      <div class="panels">
+        <div class="panel"><h2>Oportunidades por fase y país</h2>
+          <div class="tbl-wrap"><table><thead><tr><th>Fase</th>${paises.map(p => `<th>${p}</th>`).join('')}<th>Total</th></tr></thead>
+          <tbody>${TODAS.map(e => `<tr><td>${e.n}</td>${paises.map(p => celda(e.id, p)).join('')}<td class="num">${v.filter(o => o.etapa === e.id).length}</td></tr>`).join('')}</tbody></table></div>
+        </div>
+        <div class="panel"><h2>Valor potencial por fase</h2>
+          <div class="bars">${ETAPAS.map(e => { const s = v.filter(o => o.etapa === e.id).reduce((a, o) => a + o.potencial, 0); return `<div class="bar-row"><span>${e.n}</span><span class="bar-track"><span class="bar-fill" style="display:block; width:${(s / maxPot * 100).toFixed(1)}%"></span></span><span class="r num">${s ? eur(s) : '—'}</span></div>`; }).join('')}</div>
+          <h2>Actividad</h2>
+          <div class="bars">
+            ${[['demo', 'Reuniones / demos'], ['muestra', 'Muestras enviadas'], ['oferta', 'Ofertas enviadas']].map(([id, n]) => `<div class="bar-row"><span>${n}</span><span class="bar-track"><span class="bar-fill" style="display:block; width:${(alcanzo(id) / Math.max(1, v.length) * 100).toFixed(1)}%"></span></span><span class="r num">${alcanzo(id)}</span></div>`).join('')}
+          </div>
+          <p class="legend">Actividad = oportunidades que han llegado al menos a esa fase.</p>
+        </div>
+      </div>
+      <div class="panel"><h2>Por comercial</h2>
+        <div class="tbl-wrap"><table><thead><tr><th>Comercial</th><th>Abiertas</th><th>Vencidas o sin acción</th><th>Potencial</th><th>Ganadas</th></tr></thead><tbody>
+        ${paises.map(p => { const vv = v.filter(o => o.pais === p); const ab = vv.filter(o => ABIERTAS.includes(o.etapa)); return `<tr><td>${COMERCIAL[p]}</td><td class="num">${ab.length}</td><td class="num" style="color:${vv.some(o => ['late', 'none'].includes(estado(o))) ? 'var(--late)' : 'inherit'}">${vv.filter(o => ['late', 'none'].includes(estado(o))).length}</td><td class="num">${eur(ab.reduce((s, o) => s + o.potencial, 0))}</td><td class="num">${vv.filter(o => o.etapa === 'ganado').length}</td></tr>`; }).join('')}
+        </tbody></table></div>
+      </div>`;
+  }
+
+  const NECESIDADES = [
+    ['pipeline', 'Pipeline de 9 fases', 'Nuevo lead, Contactado, Interés, Reunión/Demo, Muestra, Prueba, Oferta, Negociación, Ganado.'],
+    ['salidas', 'Salidas Perdido y Seguimiento futuro', '¿Hace falta pedir el motivo cuando se pierde?'],
+    ['campos', 'Los 12 datos de cada oportunidad', 'Empresa, país, contacto, tipo, comercial, producto, unidades/año, potencial, fase, último contacto, próxima acción y fecha, origen, notas.'],
+    ['regla', 'Próxima acción y fecha obligatorias', 'No deja guardar una oportunidad abierta sin ellas.'],
+    ['hoy', 'Agenda de hoy', 'Vencidas, de hoy y próximas, también en el móvil.'],
+    ['aviso', 'Correo cada mañana con las vencidas', 'Aviso automático a cada comercial.'],
+    ['permisos', 'Cada agente ve solo su país', 'Dirección y CEO ven todo.'],
+    ['panel', 'Panel de dirección', 'Por fase y país, vencidas, valor potencial, actividad y por comercial.'],
+    ['movil', 'App en el móvil', 'Fichas, llamadas, notas y tareas desde el teléfono.'],
+    ['excel', 'Cargar los Excel actuales', 'Contactos y oportunidades que ya tenéis.'],
+    ['pedidos', 'Ver en la ficha los pedidos de la plataforma B2B', 'Pedidos, PO, importes y estado del cliente, sin preguntar.'],
+    ['altas', 'Cliente ganado pasa a la plataforma para aprobarlo', 'La empresa llega al panel de admin pendiente de aprobación.']
+  ];
+
+  function renderFalta() {
+    view.innerHTML = `
+      <div class="head"><div><h1>¿Qué te hace falta?</h1><p class="sub">Marca cada función y añade un comentario si quieres. Al final copia las respuestas y envíalas a David.</p></div></div>
+      <div class="needs">${NECESIDADES.map(([id, n, d]) => { const r = respuestas[id] || {}; return `<div class="need">
+        <div><strong>${n}</strong><div class="d">${d}</div></div>
+        <div class="seg" role="group" aria-label="${n}">
+          ${[['si', 'Lo necesito'], ['no', 'No hace falta'], ['cambiar', 'Cambiarlo']].map(([k, t]) => `<button class="${k}" data-need="${id}" data-val="${k}" aria-pressed="${r.v === k}">${t}</button>`).join('')}
+        </div>
+        <input id="nota-${id}" data-nota="${id}" placeholder="Comentario (opcional)" value="${esc(r.nota || '')}">
+      </div>`; }).join('')}
+      <div class="need"><div><strong>¿Falta algo?</strong><div class="d">Cualquier cosa que no esté en la maqueta.</div></div><span></span>
+        <input id="nota-extra" data-nota="extra" placeholder="Escribe aquí lo que falte" value="${esc((respuestas.extra || {}).nota || '')}"></div>
+      </div>
+      <div class="actions"><button class="btn primary" data-copy>Copiar respuestas</button><span id="copyMsg" class="legend" aria-live="polite"></span></div>
+      <textarea id="copyBox" class="copybox" readonly hidden></textarea>`;
+  }
+
+  function textoRespuestas() {
+    const map = { si: 'Lo necesito', no: 'No hace falta', cambiar: 'Cambiarlo' };
+    const lineas = NECESIDADES.map(([id, n]) => { const r = respuestas[id] || {}; return `- ${n}: ${r.v ? map[r.v] : 'sin marcar'}${r.nota ? ' (' + r.nota + ')' : ''}`; });
+    if ((respuestas.extra || {}).nota) lineas.push(`- Falta: ${respuestas.extra.nota}`);
+    return 'Respuestas sobre la maqueta del CRM\n' + lineas.join('\n');
+  }
+  const guardar = () => { try { localStorage.setItem('crm-maqueta-respuestas', JSON.stringify(respuestas)); } catch (e) {} };
+
+  // ---------- Ficha ----------
+  const drawerRoot = document.getElementById('drawerRoot');
+  let ultimoFoco = null;
+
+  function abrirFicha(o, nueva) {
+    ultimoFoco = document.activeElement;
+    const r = ROLES.find(x => x.id === rol);
+    const paisFijo = r.pais;
+    const idx = ETAPAS.findIndex(e => e.id === o.etapa);
+    const opt = (arr, val) => arr.map(x => `<option ${x === val ? 'selected' : ''}>${esc(x)}</option>`).join('');
+    drawerRoot.innerHTML = `
+      <div class="scrim" data-close></div>
+      <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="fichaTitulo">
+        <div class="drawer-h"><div><span class="label">${nueva ? 'Nueva oportunidad' : 'Oportunidad'}</span><h1 id="fichaTitulo">${esc(o.empresa || 'Sin nombre')}</h1>
+          <p class="sub">${o.pais ? PAISES[o.pais] + ' · ' + COMERCIAL[o.pais] : ''}</p></div>
+          <button class="x" data-close aria-label="Cerrar">×</button></div>
+        ${nueva ? '' : `<div class="steps" aria-label="Fase ${idx + 1} de 9">${ETAPAS.map((e, i) => `<span class="${idx >= 0 && i <= idx ? 'on' : ''}"></span>`).join('')}</div>`}
+        <form id="ficha" novalidate>
+          <div style="display:grid; gap:14px">
+          <fieldset><legend class="label">Contexto comercial</legend>
+            <div class="f wide must"><label for="f-empresa">Empresa</label><input id="f-empresa" value="${esc(o.empresa)}"></div>
+            <div class="f must"><label for="f-pais">País</label><select id="f-pais" ${paisFijo ? 'disabled' : ''}>${Object.entries(PAISES).map(([k, n]) => `<option value="${k}" ${k === (o.pais || paisFijo) ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="f"><label>Comercial responsable</label><div class="ro" id="f-comercial">${COMERCIAL[o.pais || paisFijo || 'ES']}</div></div>
+            <div class="f"><label for="f-contacto">Contacto</label><input id="f-contacto" value="${esc(o.contacto)}"></div>
+            <div class="f"><label for="f-tipo">Tipo de cuenta</label><select id="f-tipo">${opt(TIPOS, o.tipo)}</select></div>
+            <div class="f"><label for="f-producto">Producto de interés</label><select id="f-producto">${opt(PRODUCTOS, o.producto)}</select></div>
+            <div class="f"><label for="f-unidades">Unidades potenciales al año</label><input id="f-unidades" type="number" min="0" value="${o.unidades || ''}"></div>
+            <div class="f"><label for="f-potencial">Potencial económico (€/año)</label><input id="f-potencial" type="number" min="0" value="${o.potencial || ''}"></div>
+            <div class="f"><label for="f-origen">Origen</label><select id="f-origen">${opt(ORIGENES, o.origen)}</select></div>
+          </fieldset>
+          <fieldset><legend class="label">Seguimiento</legend>
+            <div class="f must"><label for="f-etapa">Fase</label><select id="f-etapa">${TODAS.map(e => `<option value="${e.id}" ${e.id === o.etapa ? 'selected' : ''}>${e.n}</option>`).join('')}</select></div>
+            <div class="f"><label>Último contacto</label><div class="ro">${fecha(o.ultimo)}</div></div>
+            <div class="f wide must" id="w-accion"><label for="f-accion">Próxima acción</label><input id="f-accion" value="${esc(o.accion)}" placeholder="Ej.: Llamar para cerrar la demo"></div>
+            <div class="f must" id="w-fecha"><label for="f-fecha">Fecha de la próxima acción</label><input id="f-fecha" type="date" value="${iso(o.fechaAccion)}"></div>
+            <div class="f wide"><label for="f-notas">Observaciones</label><textarea id="f-notas">${esc(o.notas)}</textarea></div>
+          </fieldset>
+          ${o.b2b ? `<div class="b2b"><div class="b2b-h"><h2>En la plataforma B2B</h2><span class="pill flag">Llega solo desde la plataforma</span></div>
+            <div class="legend">Cliente ${esc(o.b2b.codigo)} · ${esc(o.b2b.tipoEmpresa)} · catálogo ${esc(o.b2b.marca)} · ${esc(o.b2b.estado)}</div>
+            <div class="tbl-wrap"><table><thead><tr><th>Pedido</th><th>PO cliente</th><th>Fecha</th><th>Total neto</th><th>Estado</th></tr></thead><tbody>
+            ${o.b2b.pedidos.map(p => `<tr><td class="num">${p.ped}</td><td class="num">${esc(p.po)}</td><td>${fecha(p.fecha)}</td><td class="num">${eur2(p.total)}</td><td>${esc(p.estado)}</td></tr>`).join('')}
+            </tbody></table></div></div>` : ''}
+          ${o.hist.length ? `<div><span class="label">Historial</span><ul class="hist">${o.hist.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>` : ''}
+          <div id="fichaMsg" aria-live="polite"></div>
+          <div class="actions"><button type="submit" class="btn primary">${nueva ? 'Crear oportunidad' : 'Guardar'}</button><button type="button" class="btn" data-close>Cancelar</button></div>
+          </div>
+        </form>
+      </aside>`;
+    const pais = document.getElementById('f-pais');
+    pais.addEventListener('change', () => { document.getElementById('f-comercial').textContent = COMERCIAL[pais.value]; });
+    const etapa = document.getElementById('f-etapa');
+    const marcarObligatorio = () => { const req = etapa.value !== 'perdido'; ['w-accion', 'w-fecha'].forEach(id => document.getElementById(id).classList.toggle('must', req)); };
+    etapa.addEventListener('change', marcarObligatorio); marcarObligatorio();
+    document.getElementById('ficha').addEventListener('submit', ev => {
+      ev.preventDefault();
+      const g = id => document.getElementById(id);
+      const datos = {
+        empresa: g('f-empresa').value.trim(), pais: paisFijo || pais.value, contacto: g('f-contacto').value.trim(), tipo: g('f-tipo').value,
+        producto: g('f-producto').value, unidades: Number(g('f-unidades').value) || 0, potencial: Number(g('f-potencial').value) || 0,
+        origen: g('f-origen').value, etapa: etapa.value, accion: g('f-accion').value.trim(), fechaAccion: deIso(g('f-fecha').value), notas: g('f-notas').value.trim()
+      };
+      const msg = g('fichaMsg');
+      if (!datos.empresa) { msg.innerHTML = '<div class="err">Falta el nombre de la empresa.</div>'; g('f-empresa').focus(); return; }
+      if (datos.etapa !== 'perdido' && (!datos.accion || !datos.fechaAccion)) {
+        msg.innerHTML = '<div class="err">No se puede guardar: una oportunidad abierta necesita próxima acción y fecha. Es la regla esencial del CRM.</div>';
+        (datos.accion ? g('f-fecha') : g('f-accion')).focus(); return;
+      }
+      if (nueva) {
+        Object.assign(o, datos, { id: Math.max(...opps.map(x => x.id)) + 1, ultimo: new Date(hoy), hist: ['Creada hoy'] });
+        opps.push(o);
+      } else {
+        if (datos.etapa !== o.etapa) o.hist.unshift(`Hoy: ${nombreEtapa(o.etapa)} → ${nombreEtapa(datos.etapa)}`);
+        Object.assign(o, datos, { ultimo: new Date(hoy) });
+      }
+      if (datos.etapa === 'perdido') { o.accion = ''; o.fechaAccion = null; }
+      cerrar();
+      render();
+      if (datos.etapa === 'ganado') avisoGanado(o);
+    });
+    drawerRoot.querySelector('.x').focus();
+  }
+
+  function avisoGanado(o) {
+    const n = document.createElement('div');
+    n.className = 'okmsg';
+    n.setAttribute('role', 'status');
+    n.textContent = `${o.empresa} ganada. Con la integración, llegaría al panel de admin de la plataforma como empresa pendiente de aprobar.`;
+    view.prepend(n);
+    setTimeout(() => n.remove(), 7000);
+  }
+
+  function cerrar() { drawerRoot.innerHTML = ''; if (ultimoFoco && ultimoFoco.isConnected) ultimoFoco.focus(); }
+
+  // ---------- Eventos ----------
+  const sel = document.getElementById('verComo');
+  sel.innerHTML = ROLES.map(r => `<option value="${r.id}">${r.n}</option>`).join('');
+  sel.addEventListener('change', () => { rol = sel.value; render(); });
+  document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { tab = b.dataset.tab; render(); } });
+
+  document.addEventListener('click', e => {
+    const open = e.target.closest('[data-open]');
+    if (open) { const o = opps.find(x => x.id === Number(open.dataset.open)); if (o) abrirFicha(o, false); return; }
+    if (e.target.closest('[data-new]')) {
+      const r = ROLES.find(x => x.id === rol);
+      abrirFicha({ empresa: '', pais: r.pais || 'ES', contacto: '', tipo: TIPOS[0], producto: PRODUCTOS[0], unidades: 0, potencial: 0, etapa: 'lead', ultimo: null, accion: '', fechaAccion: null, origen: ORIGENES[0], notas: '', hist: [] }, true);
+      return;
+    }
+    if (e.target.closest('[data-close]')) { cerrar(); return; }
+    const nb = e.target.closest('[data-need]');
+    if (nb) { const id = nb.dataset.need; respuestas[id] = Object.assign(respuestas[id] || {}, { v: nb.dataset.val }); guardar(); nb.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === nb))); return; }
+    if (e.target.closest('[data-copy]')) {
+      const txt = textoRespuestas();
+      const box = document.getElementById('copyBox');
+      const msg = document.getElementById('copyMsg');
+      const mostrar = () => { box.hidden = false; box.value = txt; box.focus(); box.select(); msg.textContent = 'Selecciona el texto y cópialo.'; };
+      try {
+        navigator.clipboard.writeText(txt).then(() => { msg.textContent = 'Copiado. Pégalo en un correo o un WhatsApp a David.'; box.hidden = false; box.value = txt; }, mostrar);
+      } catch (err) { mostrar(); }
+    }
+  });
+  document.addEventListener('input', e => { const n = e.target.closest('[data-nota]'); if (n) { const id = n.dataset.nota; respuestas[id] = Object.assign(respuestas[id] || {}, { nota: n.value }); guardar(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawerRoot.innerHTML) cerrar(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

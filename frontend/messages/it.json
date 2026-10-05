@@ -32,6 +32,7 @@
     "catalogo": "Catalogo",
     "carrito": "Carrello",
     "pedidos": "Ordini",
+    "usuarios": "Utenti",
     "partners": "Aziende",
     "logout": "Esci",
     "login": "Accedi",
@@ -57,6 +58,8 @@
   },
   "login": {
     "title": "Accedi",
+    "sessionExpired": "La tua sessione è scaduta o è stata chiusa. Accedi di nuovo per continuare.",
+    "loginToContinue": "Accedi per vedere questa pagina.",
     "email": "Email",
     "password": "Password",
     "submitting": "Accesso in corso…",
@@ -94,6 +97,52 @@
     "backToLogin": "Vai al login",
     "genericError": "Errore durante la reimpostazione della password"
   },
+  "verificarEmail": {
+    "verifying": "Verifica della tua email in corso…",
+    "doneTitle": "Email verificata",
+    "doneBody": "Grazie. La tua registrazione è ora in attesa di approvazione: IoT FENSTER esaminerà i dati della tua azienda e ti avviserà via email quando potrai accedere.",
+    "goToLogin": "Vai all'accesso",
+    "alreadyTitle": "Questa email era già verificata",
+    "alreadyBody": "Non devi fare altro. Se la tua registrazione è già approvata puoi accedere; altrimenti ti avviseremo via email.",
+    "expiredTitle": "Il link è scaduto",
+    "expiredBody": "I link di verifica valgono 24 ore. Richiedine uno nuovo con l'email con cui hai registrato la tua azienda.",
+    "invalidTitle": "Questo link non funziona",
+    "invalidBody": "Potresti averlo già usato oppure è incompleto. Se hai già verificato la tua email non devi fare altro; altrimenti richiedi un nuovo link.",
+    "genericError": "Non è stato possibile verificare l'email. Riprova tra qualche minuto o richiedi un nuovo link.",
+    "missingTokenTitle": "Al link manca una parte",
+    "missingTokenBody": "Apri il link completo che hai ricevuto via email oppure richiedine uno nuovo.",
+    "resendLabel": "Ti serve un nuovo link? Inserisci l'email con cui hai registrato la tua azienda",
+    "resendSubmit": "Invia nuovo link",
+    "resendSubmitting": "Invio in corso…",
+    "resendDone": "Se c'è una registrazione in attesa di verifica con questa email, ti abbiamo inviato un nuovo link. Controlla anche la cartella spam.",
+    "tooManyRequests": "Troppi tentativi di seguito. Attendi un minuto e riprova."
+  },
+  "nuevoUsuario": {
+    "add": "Aggiungi utente",
+    "title": "Nuovo utente",
+    "help": "Riceverà un'email per creare la sua password. Il link è valido 7 giorni.",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Ruolo",
+    "language": "Lingua del portale e delle email",
+    "submit": "Aggiungi e invia invito",
+    "submitting": "Aggiunta in corso…",
+    "cancel": "Annulla",
+    "invited": "Utente aggiunto. Abbiamo inviato a {email} un'email per creare la password.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Vede il catalogo ed effettua ordini.",
+      "PARTNER_CONSULTA": "Vede catalogo e ordini, ma non può ordinare.",
+      "PARTNER_ADMIN": "Effettua ordini e può aggiungere altri utenti dell'azienda."
+    }
+  },
+  "equipo": {
+    "title": "Utenti della tua azienda",
+    "subtitle": "Chi può accedere al portale per conto della tua azienda. Per cambiare il ruolo di qualcuno o rimuoverlo, scrivi a IoT FENSTER.",
+    "loading": "Caricamento utenti…",
+    "loadError": "Impossibile caricare gli utenti.",
+    "active": "Attivo",
+    "inactive": "Inattivo"
+  },
   "registro": {
     "title": "Registra la tua azienda",
     "razonSocial": "Ragione sociale",
@@ -109,7 +158,9 @@
     "submitting": "Invio in corso…",
     "submit": "Registra azienda",
     "doneTitle": "Registrazione ricevuta",
-    "doneBody": "Controlla l'email aziendale indicata per verificare l'account. Dopo la verifica, un amministratore di IoT FENSTER esaminerà e approverà la registrazione."
+    "doneBody": "Controlla l'email aziendale indicata per verificare l'account. Dopo la verifica, un amministratore di IoT FENSTER esaminerà e approverà la registrazione.",
+    "aceptoCondiciones": "Ho letto e accetto le <condiciones>condizioni d'uso</condiciones> e l'<privacidad>informativa sulla privacy</privacidad>.",
+    "infoPrivacidad": "IoT FENSTER tratterà questi dati per gestire la registrazione della tua azienda e i suoi ordini. Puoi esercitare i tuoi diritti come indicato nell'<privacidad>informativa sulla privacy</privacidad>."
   },
   "catalogo": {
     "title": "Catalogo autorizzato",
@@ -140,7 +191,7 @@
     "quantity": "Quantità",
     "total": "Totale",
     "removeLine": "Rimuovi riga",
-    "totalLabel": "Totale: {total} €",
+    "totalLabel": "Totale: {total}",
     "continueToCheckout": "Procedi al checkout"
   },
   "checkout": {
@@ -155,9 +206,10 @@
     "confirming": "Conferma in corso…",
     "confirm": "Conferma ordine",
     "disclaimer": "Alla conferma, l'ordine viene registrato con i prezzi congelati. Non viene effettuato alcun pagamento online: la gestione avviene a fronte dell'ordine di acquisto indicato.",
-    "totalLabel": "Totale: {total} €",
+    "totalLabel": "Totale: {total}",
     "confirmError": "Errore durante la conferma dell'ordine",
-    "pricesChanged": "I prezzi del tuo carrello sono cambiati. Abbiamo aggiornato il riepilogo: controlla il nuovo totale e conferma di nuovo."
+    "pricesChanged": "I prezzi del tuo carrello sono cambiati. Abbiamo aggiornato il riepilogo: controlla il nuovo totale e conferma di nuovo.",
+    "requiredFields": "Inserisci l'indirizzo di spedizione e il PO Number per confermare l'ordine."
   },
   "pedidos": {
     "title": "I miei ordini",
@@ -207,9 +259,10 @@
     "quantity": "Quantità",
     "netPrice": "Prezzo netto",
     "total": "Totale",
-    "totalLabel": "Totale: {total} €",
+    "totalLabel": "Totale: {total}",
     "back": "I miei ordini",
     "placedOn": "Effettuato il {fecha}",
+    "placedBy": "Effettuato da {nombre} ({email})",
     "downloadPdf": "Scarica PDF",
     "downloading": "Download in corso…",
     "downloadError": "Non è stato possibile scaricare il PDF. Riprova.",
@@ -221,13 +274,13 @@
     "goToCart": "Vai al carrello",
     "reorderUnavailable": "Non più disponibili e non aggiunti: {productos}.",
     "reorderPriceChanges": "Il prezzo è cambiato per:",
-    "reorderPriceLine": "{nombre}: prima {anterior} €, ora {actual} €",
+    "reorderPriceLine": "{nombre}: prima {anterior}, ora {actual}",
     "timelineLabel": "Avanzamento dell''ordine",
     "cancelledTitle": "Ordine annullato",
     "cancelledOn": "Annullato il {fecha}",
     "cancelReason": "Motivo: {motivo}",
-    "unitPrice": "{precio} € / pz.",
-    "pvpDiscount": "Prezzo di listino {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / pz.",
+    "pvpDiscount": "Prezzo di listino {pvp} · −{descuento} %",
     "pdfLanguageTitle": "Lingua del PDF"
   },
   "adminPartners": {
@@ -598,12 +651,66 @@
   "adminDashboard": {
     "title": "Pannello statistiche",
     "loading": "Caricamento statistiche…",
-    "totalOrders": "Ordini totali",
-    "totalBilled": "Fatturato totale",
+    "updating": "Aggiornamento…",
+    "periodSummary": "Dal {desde} al {hasta}, confrontato con il periodo precedente di pari durata",
+    "noData": "Nessun ordine in questo periodo.",
+    "filters": {
+      "period": "Periodo",
+      "from": "Da",
+      "to": "A",
+      "brand": "Marca",
+      "allBrands": "Tutte le marche",
+      "company": "Azienda",
+      "allCompanies": "Tutte le aziende",
+      "reset": "Rimuovi filtri"
+    },
+    "presets": {
+      "7d": "7 giorni",
+      "30d": "30 giorni",
+      "90d": "90 giorni",
+      "ytd": "Quest'anno",
+      "12m": "12 mesi"
+    },
+    "kpis": {
+      "billed": "Fatturato",
+      "orders": "Ordini",
+      "avgOrder": "Ordine medio",
+      "pending": "Non spediti",
+      "cancelled": "{n, plural, =0 {Nessun annullato} one {# annullato (non conta)} other {# annullati (non contano)}}",
+      "units": "Pezzi venduti"
+    },
+    "vsPrevious": {
+      "label": "vs periodo precedente",
+      "none": "Nessun dato del periodo precedente"
+    },
+    "evolution": {
+      "day": "Andamento giornaliero",
+      "week": "Andamento settimanale",
+      "month": "Andamento mensile"
+    },
+    "measure": {
+      "facturado": "Fatturato",
+      "pedidos": "Ordini",
+      "unidades": "Pezzi"
+    },
     "byStatus": "Ordini per stato",
-    "last30Days": "Ordini per giorno (ultimi 30 giorni)",
-    "topPartners": "Partner con più ordini",
-    "noData": "Dati non ancora sufficienti."
+    "byBrand": "Fatturato per marca",
+    "topCompanies": "Aziende con più fatturato",
+    "topProducts": "Prodotti più venduti",
+    "ordersN": "{n, plural, one {# ordine} other {# ordini}}",
+    "cols": {
+      "company": "Azienda",
+      "orders": "Ordini",
+      "billed": "Fatturato",
+      "product": "Prodotto",
+      "units": "Pz."
+    },
+    "export": {
+      "button": "Scarica Excel",
+      "downloading": "Preparazione…",
+      "hint": "Scarica in Excel le cifre con i filtri attuali, più l'elenco degli ordini del periodo"
+    },
+    "unitsN": "{n, plural, one {# pz.} other {# pz.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Corriere",
@@ -690,8 +797,7 @@
     "enEstaPantalla": "In questa schermata",
     "preguntasGenerales": "Domande generali",
     "masInfo": "Maggiori informazioni",
-    "contacto": "Non trovi quello che cerchi?",
-    "escribirSoporte": "Scrivi al supporto",
+    "contacto": "Non trovi quello che cerchi? Scrivici",
     "temas": {
       "inicio": "Home",
       "login": "Accesso",
@@ -706,7 +812,10 @@
       "adminMarcas": "Marchi",
       "adminProductos": "Prodotti",
       "adminPedidos": "Ordini",
-      "adminDashboard": "Statistiche"
+      "adminDashboard": "Statistiche",
+      "adminAlta": "Nuova azienda",
+      "adminCatalogoEmpresa": "Catalogo dell'azienda",
+      "adminUsuarios": "Utenti dell'azienda"
     },
     "puntual": {
       "estados": "Ricevuto, Confermato, In preparazione, Preparato e Spedito sono le fasi di un ordine, in questo ordine. Annullato significa che è stato cancellato.",
@@ -841,7 +950,7 @@
       },
       "cifrasCanceladas": {
         "p": "Cosa contano le cifre?",
-        "r": "Il totale fatturato e i grafici per azienda e per giorno non includono gli ordini annullati."
+        "r": "Solo gli ordini creati nel periodo scelto, per la marca e l'azienda filtrate. Gli ordini annullati non contano in fatturato, ordini, andamento e classifiche: compaiono solo in «Ordini per stato». La percentuale confronta con il periodo precedente di pari durata."
       },
       "cambiarIdioma": {
         "p": "Come cambio la lingua?",
@@ -850,7 +959,58 @@
       "miCuenta": {
         "p": "Con quale account ho effettuato l''accesso?",
         "r": "In alto a destra, sopra la barra, vedi «Accesso come» con l''email dell''account in uso."
+      },
+      "altaDirecta": {
+        "p": "In cosa si differenzia dalla registrazione?",
+        "r": "L'azienda è subito attiva con il suo primo utente: senza verifica dell'email né approvazione. Riceve il catalogo del suo marchio appena creata."
+      },
+      "contrasenaInicial": {
+        "p": "Come faccio avere la password all'utente?",
+        "r": "Scrivila o premi «Genera» per crearne una sicura. Il portale non la invia: comunicala tu all'utente tramite un canale sicuro."
+      },
+      "descuentoProducto": {
+        "p": "Posso applicare uno sconto diverso a un solo prodotto?",
+        "r": "Sì. Scrivi la percentuale nella casella dello sconto di quel prodotto e salva: userà quello al posto dello sconto generale. Lasciala vuota per tornare allo sconto generale."
+      },
+      "desactivarUsuario": {
+        "p": "Disattivare o forzare la disconnessione",
+        "r": "Disattivare impedisce all'utente di accedere finché non lo riattivi. Forzare la disconnessione chiude solo la sessione aperta: può accedere di nuovo."
+      },
+      "verAuditoria": {
+        "p": "Cosa mostra «Visualizza registro di audit»?",
+        "r": "Gli eventi registrati per quell'utente con la data, come i suoi accessi o gli ordini che ha confermato."
+      },
+      "anadirUsuario": {
+        "p": "Posso aggiungere un altro utente all'azienda?",
+        "r": "Non ancora dal portale: ogni azienda ha l'utente creato nella registrazione o al momento dell'inserimento. Qui puoi cambiarne il ruolo, disattivarlo o chiuderne la sessione."
+      }
+    },
+    "buscar": "Cerca nella guida",
+    "buscarPlaceholder": "Cerca una domanda…",
+    "resultados": "{n, plural, =0 {Nessun risultato} one {# risultato} other {# risultati}}",
+    "sinResultados": "Nessuna domanda contiene queste parole. Prova con parole più brevi o consulta gli argomenti.",
+    "otrosTemas": "Altri argomenti",
+    "volverPantalla": "Torna a questa schermata",
+    "volver": "Indietro",
+    "contactos": {
+      "comercial": {
+        "titulo": "Commerciale",
+        "texto": "informazioni, prezzi e offerte",
+        "mensaje": "Buongiorno, ho una richiesta commerciale."
+      },
+      "incidencias": {
+        "titulo": "Assistenza",
+        "texto": "problemi con un ordine o con il portale",
+        "mensaje": "Buongiorno, vorrei segnalare un problema."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Note legali",
+    "avisoLegal": "Note legali",
+    "privacidad": "Privacy",
+    "cookies": "Cookie",
+    "condiciones": "Condizioni d'uso",
+    "soloEspanol": "I testi legali sono disponibili in spagnolo, che è la versione che prevale."
   }
 }

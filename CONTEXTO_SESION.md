@@ -25,6 +25,17 @@ Todo lo que más abajo diga «cliente» como tipo de empresa se lee «distribuid
   de alta cuando se reactive, y quién factura al distribuidor.
 - Base local: 13 distribuidores (todos con marca MySmartWindow) y 3 partners.
 
+## CAMBIO 2026-10-05 — PVP reales y descuento general por empresa
+
+- PVP de tarifa reales (deducidos de la oferta VBH, que es PVP − 50 %): Connect-1/Wave-1/Icon1 90,
+  1+ 100, Connect-2 164, 2+ 174, Connect-2 Security/Wave2S 130, Pulsar+/Wave-4+ 108 (también con cable
+  1,6 m) y Wave3 Air 82 (= C-WALL). En `dispositivos.json`; quitado `datosDePrueba: precio`.
+- Siguen a 50 € de prueba: Wave2S+ (2) y tapas ICON (4).
+- VBH y Procomsa: 50 % de descuento general (se pone en su ficha, Editar → Descuento).
+- Para llevarlo a la base: `npm run import:dispositivos` y luego `npm run tarifa:marcas`
+  (sin `--aplicar` solo enseña los cambios). `rellenar` solo copia el PVP al añadir un producto.
+- EVO y mandos ya están en los catálogos de VBH y Procomsa (`ambito: 'todos'`).
+
 ## 0. ESTADO AL 2026-09-30 — leer primero
 
 **Resumen de una línea**: el portal distingue ya **partners** (VBH, Procomsa,
@@ -235,14 +246,22 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
   Código en `frontend/src/components/ayuda/`: `temas.ts` (qué preguntas salen en cada
   ruta), `ayuda-burbuja.tsx` y `ayuda-puntual.tsx`. Textos en `messages/*.json`, clave
   `ayuda` (`ayuda.q.<id>.p|r`, `ayuda.temas.<tema>`, `ayuda.puntual.*`).
+- **Buscador y "Otros temas"** (2026-10-05): el panel tiene un buscador (sin tildes ni
+  mayúsculas, busca en preguntas y respuestas) y abajo los demás temas para consultarlos
+  desde cualquier pantalla. Cada usuario solo ve los suyos: el personal de IoT FENSTER los
+  del panel (`TEMAS_PERSONAL`), los clientes los del portal (sin entrar/registro con
+  sesión). Con ayuda propia también: Nueva empresa, Catálogo de la empresa y Usuarios de
+  la empresa. La barra fija de guardar de la ficha deja sitio a la derecha para el botón.
 - **Iconos "?" puntuales** (pasas el ratón, los enfocas o los pulsas): estados en Mis
   pedidos, "Precio neto" en el carrito y en el detalle del pedido, y "Tipo de empresa"
   en la ficha de la empresa.
 - **Para añadir ayuda a una pantalla nueva**: añadir el tema y sus ids en `temas.ts`,
   la ruta en `temaDeRuta`, y los textos en los 5 idiomas.
-- **Contacto de soporte**: el enlace "Escribir a soporte" está preparado pero oculto
-  hasta definir `NEXT_PUBLIC_SOPORTE_EMAIL` (variable de entorno del frontend, se
-  aplica al compilar). David aún no tiene el correo o teléfono.
+- **Contacto** (2026-10-05, datos de David): al pie de la ayuda, solo para clientes y
+  visitantes. Comercial (información, precios y ofertas): info@iotfenster.com.
+  Incidencias: soporte@iotfenster.com. Cada uno con botón de WhatsApp y un mensaje ya
+  escrito. WhatsApp: +34 660 804 391, el mismo para los dos (constante `WHATSAPP` en
+  `frontend/src/components/ayuda/contacto.ts`; vacía, los botones no salen).
 - Dos respuestas suponen que los emails funcionan (recuperar contraseña y verificar
   correo); revisarlas al activar los emails del registro (ver pendientes).
 

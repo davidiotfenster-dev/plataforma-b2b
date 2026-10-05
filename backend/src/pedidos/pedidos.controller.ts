@@ -25,6 +25,7 @@ import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import { DescargarPdfQueryDto } from './dto/descargar-pdf-query.dto.js';
+import { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
 
 @Controller('pedidos')
 @UseGuards(JwtAuthGuard)
@@ -58,8 +59,21 @@ export class PedidosController {
   @Get('admin/estadisticas')
   @UseGuards(RolesGuard)
   @Roles(RolUsuario.ADMIN_FENSTER)
-  async estadisticas() {
-    return this.pedidosService.estadisticas();
+  async estadisticas(@Query() query: EstadisticasQueryDto) {
+    return this.pedidosService.estadisticas(query);
+  }
+
+  /// Las mismas estadísticas (con los filtros activos) en un Excel descargable.
+  @Get('admin/estadisticas/excel')
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.ADMIN_FENSTER)
+  async exportarEstadisticas(@Query() query: EstadisticasQueryDto, @Res({ passthrough: true }) res: Response) {
+    const { nombre, contenido } = await this.pedidosService.exportarEstadisticas(query);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="${nombre}"`,
+    });
+    return new StreamableFile(contenido);
   }
 
   /// Panel de fulfillment escalable: un partner por fila (paginado,
@@ -93,6 +107,29 @@ export class PedidosController {
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   async obtenerAdmin(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
     return this.pedidosService.obtenerAdmin(id, this.restriccion(usuario));
+  }
+
+  /// El PDF del resumen del pedido, el mismo que recibe el cliente.
+  @Get('admin/:id/pdf')
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async descargarPdfAdmin(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query() query: DescargarPdfQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { codigoPed, contenido } = await this.pedidosService.generarPdfAdmin(
+      id,
+      usuario.userId,
+      query.idioma,
+      this.restriccion(usuario),
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${codigoPed}.pdf"`,
+    });
+    return new StreamableFile(contenido);
   }
 
   @Get(':id')

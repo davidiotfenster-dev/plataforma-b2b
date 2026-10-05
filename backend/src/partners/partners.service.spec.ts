@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PartnersService } from './partners.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import type { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
+import type { EmailService } from '../common/email/email.service.js';
+import type { ConfigService } from '@nestjs/config';
 
 describe('PartnersService — resumen y filtros del panel', () => {
   let prisma: {
@@ -24,7 +26,7 @@ describe('PartnersService — resumen y filtros del panel', () => {
         findMany: vi.fn().mockResolvedValue([]),
       },
     };
-    service = new PartnersService(prisma as unknown as PrismaService, {} as unknown as CatalogoMarcaService);
+    service = new PartnersService(prisma as unknown as PrismaService, {} as unknown as CatalogoMarcaService, {} as EmailService, {} as ConfigService);
   });
 
   describe('resumen', () => {
@@ -135,7 +137,12 @@ describe('PartnersService — archivar y eliminar empresas', () => {
       $transaction: vi.fn().mockResolvedValue([]),
     };
     catalogoMarca = { sincronizarEmpresa: vi.fn().mockResolvedValue({}) };
-    service = new PartnersService(prisma as unknown as PrismaService, catalogoMarca as unknown as CatalogoMarcaService);
+    service = new PartnersService(
+      prisma as unknown as PrismaService,
+      catalogoMarca as unknown as CatalogoMarcaService,
+      {} as EmailService,
+      {} as ConfigService,
+    );
   });
 
   describe('archivar', () => {

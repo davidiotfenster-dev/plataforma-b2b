@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { api, ApiError } from "@/lib/api";
 import { locales, localeNames, type Locale } from "@/i18n/locales";
@@ -23,6 +24,7 @@ export default function RegistroPage() {
 
   const [form, setForm] = useState<Record<string, string>>({});
   const [idioma, setIdioma] = useState<Locale>(localeActual);
+  const [aceptaCondiciones, setAceptaCondiciones] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -32,7 +34,7 @@ export default function RegistroPage() {
     setError(null);
     setCargando(true);
     try {
-      await api.post("/auth/registro-partner", { ...form, idioma: idioma.toUpperCase() });
+      await api.post("/auth/registro-partner", { ...form, idioma: idioma.toUpperCase(), aceptaCondiciones });
       setOk(true);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : tCommon("unexpectedError"));
@@ -88,6 +90,27 @@ export default function RegistroPage() {
             ))}
           </select>
         </div>
+        <div className="flex items-start gap-2">
+          <input
+            id="registro-acepta"
+            type="checkbox"
+            required
+            checked={aceptaCondiciones}
+            onChange={(e) => setAceptaCondiciones(e.target.checked)}
+            className="mt-0.5 size-4 rounded border-neutral-300 accent-teal-600"
+          />
+          <label htmlFor="registro-acepta" className="text-sm text-neutral-700">
+            {t.rich("aceptoCondiciones", {
+              condiciones: (texto) => enlaceLegal("/legal/condiciones", texto),
+              privacidad: (texto) => enlaceLegal("/legal/privacidad", texto),
+            })}
+          </label>
+        </div>
+        <p className="text-xs text-neutral-500">
+          {t.rich("infoPrivacidad", {
+            privacidad: (texto) => enlaceLegal("/legal/privacidad", texto),
+          })}
+        </p>
         {error && (
           <p role="alert" className="text-sm text-red-600">
             {error}
@@ -102,5 +125,14 @@ export default function RegistroPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+/// Se abren en otra pestaña para no perder lo ya escrito en el formulario.
+function enlaceLegal(href: string, texto: ReactNode) {
+  return (
+    <Link href={href} target="_blank" rel="noopener" className="text-teal-700 underline hover:text-teal-800">
+      {texto}
+    </Link>
   );
 }

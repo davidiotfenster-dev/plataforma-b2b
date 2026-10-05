@@ -10,10 +10,12 @@ import { sugerenciaManual } from "@/lib/catalogo-admin";
 import { InsigniaMarca, MARCA_INFO } from "@/lib/marcas";
 import type { Partner, ProductoBaseAdmin, RepresentacionAdmin } from "@/lib/types";
 import { useMe } from "@/hooks/use-me";
+import { usePrecio } from "@/lib/formato";
 import { PartnerHeader } from "../../partner-header";
 
 function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: RepresentacionAdmin; partnerId: string; descuentoGeneral: string }) {
   const t = useTranslations("adminPartnerCatalogo");
+  const precio = usePrecio();
   const queryClient = useQueryClient();
   const [skuComercial, setSkuComercial] = useState(rep.skuComercial);
   const [nombreComercial, setNombreComercial] = useState(rep.nombreComercial);
@@ -75,7 +77,7 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
           <>
             <span className="truncate font-mono text-xs text-neutral-600">{rep.skuComercial}</span>
             <span className="truncate text-sm text-neutral-900">{rep.nombreComercial}</span>
-            <span className="text-sm text-neutral-700">{Number(rep.pvpBase).toFixed(2)} €</span>
+            <span className="text-sm text-neutral-700">{precio(rep.pvpBase)}</span>
           </>
         ) : (
           <>

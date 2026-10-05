@@ -6,6 +6,7 @@ import type { PrismaService } from '../prisma/prisma.service.js';
 import type { RedisService } from '../common/redis/redis.service.js';
 import type { PedidoPdfService } from '../common/pdf/pedido-pdf.service.js';
 import type { EmailService } from '../common/email/email.service.js';
+import type { ConfigService } from '@nestjs/config';
 
 const PARTNER_ID = 'partner-1';
 
@@ -59,6 +60,7 @@ describe('PedidosService — Mis pedidos del cliente', () => {
       {} as RedisService,
       pdfService as unknown as PedidoPdfService,
       {} as EmailService,
+      {} as ConfigService,
     );
   });
 
@@ -192,6 +194,35 @@ describe('PedidosService — Mis pedidos del cliente', () => {
       prisma.order.findUnique.mockResolvedValue({ ...pedido({ partnerId: 'otro' }), partner: { razonSocial: 'X' } });
 
       await expect(service.generarPdf(PARTNER_ID, 'user-1', 'o1', 'ES')).rejects.toBeInstanceOf(NotFoundException);
+      expect(pdfService.generar).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('generarPdfAdmin', () => {
+    it('IoT FENSTER descarga el PDF de un pedido de cualquier empresa, en su idioma', async () => {
+      prisma.order.findUnique.mockResolvedValue({
+        ...pedido({ partnerId: 'otro' }),
+        items: [],
+        partner: { razonSocial: 'Cliente S.L.', creadoPorUsuarioId: null },
+      });
+
+      const { codigoPed } = await service.generarPdfAdmin('o1', 'admin-1');
+
+      expect(codigoPed).toBe('PED-000001');
+      expect(prisma.user.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'admin-1' } }));
+      expect(pdfService.generar.mock.calls[0][0]).toMatchObject({ razonSocialPartner: 'Cliente S.L.', idioma: 'DE' });
+    });
+
+    it('un comercial no descarga pedidos de empresas que no dio de alta', async () => {
+      prisma.order.findUnique.mockResolvedValue({
+        ...pedido(),
+        items: [],
+        partner: { razonSocial: 'X', creadoPorUsuarioId: 'otro-comercial' },
+      });
+
+      await expect(service.generarPdfAdmin('o1', 'comercial-1', 'ES', 'comercial-1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
       expect(pdfService.generar).not.toHaveBeenCalled();
     });
   });

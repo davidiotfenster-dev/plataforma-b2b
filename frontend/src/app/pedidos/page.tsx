@@ -12,6 +12,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { EstadoBadge } from "@/components/estado-badge";
 import { Paginacion } from "@/components/paginacion";
 import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
+import { usePrecio } from "@/lib/formato";
 
 const POR_PAGINA = 10;
 const EN_CURSO: EstadoPedido[] = ["RECIBIDO", "CONFIRMADO", "EN_PREPARACION", "PREPARADO"];
@@ -52,6 +53,7 @@ function Envio({ pedido }: { pedido: PedidoResumen }) {
 
 export default function PedidosPage() {
   const t = useTranslations("pedidos");
+  const precio = usePrecio();
   const tEstados = useTranslations("estados");
   const tAyuda = useTranslations("ayuda");
   const locale = useLocale();
@@ -254,7 +256,7 @@ export default function PedidosPage() {
                       <p className="line-clamp-2">{resumirProductos(pedido)}</p>
                       <p className="text-xs text-neutral-400">{t("itemsCount", { n: pedido.articulos })}</p>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 font-medium text-neutral-900">{pedido.totalNeto} €</td>
+                    <td className="whitespace-nowrap px-4 py-3 font-medium text-neutral-900">{precio(pedido.totalNeto)}</td>
                     <td className="px-4 py-3">
                       <EstadoBadge estado={pedido.estado} />
                       <div>
@@ -282,7 +284,7 @@ export default function PedidosPage() {
                 <p className="mt-2 text-neutral-600">{resumirProductos(pedido)}</p>
                 <div className="mt-2 flex items-end justify-between gap-3">
                   <span className="text-xs text-neutral-400">{t("itemsCount", { n: pedido.articulos })}</span>
-                  <span className="font-semibold text-neutral-900">{pedido.totalNeto} €</span>
+                  <span className="font-semibold text-neutral-900">{precio(pedido.totalNeto)}</span>
                 </div>
                 <Envio pedido={pedido} />
               </li>

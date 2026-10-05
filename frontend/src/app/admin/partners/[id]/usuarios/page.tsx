@@ -8,6 +8,7 @@ import { api, ApiError } from "@/lib/api";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { MenuAcciones, type AccionMenu } from "@/components/menu-acciones";
 import { PartnerAvatar } from "@/components/partner-ui";
+import { NuevoUsuario } from "@/components/nuevo-usuario";
 import type { AuditLogEntry, Usuario } from "@/lib/types";
 import { PartnerHeader } from "../../partner-header";
 
@@ -183,6 +184,7 @@ export default function AdminPartnerUsuariosPage() {
   return (
     <div>
       <PartnerHeader partnerId={partnerId} activa="usuarios" />
+      <NuevoUsuario endpoint={`/partners/${partnerId}/usuarios`} invalidar={[["admin-partner-usuarios", partnerId], ["admin-partner", partnerId]]} />
       {isLoading ? (
         <p className="text-neutral-500">{t("loading")}</p>
       ) : usuarios && usuarios.length > 0 ? (

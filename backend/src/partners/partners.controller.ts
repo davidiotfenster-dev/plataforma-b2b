@@ -12,6 +12,7 @@ import { AsignarProductosDto } from './dto/asignar-productos.dto.js';
 import { ActualizarRepresentacionDto } from './dto/actualizar-representacion.dto.js';
 import { ListarPartnersQueryDto } from './dto/listar-partners-query.dto.js';
 import { EliminarPartnerDto } from './dto/eliminar-partner.dto.js';
+import { CrearUsuarioDto } from './dto/crear-usuario.dto.js';
 
 @Controller('partners')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -123,6 +124,13 @@ export class PartnersController {
   @Get(':id/usuarios')
   async usuarios(@Param('id', ParseUUIDPipe) id: string) {
     return this.usuariosService.listarPorPartner(id);
+  }
+
+  /// Alta de un usuario más en la empresa; recibe un correo para crear su contraseña.
+  @Post(':id/usuarios')
+  @HttpCode(HttpStatus.CREATED)
+  async crearUsuario(@Param('id', ParseUUIDPipe) id: string, @Body() dto: CrearUsuarioDto) {
+    return this.usuariosService.crear(id, dto);
   }
 
   @Get(':id/catalogo')

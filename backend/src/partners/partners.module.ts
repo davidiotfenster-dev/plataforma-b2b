@@ -5,10 +5,11 @@ import { PartnersController } from './partners.controller.js';
 import { PartnersService } from './partners.service.js';
 import { UsuariosController } from './usuarios.controller.js';
 import { UsuariosService } from './usuarios.service.js';
+import { MiEmpresaController } from './mi-empresa.controller.js';
 
 @Module({
   imports: [AuthModule, CatalogoMarcaModule],
-  controllers: [PartnersController, UsuariosController],
+  controllers: [PartnersController, UsuariosController, MiEmpresaController],
   providers: [PartnersService, UsuariosService],
 })
 export class PartnersModule {}

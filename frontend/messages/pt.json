@@ -32,6 +32,7 @@
     "catalogo": "Catálogo",
     "carrito": "Carrinho",
     "pedidos": "Encomendas",
+    "usuarios": "Utilizadores",
     "partners": "Empresas",
     "logout": "Sair",
     "login": "Iniciar sessão",
@@ -57,6 +58,8 @@
   },
   "login": {
     "title": "Iniciar sessão",
+    "sessionExpired": "A sua sessão expirou ou foi encerrada. Inicie sessão novamente para continuar.",
+    "loginToContinue": "Inicie sessão para ver esta página.",
     "email": "Email",
     "password": "Palavra-passe",
     "submitting": "A entrar…",
@@ -94,6 +97,52 @@
     "backToLogin": "Ir para o login",
     "genericError": "Erro ao repor a palavra-passe"
   },
+  "verificarEmail": {
+    "verifying": "A verificar o seu email…",
+    "doneTitle": "Email verificado",
+    "doneBody": "Obrigado. O seu registo fica agora pendente de aprovação: a IoT FENSTER vai rever os dados da sua empresa e avisá-lo por email quando puder entrar.",
+    "goToLogin": "Ir para o início de sessão",
+    "alreadyTitle": "Este email já estava verificado",
+    "alreadyBody": "Não precisa de fazer mais nada. Se o seu registo já foi aprovado, pode iniciar sessão; caso contrário, avisá-lo-emos por email.",
+    "expiredTitle": "A ligação expirou",
+    "expiredBody": "As ligações de verificação são válidas durante 24 horas. Peça uma nova com o email com que registou a sua empresa.",
+    "invalidTitle": "Esta ligação não funciona",
+    "invalidBody": "Pode já ter sido usada ou estar incompleta. Se já verificou o seu email, não precisa de fazer mais nada; caso contrário, peça uma nova ligação.",
+    "genericError": "Não foi possível verificar o email. Tente novamente dentro de alguns minutos ou peça uma nova ligação.",
+    "missingTokenTitle": "Falta uma parte da ligação",
+    "missingTokenBody": "Abra a ligação completa que recebeu por email ou peça uma nova.",
+    "resendLabel": "Precisa de uma nova ligação? Indique o email com que registou a sua empresa",
+    "resendSubmit": "Enviar nova ligação",
+    "resendSubmitting": "A enviar…",
+    "resendDone": "Se existir um registo pendente de verificação com esse email, enviámos-lhe uma nova ligação. Verifique também a pasta de spam.",
+    "tooManyRequests": "Demasiadas tentativas seguidas. Aguarde um minuto e tente novamente."
+  },
+  "nuevoUsuario": {
+    "add": "Adicionar utilizador",
+    "title": "Novo utilizador",
+    "help": "Receberá um email para criar a sua palavra-passe. O link é válido durante 7 dias.",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Função",
+    "language": "Idioma do portal e dos emails",
+    "submit": "Adicionar e enviar convite",
+    "submitting": "A adicionar…",
+    "cancel": "Cancelar",
+    "invited": "Utilizador adicionado. Enviámos a {email} um email para criar a palavra-passe.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Vê o catálogo e faz encomendas.",
+      "PARTNER_CONSULTA": "Vê o catálogo e as encomendas, mas não pode encomendar.",
+      "PARTNER_ADMIN": "Faz encomendas e pode adicionar outros utilizadores da empresa."
+    }
+  },
+  "equipo": {
+    "title": "Utilizadores da sua empresa",
+    "subtitle": "Quem pode entrar no portal em nome da sua empresa. Para alterar a função de alguém ou removê-lo, contacte a IoT FENSTER.",
+    "loading": "A carregar utilizadores…",
+    "loadError": "Não foi possível carregar os utilizadores.",
+    "active": "Ativo",
+    "inactive": "Inativo"
+  },
   "registro": {
     "title": "Registar a minha empresa",
     "razonSocial": "Denominação social",
@@ -109,7 +158,9 @@
     "submitting": "A enviar…",
     "submit": "Registar empresa",
     "doneTitle": "Registo recebido",
-    "doneBody": "Verifique o email corporativo indicado para confirmar a conta. Após a verificação, um administrador da IoT FENSTER irá rever e aprovar o registo."
+    "doneBody": "Verifique o email corporativo indicado para confirmar a conta. Após a verificação, um administrador da IoT FENSTER irá rever e aprovar o registo.",
+    "aceptoCondiciones": "Li e aceito as <condiciones>condições de utilização</condiciones> e a <privacidad>política de privacidade</privacidad>.",
+    "infoPrivacidad": "A IoT FENSTER tratará estes dados para gerir o registo da sua empresa e as suas encomendas. Pode exercer os seus direitos conforme indicado na <privacidad>política de privacidade</privacidad>."
   },
   "catalogo": {
     "title": "Catálogo autorizado",
@@ -140,7 +191,7 @@
     "quantity": "Quantidade",
     "total": "Total",
     "removeLine": "Remover linha",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "continueToCheckout": "Continuar para o checkout"
   },
   "checkout": {
@@ -155,9 +206,10 @@
     "confirming": "A confirmar…",
     "confirm": "Confirmar encomenda",
     "disclaimer": "Ao confirmar, a encomenda fica registada com os preços congelados. Não é efetuado pagamento online: a gestão é feita contra a ordem de compra indicada.",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "confirmError": "Erro ao confirmar a encomenda",
-    "pricesChanged": "Os preços do seu carrinho mudaram. Atualizámos o resumo: verifique o novo total e confirme novamente."
+    "pricesChanged": "Os preços do seu carrinho mudaram. Atualizámos o resumo: verifique o novo total e confirme novamente.",
+    "requiredFields": "Indique a morada de envio e o PO Number para confirmar a encomenda."
   },
   "pedidos": {
     "title": "As minhas encomendas",
@@ -207,9 +259,10 @@
     "quantity": "Quantidade",
     "netPrice": "Preço líquido",
     "total": "Total",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "back": "As minhas encomendas",
     "placedOn": "Realizada em {fecha}",
+    "placedBy": "Feita por {nombre} ({email})",
     "downloadPdf": "Descarregar PDF",
     "downloading": "A descarregar…",
     "downloadError": "Não foi possível descarregar o PDF. Tente novamente.",
@@ -221,13 +274,13 @@
     "goToCart": "Ir para o carrinho",
     "reorderUnavailable": "Já não estão disponíveis e não foram adicionados: {productos}.",
     "reorderPriceChanges": "O preço mudou em:",
-    "reorderPriceLine": "{nombre}: antes {anterior} €, agora {actual} €",
+    "reorderPriceLine": "{nombre}: antes {anterior}, agora {actual}",
     "timelineLabel": "Progresso da encomenda",
     "cancelledTitle": "Encomenda cancelada",
     "cancelledOn": "Cancelada em {fecha}",
     "cancelReason": "Motivo: {motivo}",
-    "unitPrice": "{precio} € / un.",
-    "pvpDiscount": "PVP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / un.",
+    "pvpDiscount": "PVP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "Idioma do PDF"
   },
   "adminPartners": {
@@ -598,12 +651,66 @@
   "adminDashboard": {
     "title": "Painel de estatísticas",
     "loading": "A carregar estatísticas…",
-    "totalOrders": "Total de encomendas",
-    "totalBilled": "Faturação total",
+    "updating": "A atualizar…",
+    "periodSummary": "De {desde} a {hasta}, comparado com o período anterior da mesma duração",
+    "noData": "Não há encomendas neste período.",
+    "filters": {
+      "period": "Período",
+      "from": "De",
+      "to": "Até",
+      "brand": "Marca",
+      "allBrands": "Todas as marcas",
+      "company": "Empresa",
+      "allCompanies": "Todas as empresas",
+      "reset": "Limpar filtros"
+    },
+    "presets": {
+      "7d": "7 dias",
+      "30d": "30 dias",
+      "90d": "90 dias",
+      "ytd": "Este ano",
+      "12m": "12 meses"
+    },
+    "kpis": {
+      "billed": "Faturação",
+      "orders": "Encomendas",
+      "avgOrder": "Encomenda média",
+      "pending": "Por enviar",
+      "cancelled": "{n, plural, =0 {Nenhuma cancelada} one {# cancelada (não conta)} other {# canceladas (não contam)}}",
+      "units": "Unidades vendidas"
+    },
+    "vsPrevious": {
+      "label": "vs período anterior",
+      "none": "Sem dados do período anterior"
+    },
+    "evolution": {
+      "day": "Evolução diária",
+      "week": "Evolução semanal",
+      "month": "Evolução mensal"
+    },
+    "measure": {
+      "facturado": "Faturação",
+      "pedidos": "Encomendas",
+      "unidades": "Unidades"
+    },
     "byStatus": "Encomendas por estado",
-    "last30Days": "Encomendas por dia (últimos 30 dias)",
-    "topPartners": "Parceiros com mais encomendas",
-    "noData": "Ainda não há dados suficientes."
+    "byBrand": "Faturação por marca",
+    "topCompanies": "Empresas com mais faturação",
+    "topProducts": "Produtos mais vendidos",
+    "ordersN": "{n, plural, one {# encomenda} other {# encomendas}}",
+    "cols": {
+      "company": "Empresa",
+      "orders": "Encomendas",
+      "billed": "Faturado",
+      "product": "Produto",
+      "units": "Un."
+    },
+    "export": {
+      "button": "Descarregar Excel",
+      "downloading": "A preparar…",
+      "hint": "Descarrega em Excel os valores com os filtros atuais, mais a lista de encomendas do período"
+    },
+    "unitsN": "{n, plural, one {# un.} other {# un.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Transportadora",
@@ -690,8 +797,7 @@
     "enEstaPantalla": "Neste ecrã",
     "preguntasGenerales": "Perguntas gerais",
     "masInfo": "Mais informações",
-    "contacto": "Não encontra o que procura?",
-    "escribirSoporte": "Escrever ao suporte",
+    "contacto": "Não encontra o que procura? Escreva-nos",
     "temas": {
       "inicio": "Início",
       "login": "Iniciar sessão",
@@ -706,7 +812,10 @@
       "adminMarcas": "Marcas",
       "adminProductos": "Produtos",
       "adminPedidos": "Encomendas",
-      "adminDashboard": "Estatísticas"
+      "adminDashboard": "Estatísticas",
+      "adminAlta": "Nova empresa",
+      "adminCatalogoEmpresa": "Catálogo da empresa",
+      "adminUsuarios": "Utilizadores da empresa"
     },
     "puntual": {
       "estados": "Recebida, Confirmada, Em preparação, Preparada e Enviada são os passos de uma encomenda, por essa ordem. Cancelada significa que foi anulada.",
@@ -841,7 +950,7 @@
       },
       "cifrasCanceladas": {
         "p": "O que contam os valores?",
-        "r": "O total faturado e os gráficos por empresa e por dia não incluem as encomendas canceladas."
+        "r": "Apenas as encomendas criadas no período escolhido, para a marca e a empresa filtradas. As canceladas não contam na faturação, encomendas, evolução nem rankings: só aparecem em «Encomendas por estado». A percentagem compara com o período anterior da mesma duração."
       },
       "cambiarIdioma": {
         "p": "Como mudo o idioma?",
@@ -850,7 +959,58 @@
       "miCuenta": {
         "p": "Com que conta entrei?",
         "r": "No canto superior direito, por cima da barra, vê «Sessão iniciada como» com o email da conta em uso."
+      },
+      "altaDirecta": {
+        "p": "Em que é diferente do registo?",
+        "r": "A empresa fica ativa de imediato com o seu primeiro utilizador: sem verificação de email nem aprovação. Recebe o catálogo da sua marca assim que é criada."
+      },
+      "contrasenaInicial": {
+        "p": "Como faço chegar a palavra-passe ao utilizador?",
+        "r": "Escreva-a ou carregue em «Gerar» para criar uma segura. O portal não a envia: transmita-a ao utilizador por um canal seguro."
+      },
+      "descuentoProducto": {
+        "p": "Posso dar outro desconto a um só produto?",
+        "r": "Sim. Escreva a percentagem na caixa de desconto desse produto e guarde: usará esse em vez do geral. Deixe-a vazia para voltar ao desconto geral."
+      },
+      "desactivarUsuario": {
+        "p": "Desativar ou forçar o fim de sessão",
+        "r": "Desativar impede o utilizador de entrar até o ativar de novo. Forçar o fim de sessão só fecha a sessão que tem aberta: pode voltar a entrar."
+      },
+      "verAuditoria": {
+        "p": "O que mostra «Ver registo de auditoria»?",
+        "r": "Os eventos registados desse utilizador com a data, como os seus inícios de sessão ou as encomendas que confirmou."
+      },
+      "anadirUsuario": {
+        "p": "Posso adicionar outro utilizador à empresa?",
+        "r": "Ainda não a partir do portal: cada empresa tem o utilizador criado no registo ou na criação. Aqui pode alterar o seu perfil, desativá-lo ou fechar a sessão."
+      }
+    },
+    "buscar": "Pesquisar na ajuda",
+    "buscarPlaceholder": "Pesquise uma pergunta…",
+    "resultados": "{n, plural, =0 {Nenhum resultado} one {# resultado} other {# resultados}}",
+    "sinResultados": "Nenhuma pergunta contém essas palavras. Tente palavras mais curtas ou consulte os temas.",
+    "otrosTemas": "Outros temas",
+    "volverPantalla": "Voltar a este ecrã",
+    "volver": "Voltar",
+    "contactos": {
+      "comercial": {
+        "titulo": "Comercial",
+        "texto": "informações, preços e ofertas",
+        "mensaje": "Olá, tenho uma questão comercial."
+      },
+      "incidencias": {
+        "titulo": "Incidências",
+        "texto": "problemas com uma encomenda ou com o portal",
+        "mensaje": "Olá, quero comunicar uma incidência."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Informação legal",
+    "avisoLegal": "Aviso legal",
+    "privacidad": "Privacidade",
+    "cookies": "Cookies",
+    "condiciones": "Condições de utilização",
+    "soloEspanol": "Os textos legais estão disponíveis em espanhol, que é a versão que prevalece."
   }
 }

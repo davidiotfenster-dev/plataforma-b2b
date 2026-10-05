@@ -32,6 +32,7 @@
     "catalogo": "Catalog",
     "carrito": "Cart",
     "pedidos": "Orders",
+    "usuarios": "Users",
     "partners": "Companies",
     "logout": "Log out",
     "login": "Log in",
@@ -57,6 +58,8 @@
   },
   "login": {
     "title": "Log in",
+    "sessionExpired": "Your session has expired or was closed. Log in again to continue.",
+    "loginToContinue": "Log in to see this page.",
     "email": "Email",
     "password": "Password",
     "submitting": "Logging in…",
@@ -94,6 +97,52 @@
     "backToLogin": "Go to log in",
     "genericError": "Error resetting the password"
   },
+  "verificarEmail": {
+    "verifying": "Verifying your email…",
+    "doneTitle": "Email verified",
+    "doneBody": "Thank you. Your registration is now awaiting approval: IoT FENSTER will review your company details and let you know by email when you can sign in.",
+    "goToLogin": "Go to sign in",
+    "alreadyTitle": "This email was already verified",
+    "alreadyBody": "There is nothing else to do. If your registration has been approved you can sign in; otherwise we will let you know by email.",
+    "expiredTitle": "The link has expired",
+    "expiredBody": "Verification links are valid for 24 hours. Request a new one with the email you used to register your company.",
+    "invalidTitle": "This link does not work",
+    "invalidBody": "You may have used it already, or it may be incomplete. If you have already verified your email there is nothing else to do; otherwise request a new link.",
+    "genericError": "We could not verify your email. Try again in a few minutes or request a new link.",
+    "missingTokenTitle": "Part of the link is missing",
+    "missingTokenBody": "Open the full link you received by email, or request a new one.",
+    "resendLabel": "Need a new link? Enter the email you used to register your company",
+    "resendSubmit": "Send new link",
+    "resendSubmitting": "Sending…",
+    "resendDone": "If there is a registration awaiting verification with that email, we have sent you a new link. Please also check your spam folder.",
+    "tooManyRequests": "Too many attempts in a row. Wait a minute and try again."
+  },
+  "nuevoUsuario": {
+    "add": "Add user",
+    "title": "New user",
+    "help": "They will receive an email to create their password. The link is valid for 7 days.",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "language": "Language for the portal and emails",
+    "submit": "Add and send invitation",
+    "submitting": "Adding…",
+    "cancel": "Cancel",
+    "invited": "User added. We have sent {email} an email to create their password.",
+    "roleHelp": {
+      "PARTNER_COMPRADOR": "Sees the catalogue and places orders.",
+      "PARTNER_CONSULTA": "Sees the catalogue and orders, but cannot order.",
+      "PARTNER_ADMIN": "Places orders and can also add other users of the company."
+    }
+  },
+  "equipo": {
+    "title": "Your company's users",
+    "subtitle": "Who can log in to the portal on behalf of your company. To change someone's role or remove them, contact IoT FENSTER.",
+    "loading": "Loading users…",
+    "loadError": "The users could not be loaded.",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
   "registro": {
     "title": "Register your company",
     "razonSocial": "Company name",
@@ -109,7 +158,9 @@
     "submitting": "Submitting…",
     "submit": "Register company",
     "doneTitle": "Registration received",
-    "doneBody": "Check the corporate email address you provided to verify the account. Once verified, an IoT FENSTER administrator will review and approve the registration."
+    "doneBody": "Check the corporate email address you provided to verify the account. Once verified, an IoT FENSTER administrator will review and approve the registration.",
+    "aceptoCondiciones": "I have read and accept the <condiciones>terms of use</condiciones> and the <privacidad>privacy policy</privacidad>.",
+    "infoPrivacidad": "IoT FENSTER will process this data to manage your company's registration and its orders. You can exercise your rights as described in the <privacidad>privacy policy</privacidad>."
   },
   "catalogo": {
     "title": "Authorized catalog",
@@ -140,7 +191,7 @@
     "quantity": "Quantity",
     "total": "Total",
     "removeLine": "Remove line",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "continueToCheckout": "Continue to checkout"
   },
   "checkout": {
@@ -155,9 +206,10 @@
     "confirming": "Confirming…",
     "confirm": "Confirm order",
     "disclaimer": "On confirmation, the order is registered with prices frozen. No online payment is taken: it is settled against the purchase order provided.",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "confirmError": "Error confirming the order",
-    "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again."
+    "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again.",
+    "requiredFields": "Enter the shipping address and the PO Number to confirm the order."
   },
   "pedidos": {
     "title": "My orders",
@@ -207,9 +259,10 @@
     "quantity": "Quantity",
     "netPrice": "Net price",
     "total": "Total",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "back": "My orders",
     "placedOn": "Placed on {fecha}",
+    "placedBy": "Placed by {nombre} ({email})",
     "downloadPdf": "Download PDF",
     "downloading": "Downloading…",
     "downloadError": "The PDF could not be downloaded. Please try again.",
@@ -221,13 +274,13 @@
     "goToCart": "Go to cart",
     "reorderUnavailable": "No longer available and not added: {productos}.",
     "reorderPriceChanges": "The price has changed for:",
-    "reorderPriceLine": "{nombre}: was {anterior} €, now {actual} €",
+    "reorderPriceLine": "{nombre}: was {anterior}, now {actual}",
     "timelineLabel": "Order progress",
     "cancelledTitle": "Order cancelled",
     "cancelledOn": "Cancelled on {fecha}",
     "cancelReason": "Reason: {motivo}",
-    "unitPrice": "{precio} € / unit",
-    "pvpDiscount": "RRP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / unit",
+    "pvpDiscount": "RRP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "PDF language"
   },
   "adminPartners": {
@@ -598,12 +651,66 @@
   "adminDashboard": {
     "title": "Statistics dashboard",
     "loading": "Loading statistics…",
-    "totalOrders": "Total orders",
-    "totalBilled": "Total billed",
+    "updating": "Updating…",
+    "periodSummary": "{desde} to {hasta}, compared with the previous period of the same length",
+    "noData": "No orders in this period.",
+    "filters": {
+      "period": "Period",
+      "from": "From",
+      "to": "To",
+      "brand": "Brand",
+      "allBrands": "All brands",
+      "company": "Company",
+      "allCompanies": "All companies",
+      "reset": "Clear filters"
+    },
+    "presets": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "ytd": "This year",
+      "12m": "12 months"
+    },
+    "kpis": {
+      "billed": "Revenue",
+      "orders": "Orders",
+      "avgOrder": "Average order",
+      "pending": "Not shipped",
+      "cancelled": "{n, plural, =0 {No cancellations} one {# cancelled (not counted)} other {# cancelled (not counted)}}",
+      "units": "Units sold"
+    },
+    "vsPrevious": {
+      "label": "vs previous period",
+      "none": "No data for the previous period"
+    },
+    "evolution": {
+      "day": "Daily trend",
+      "week": "Weekly trend",
+      "month": "Monthly trend"
+    },
+    "measure": {
+      "facturado": "Revenue",
+      "pedidos": "Orders",
+      "unidades": "Units"
+    },
     "byStatus": "Orders by status",
-    "last30Days": "Orders per day (last 30 days)",
-    "topPartners": "Top partners by orders",
-    "noData": "Not enough data yet."
+    "byBrand": "Revenue by brand",
+    "topCompanies": "Top companies by revenue",
+    "topProducts": "Best-selling products",
+    "ordersN": "{n, plural, one {# order} other {# orders}}",
+    "cols": {
+      "company": "Company",
+      "orders": "Orders",
+      "billed": "Revenue",
+      "product": "Product",
+      "units": "Units"
+    },
+    "export": {
+      "button": "Download Excel",
+      "downloading": "Preparing…",
+      "hint": "Downloads the figures with the current filters as Excel, plus the list of orders in the period"
+    },
+    "unitsN": "{n, plural, one {# unit} other {# units}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Carrier",
@@ -690,8 +797,7 @@
     "enEstaPantalla": "On this screen",
     "preguntasGenerales": "General questions",
     "masInfo": "More information",
-    "contacto": "Cannot find what you are looking for?",
-    "escribirSoporte": "Write to support",
+    "contacto": "Can't find what you need? Get in touch",
     "temas": {
       "inicio": "Home",
       "login": "Sign in",
@@ -706,7 +812,10 @@
       "adminMarcas": "Brands",
       "adminProductos": "Products",
       "adminPedidos": "Orders",
-      "adminDashboard": "Statistics"
+      "adminDashboard": "Statistics",
+      "adminAlta": "New company",
+      "adminCatalogoEmpresa": "Company catalogue",
+      "adminUsuarios": "Company users"
     },
     "puntual": {
       "estados": "Received, Confirmed, In preparation, Prepared and Shipped are the steps of an order, in that order. Cancelled means it has been called off.",
@@ -841,7 +950,7 @@
       },
       "cifrasCanceladas": {
         "p": "What do the figures count?",
-        "r": "The invoiced total and the charts by company and by day do not include cancelled orders."
+        "r": "Only orders created in the chosen period, for the filtered brand and company. Cancelled orders are left out of revenue, orders, trend and rankings: they only appear under “Orders by status”. The percentage compares with the previous period of the same length."
       },
       "cambiarIdioma": {
         "p": "How do I change the language?",
@@ -850,7 +959,58 @@
       "miCuenta": {
         "p": "Which account am I signed in with?",
         "r": "At the top right, above the bar, you see “Signed in as” with the email of the account in use."
+      },
+      "altaDirecta": {
+        "p": "How is this different from sign-up?",
+        "r": "The company is active straight away with its first user: no email verification and no approval. It gets its brand's catalogue as soon as it is created."
+      },
+      "contrasenaInicial": {
+        "p": "How do I give them the password?",
+        "r": "Type one or press “Generate” to create a strong one. The portal does not send it: pass it on to the user yourself through a secure channel."
+      },
+      "descuentoProducto": {
+        "p": "Can I set a different discount on a single product?",
+        "r": "Yes. Type the percentage in that product's discount box and save: it will use that one instead of the general discount. Leave it empty to go back to the general discount."
+      },
+      "desactivarUsuario": {
+        "p": "Deactivate or force logout",
+        "r": "Deactivating stops the user from signing in until you activate them again. Forcing logout only ends their current session: they can sign in again."
+      },
+      "verAuditoria": {
+        "p": "What does “View audit log” show?",
+        "r": "The events recorded for that user with their date, such as their sign-ins or the orders they confirmed."
+      },
+      "anadirUsuario": {
+        "p": "Can I add another user to the company?",
+        "r": "Not from the portal yet: each company has the user created at sign-up or when it was added. Here you can change their role, deactivate them or end their session."
+      }
+    },
+    "buscar": "Search help",
+    "buscarPlaceholder": "Search for a question…",
+    "resultados": "{n, plural, =0 {No results} one {# result} other {# results}}",
+    "sinResultados": "No question matches those words. Try shorter ones or browse the topics.",
+    "otrosTemas": "Other topics",
+    "volverPantalla": "Back to this screen",
+    "volver": "Back",
+    "contactos": {
+      "comercial": {
+        "titulo": "Sales",
+        "texto": "information, prices and offers",
+        "mensaje": "Hello, I have a sales enquiry."
+      },
+      "incidencias": {
+        "titulo": "Support",
+        "texto": "problems with an order or with the portal",
+        "mensaje": "Hello, I would like to report an issue."
       }
     }
+  },
+  "legal": {
+    "navLabel": "Legal",
+    "avisoLegal": "Legal notice",
+    "privacidad": "Privacy",
+    "cookies": "Cookies",
+    "condiciones": "Terms of use",
+    "soloEspanol": "The legal texts are available in Spanish, which is the version that prevails."
   }
 }

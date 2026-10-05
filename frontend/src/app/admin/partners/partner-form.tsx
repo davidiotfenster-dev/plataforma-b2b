@@ -347,7 +347,8 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         />
       </Seccion>
 
-      <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
+      {/* A la derecha se reserva sitio para el botón de ayuda flotante, que si no tapa los botones. */}
+      <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white/95 py-3 pl-4 pr-16 shadow-sm backdrop-blur xl:pr-4">
         <div className="min-h-5 text-sm" aria-live="polite">
           {error && <span role="alert" className="text-red-600">{error}</span>}
           {!error && guardado && (

@@ -30,7 +30,9 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
     mutationFn: () =>
       api.patch(`/pedidos/${order.id}/estado`, {
         estado: siguiente,
-        ...(siguiente === "ENVIADO" ? { transportista, numeroExpedicion, trackingUrl } : {}),
+        ...(siguiente === "ENVIADO"
+          ? { transportista: transportista.trim(), numeroExpedicion: numeroExpedicion.trim(), trackingUrl: trackingUrl.trim() }
+          : {}),
       }),
     onSuccess: () => {
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
@@ -70,7 +72,7 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
             setError(null);
             avanzar.mutate();
           }}
-          disabled={avanzar.isPending || !transportista || !numeroExpedicion || !trackingUrl}
+          disabled={avanzar.isPending || !transportista.trim() || !numeroExpedicion.trim() || !trackingUrl.trim()}
           className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
         >
           {t("markAsShipped")}
