@@ -598,12 +598,58 @@
   "adminDashboard": {
     "title": "Pannello statistiche",
     "loading": "Caricamento statistiche…",
-    "totalOrders": "Ordini totali",
-    "totalBilled": "Fatturato totale",
+    "updating": "Aggiornamento…",
+    "periodSummary": "Dal {desde} al {hasta}, confrontato con il periodo precedente di pari durata",
+    "noData": "Nessun ordine in questo periodo.",
+    "filters": {
+      "period": "Periodo",
+      "from": "Da",
+      "to": "A",
+      "brand": "Marca",
+      "allBrands": "Tutte le marche",
+      "company": "Azienda",
+      "allCompanies": "Tutte le aziende",
+      "reset": "Rimuovi filtri"
+    },
+    "presets": {
+      "7d": "7 giorni",
+      "30d": "30 giorni",
+      "90d": "90 giorni",
+      "ytd": "Quest'anno",
+      "12m": "12 mesi"
+    },
+    "kpis": {
+      "billed": "Fatturato",
+      "orders": "Ordini",
+      "avgOrder": "Ordine medio",
+      "pending": "Non spediti",
+      "cancelled": "{n, plural, =0 {Nessun annullato} one {# annullato (non conta)} other {# annullati (non contano)}}"
+    },
+    "vsPrevious": {
+      "label": "vs periodo precedente",
+      "none": "Nessun dato del periodo precedente"
+    },
+    "evolution": {
+      "day": "Andamento giornaliero",
+      "week": "Andamento settimanale",
+      "month": "Andamento mensile"
+    },
+    "measure": {
+      "facturado": "Fatturato",
+      "pedidos": "Ordini"
+    },
     "byStatus": "Ordini per stato",
-    "last30Days": "Ordini per giorno (ultimi 30 giorni)",
-    "topPartners": "Partner con più ordini",
-    "noData": "Dati non ancora sufficienti."
+    "byBrand": "Fatturato per marca",
+    "topCompanies": "Aziende con più fatturato",
+    "topProducts": "Prodotti più venduti",
+    "ordersN": "{n, plural, one {# ordine} other {# ordini}}",
+    "cols": {
+      "company": "Azienda",
+      "orders": "Ordini",
+      "billed": "Fatturato",
+      "product": "Prodotto",
+      "units": "Pz."
+    }
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Corriere",
@@ -841,7 +887,7 @@
       },
       "cifrasCanceladas": {
         "p": "Cosa contano le cifre?",
-        "r": "Il totale fatturato e i grafici per azienda e per giorno non includono gli ordini annullati."
+        "r": "Solo gli ordini creati nel periodo scelto, per la marca e l'azienda filtrate. Gli ordini annullati non contano in fatturato, ordini, andamento e classifiche: compaiono solo in «Ordini per stato». La percentuale confronta con il periodo precedente di pari durata."
       },
       "cambiarIdioma": {
         "p": "Come cambio la lingua?",

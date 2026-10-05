@@ -598,12 +598,58 @@
   "adminDashboard": {
     "title": "Painel de estatísticas",
     "loading": "A carregar estatísticas…",
-    "totalOrders": "Total de encomendas",
-    "totalBilled": "Faturação total",
+    "updating": "A atualizar…",
+    "periodSummary": "De {desde} a {hasta}, comparado com o período anterior da mesma duração",
+    "noData": "Não há encomendas neste período.",
+    "filters": {
+      "period": "Período",
+      "from": "De",
+      "to": "Até",
+      "brand": "Marca",
+      "allBrands": "Todas as marcas",
+      "company": "Empresa",
+      "allCompanies": "Todas as empresas",
+      "reset": "Limpar filtros"
+    },
+    "presets": {
+      "7d": "7 dias",
+      "30d": "30 dias",
+      "90d": "90 dias",
+      "ytd": "Este ano",
+      "12m": "12 meses"
+    },
+    "kpis": {
+      "billed": "Faturação",
+      "orders": "Encomendas",
+      "avgOrder": "Encomenda média",
+      "pending": "Por enviar",
+      "cancelled": "{n, plural, =0 {Nenhuma cancelada} one {# cancelada (não conta)} other {# canceladas (não contam)}}"
+    },
+    "vsPrevious": {
+      "label": "vs período anterior",
+      "none": "Sem dados do período anterior"
+    },
+    "evolution": {
+      "day": "Evolução diária",
+      "week": "Evolução semanal",
+      "month": "Evolução mensal"
+    },
+    "measure": {
+      "facturado": "Faturação",
+      "pedidos": "Encomendas"
+    },
     "byStatus": "Encomendas por estado",
-    "last30Days": "Encomendas por dia (últimos 30 dias)",
-    "topPartners": "Parceiros com mais encomendas",
-    "noData": "Ainda não há dados suficientes."
+    "byBrand": "Faturação por marca",
+    "topCompanies": "Empresas com mais faturação",
+    "topProducts": "Produtos mais vendidos",
+    "ordersN": "{n, plural, one {# encomenda} other {# encomendas}}",
+    "cols": {
+      "company": "Empresa",
+      "orders": "Encomendas",
+      "billed": "Faturado",
+      "product": "Produto",
+      "units": "Un."
+    }
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Transportadora",
@@ -841,7 +887,7 @@
       },
       "cifrasCanceladas": {
         "p": "O que contam os valores?",
-        "r": "O total faturado e os gráficos por empresa e por dia não incluem as encomendas canceladas."
+        "r": "Apenas as encomendas criadas no período escolhido, para a marca e a empresa filtradas. As canceladas não contam na faturação, encomendas, evolução nem rankings: só aparecem em «Encomendas por estado». A percentagem compara com o período anterior da mesma duração."
       },
       "cambiarIdioma": {
         "p": "Como mudo o idioma?",

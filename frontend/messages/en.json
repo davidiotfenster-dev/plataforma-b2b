@@ -598,12 +598,58 @@
   "adminDashboard": {
     "title": "Statistics dashboard",
     "loading": "Loading statistics…",
-    "totalOrders": "Total orders",
-    "totalBilled": "Total billed",
+    "updating": "Updating…",
+    "periodSummary": "{desde} to {hasta}, compared with the previous period of the same length",
+    "noData": "No orders in this period.",
+    "filters": {
+      "period": "Period",
+      "from": "From",
+      "to": "To",
+      "brand": "Brand",
+      "allBrands": "All brands",
+      "company": "Company",
+      "allCompanies": "All companies",
+      "reset": "Clear filters"
+    },
+    "presets": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "ytd": "This year",
+      "12m": "12 months"
+    },
+    "kpis": {
+      "billed": "Revenue",
+      "orders": "Orders",
+      "avgOrder": "Average order",
+      "pending": "Not shipped",
+      "cancelled": "{n, plural, =0 {No cancellations} one {# cancelled (not counted)} other {# cancelled (not counted)}}"
+    },
+    "vsPrevious": {
+      "label": "vs previous period",
+      "none": "No data for the previous period"
+    },
+    "evolution": {
+      "day": "Daily trend",
+      "week": "Weekly trend",
+      "month": "Monthly trend"
+    },
+    "measure": {
+      "facturado": "Revenue",
+      "pedidos": "Orders"
+    },
     "byStatus": "Orders by status",
-    "last30Days": "Orders per day (last 30 days)",
-    "topPartners": "Top partners by orders",
-    "noData": "Not enough data yet."
+    "byBrand": "Revenue by brand",
+    "topCompanies": "Top companies by revenue",
+    "topProducts": "Best-selling products",
+    "ordersN": "{n, plural, one {# order} other {# orders}}",
+    "cols": {
+      "company": "Company",
+      "orders": "Orders",
+      "billed": "Revenue",
+      "product": "Product",
+      "units": "Units"
+    }
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Carrier",
@@ -841,7 +887,7 @@
       },
       "cifrasCanceladas": {
         "p": "What do the figures count?",
-        "r": "The invoiced total and the charts by company and by day do not include cancelled orders."
+        "r": "Only orders created in the chosen period, for the filtered brand and company. Cancelled orders are left out of revenue, orders, trend and rankings: they only appear under “Orders by status”. The percentage compares with the previous period of the same length."
       },
       "cambiarIdioma": {
         "p": "How do I change the language?",

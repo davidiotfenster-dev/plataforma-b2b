@@ -598,12 +598,58 @@
   "adminDashboard": {
     "title": "Panel de estadísticas",
     "loading": "Cargando estadísticas…",
-    "totalOrders": "Pedidos totales",
-    "totalBilled": "Facturación total",
+    "updating": "Actualizando…",
+    "periodSummary": "Del {desde} al {hasta}, comparado con el periodo anterior de la misma duración",
+    "noData": "No hay pedidos en este periodo.",
+    "filters": {
+      "period": "Periodo",
+      "from": "Desde",
+      "to": "Hasta",
+      "brand": "Marca",
+      "allBrands": "Todas las marcas",
+      "company": "Empresa",
+      "allCompanies": "Todas las empresas",
+      "reset": "Quitar filtros"
+    },
+    "presets": {
+      "7d": "7 días",
+      "30d": "30 días",
+      "90d": "90 días",
+      "ytd": "Este año",
+      "12m": "12 meses"
+    },
+    "kpis": {
+      "billed": "Facturación",
+      "orders": "Pedidos",
+      "avgOrder": "Pedido medio",
+      "pending": "Sin enviar",
+      "cancelled": "{n, plural, =0 {Ningún cancelado} one {# cancelado (no cuenta)} other {# cancelados (no cuentan)}}"
+    },
+    "vsPrevious": {
+      "label": "vs periodo anterior",
+      "none": "Sin datos del periodo anterior"
+    },
+    "evolution": {
+      "day": "Evolución por día",
+      "week": "Evolución por semana",
+      "month": "Evolución por mes"
+    },
+    "measure": {
+      "facturado": "Facturación",
+      "pedidos": "Pedidos"
+    },
     "byStatus": "Pedidos por estado",
-    "last30Days": "Pedidos por día (últimos 30 días)",
-    "topPartners": "Partners con más pedidos",
-    "noData": "Todavía no hay datos suficientes."
+    "byBrand": "Facturación por marca",
+    "topCompanies": "Empresas con más facturación",
+    "topProducts": "Productos más vendidos",
+    "ordersN": "{n, plural, one {# pedido} other {# pedidos}}",
+    "cols": {
+      "company": "Empresa",
+      "orders": "Pedidos",
+      "billed": "Facturado",
+      "product": "Producto",
+      "units": "Uds."
+    }
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Transportista",
@@ -841,7 +887,7 @@
       },
       "cifrasCanceladas": {
         "p": "¿Qué cuentan las cifras?",
-        "r": "El total facturado y los gráficos por empresa y por día no incluyen los pedidos cancelados."
+        "r": "Solo los pedidos creados en el periodo elegido, con la marca y empresa filtradas. Los cancelados no suman en facturación, pedidos, evolución ni rankings: solo aparecen en «Pedidos por estado». El porcentaje compara con el periodo anterior de la misma duración."
       },
       "cambiarIdioma": {
         "p": "¿Cómo cambio el idioma?",

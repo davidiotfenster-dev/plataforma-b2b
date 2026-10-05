@@ -598,12 +598,58 @@
   "adminDashboard": {
     "title": "Statistik-Übersicht",
     "loading": "Statistiken werden geladen…",
-    "totalOrders": "Bestellungen gesamt",
-    "totalBilled": "Gesamtumsatz",
+    "updating": "Wird aktualisiert…",
+    "periodSummary": "{desde} bis {hasta}, verglichen mit dem gleich langen Vorzeitraum",
+    "noData": "Keine Bestellungen in diesem Zeitraum.",
+    "filters": {
+      "period": "Zeitraum",
+      "from": "Von",
+      "to": "Bis",
+      "brand": "Marke",
+      "allBrands": "Alle Marken",
+      "company": "Unternehmen",
+      "allCompanies": "Alle Unternehmen",
+      "reset": "Filter entfernen"
+    },
+    "presets": {
+      "7d": "7 Tage",
+      "30d": "30 Tage",
+      "90d": "90 Tage",
+      "ytd": "Dieses Jahr",
+      "12m": "12 Monate"
+    },
+    "kpis": {
+      "billed": "Umsatz",
+      "orders": "Bestellungen",
+      "avgOrder": "Ø Bestellung",
+      "pending": "Nicht versendet",
+      "cancelled": "{n, plural, =0 {Keine Stornierungen} one {# storniert (zählt nicht)} other {# storniert (zählen nicht)}}"
+    },
+    "vsPrevious": {
+      "label": "ggü. Vorzeitraum",
+      "none": "Keine Daten für den Vorzeitraum"
+    },
+    "evolution": {
+      "day": "Verlauf pro Tag",
+      "week": "Verlauf pro Woche",
+      "month": "Verlauf pro Monat"
+    },
+    "measure": {
+      "facturado": "Umsatz",
+      "pedidos": "Bestellungen"
+    },
     "byStatus": "Bestellungen nach Status",
-    "last30Days": "Bestellungen pro Tag (letzte 30 Tage)",
-    "topPartners": "Partner mit den meisten Bestellungen",
-    "noData": "Noch nicht genügend Daten."
+    "byBrand": "Umsatz nach Marke",
+    "topCompanies": "Unternehmen mit dem meisten Umsatz",
+    "topProducts": "Meistverkaufte Produkte",
+    "ordersN": "{n, plural, one {# Bestellung} other {# Bestellungen}}",
+    "cols": {
+      "company": "Unternehmen",
+      "orders": "Bestellungen",
+      "billed": "Umsatz",
+      "product": "Produkt",
+      "units": "Stk."
+    }
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Spediteur",
@@ -841,7 +887,7 @@
       },
       "cifrasCanceladas": {
         "p": "Was zählen die Zahlen?",
-        "r": "Der fakturierte Gesamtbetrag und die Diagramme nach Unternehmen und Tag enthalten keine stornierten Bestellungen."
+        "r": "Nur Bestellungen aus dem gewählten Zeitraum, für die gefilterte Marke und das gefilterte Unternehmen. Stornierte Bestellungen zählen nicht zu Umsatz, Bestellungen, Verlauf und Ranglisten: Sie erscheinen nur unter „Bestellungen nach Status“. Der Prozentwert vergleicht mit dem gleich langen Vorzeitraum."
       },
       "cambiarIdioma": {
         "p": "Wie ändere ich die Sprache?",

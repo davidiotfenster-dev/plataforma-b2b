@@ -25,6 +25,7 @@ import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import { DescargarPdfQueryDto } from './dto/descargar-pdf-query.dto.js';
+import { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
 
 @Controller('pedidos')
 @UseGuards(JwtAuthGuard)
@@ -58,8 +59,8 @@ export class PedidosController {
   @Get('admin/estadisticas')
   @UseGuards(RolesGuard)
   @Roles(RolUsuario.ADMIN_FENSTER)
-  async estadisticas() {
-    return this.pedidosService.estadisticas();
+  async estadisticas(@Query() query: EstadisticasQueryDto) {
+    return this.pedidosService.estadisticas(query);
   }
 
   /// Panel de fulfillment escalable: un partner por fila (paginado,

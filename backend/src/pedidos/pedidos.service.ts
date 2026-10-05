@@ -10,6 +10,8 @@ import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
 import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
+import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
+import { calcularPeriodo, tramosDelPeriodo } from './estadisticas-periodo.js';
 import {
   asuntoCambioEstado,
   asuntoConfirmacionPedido,
@@ -427,72 +429,145 @@ export class PedidosService {
     });
   }
 
-  /// Datos agregados para el panel de estadísticas de ADMIN_FENSTER (gráficas
-  /// de pedidos por estado, por partner y por día). Solo lectura, no expone
-  /// datos de un partner a otro (uso exclusivo de ADMIN_FENSTER).
-  async estadisticas() {
-    const cacheado = await this.redis.get(ESTADISTICAS_CACHE_KEY);
+  /// Datos agregados para el panel de estadísticas de ADMIN_FENSTER, filtrados
+  /// por periodo, marca y empresa. Solo lectura y de uso exclusivo de
+  /// ADMIN_FENSTER. Un pedido cancelado no es facturación: cuenta en
+  /// `porEstado` y en `kpis.cancelados`, pero no suma en el resto.
+  async estadisticas(query: EstadisticasQueryDto = {}) {
+    const periodo = calcularPeriodo(query.desde, query.hasta);
+    const cacheKey = [ESTADISTICAS_CACHE_KEY, periodo.desde, periodo.hasta, query.marca ?? '*', query.partnerId ?? '*'].join(':');
+    const cacheado = await this.redis.get(cacheKey);
     if (cacheado) {
       return JSON.parse(cacheado);
     }
 
-    const [porEstado, porPartner, totalGeneral, pedidosPorDia] = await Promise.all([
+    const filtroEmpresa: Prisma.OrderWhereInput = {
+      ...(query.partnerId ? { partnerId: query.partnerId } : {}),
+      ...(query.marca ? { partner: { marcaCatalogo: query.marca } } : {}),
+    };
+    const enPeriodo: Prisma.OrderWhereInput = { ...filtroEmpresa, createdAt: { gte: periodo.inicio, lt: periodo.fin } };
+    const validos: Prisma.OrderWhereInput = { ...enPeriodo, estado: { not: EstadoPedido.CANCELADO } };
+
+    const condicionesSql = [
+      Prisma.sql`o."createdAt" >= ${periodo.inicio}`,
+      Prisma.sql`o."createdAt" < ${periodo.fin}`,
+      Prisma.sql`o."estado" <> 'CANCELADO'`,
+      ...(query.partnerId ? [Prisma.sql`o."partnerId" = ${query.partnerId}::uuid`] : []),
+      ...(query.marca ? [Prisma.sql`p."marcaCatalogo" = ${query.marca}::"MarcaCatalogo"`] : []),
+    ];
+
+    const [porEstado, porEmpresa, totales, anterior, serie, productos, empresas] = await Promise.all([
       this.prisma.order.groupBy({
         by: ['estado'],
+        where: enPeriodo,
         _count: { _all: true },
         _sum: { totalNeto: true },
       }),
       this.prisma.order.groupBy({
         by: ['partnerId'],
-        where: { estado: { not: EstadoPedido.CANCELADO } },
+        where: validos,
         _count: { _all: true },
         _sum: { totalNeto: true },
-        orderBy: { _sum: { totalNeto: 'desc' } },
+      }),
+      this.prisma.order.aggregate({ where: validos, _count: { _all: true }, _sum: { totalNeto: true } }),
+      this.prisma.order.aggregate({
+        where: { ...filtroEmpresa, estado: { not: EstadoPedido.CANCELADO }, createdAt: { gte: periodo.inicioAnterior, lt: periodo.inicio } },
+        _count: { _all: true },
+        _sum: { totalNeto: true },
+      }),
+      this.prisma.$queryRaw<{ tramo: Date; pedidos: bigint; facturado: Prisma.Decimal | null }[]>`
+        SELECT date_trunc(${periodo.granularidad}::text, o."createdAt") AS tramo,
+               COUNT(*)::bigint AS pedidos,
+               SUM(o."totalNeto") AS facturado
+        FROM "Order" o
+        JOIN "Partner" p ON p."id" = o."partnerId"
+        WHERE ${Prisma.join(condicionesSql, ' AND ')}
+        GROUP BY tramo
+        ORDER BY tramo ASC
+      `,
+      this.prisma.orderItem.groupBy({
+        by: ['skuComercial', 'nombreProducto'],
+        where: { order: { is: validos } },
+        _sum: { cantidad: true, totalLinea: true },
+        orderBy: { _sum: { totalLinea: 'desc' } },
         take: 10,
       }),
-      /// Un pedido cancelado no es facturación: se cuenta en `totalPedidos` y en
-      /// `porEstado`, pero no suma en `totalFacturado` ni en el ranking.
-      this.prisma.order.aggregate({
-        where: { estado: { not: EstadoPedido.CANCELADO } },
-        _count: { _all: true },
-        _sum: { totalNeto: true },
+      /// Empresas con algún pedido, para el desplegable del filtro.
+      this.prisma.partner.findMany({
+        where: { ordenes: { some: {} } },
+        select: { id: true, razonSocial: true, marcaCatalogo: true },
+        orderBy: { razonSocial: 'asc' },
       }),
-      this.prisma.$queryRaw<{ dia: Date; total: bigint }[]>`
-        SELECT date_trunc('day', "createdAt") AS dia, COUNT(*)::bigint AS total
-        FROM "Order"
-        WHERE "createdAt" >= NOW() - INTERVAL '30 days'
-        GROUP BY dia
-        ORDER BY dia ASC
-      `,
     ]);
 
-    const partners = await this.prisma.partner.findMany({
-      where: { id: { in: porPartner.map((p) => p.partnerId) } },
-      select: { id: true, razonSocial: true },
-    });
-    const nombrePartner = new Map(partners.map((p) => [p.id, p.razonSocial]));
+    const infoEmpresa = new Map(empresas.map((e) => [e.id, e]));
+    const facturadoDe = (v: Prisma.Decimal | null | undefined) => (v ? Number(v) : 0);
+    const centimos = (n: number) => Math.round(n * 100) / 100;
+
+    const ranking = porEmpresa
+      .map((e) => ({
+        partnerId: e.partnerId,
+        razonSocial: infoEmpresa.get(e.partnerId)?.razonSocial ?? 'Desconocido',
+        marca: infoEmpresa.get(e.partnerId)?.marcaCatalogo ?? null,
+        pedidos: e._count._all,
+        facturado: facturadoDe(e._sum.totalNeto),
+      }))
+      .sort((a, b) => b.facturado - a.facturado);
+
+    const porMarca = new Map<string, { marca: string; pedidos: number; facturado: number }>();
+    for (const e of ranking) {
+      if (!e.marca) continue;
+      const acc = porMarca.get(e.marca) ?? { marca: e.marca, pedidos: 0, facturado: 0 };
+      acc.pedidos += e.pedidos;
+      acc.facturado += e.facturado;
+      porMarca.set(e.marca, acc);
+    }
+
+    const serieIndexada = new Map(serie.map((s) => [s.tramo.toISOString().slice(0, 10), s]));
+    const pedidos = totales._count._all;
+    const facturado = facturadoDe(totales._sum.totalNeto);
+    const cancelados = porEstado.find((e) => e.estado === EstadoPedido.CANCELADO)?._count._all ?? 0;
+    const sinEnviar = porEstado
+      .filter((e) => e.estado !== EstadoPedido.ENVIADO && e.estado !== EstadoPedido.CANCELADO)
+      .reduce((acc, e) => acc + e._count._all, 0);
 
     const resultado = {
-      totalPedidos: porEstado.reduce((acc, e) => acc + e._count._all, 0),
-      totalFacturado: totalGeneral._sum.totalNeto?.toString() ?? '0',
+      periodo: { desde: periodo.desde, hasta: periodo.hasta, granularidad: periodo.granularidad },
+      kpis: {
+        pedidos,
+        facturado,
+        ticketMedio: pedidos > 0 ? centimos(facturado / pedidos) : 0,
+        sinEnviar,
+        cancelados,
+      },
+      periodoAnterior: {
+        pedidos: anterior._count._all,
+        facturado: facturadoDe(anterior._sum.totalNeto),
+      },
+      serie: tramosDelPeriodo(periodo).map((tramo) => ({
+        tramo,
+        pedidos: Number(serieIndexada.get(tramo)?.pedidos ?? 0),
+        facturado: facturadoDe(serieIndexada.get(tramo)?.facturado),
+      })),
       porEstado: porEstado.map((e) => ({
         estado: e.estado,
         cantidad: e._count._all,
-        totalNeto: e._sum.totalNeto?.toString() ?? '0',
+        facturado: facturadoDe(e._sum.totalNeto),
       })),
-      porPartner: porPartner.map((p) => ({
-        partnerId: p.partnerId,
-        razonSocial: nombrePartner.get(p.partnerId) ?? 'Desconocido',
-        cantidad: p._count._all,
-        totalNeto: p._sum.totalNeto?.toString() ?? '0',
+      porMarca: [...porMarca.values()]
+        .map((m) => ({ ...m, facturado: centimos(m.facturado) }))
+        .sort((a, b) => b.facturado - a.facturado),
+      topEmpresas: ranking.slice(0, 10),
+      topProductos: productos.map((p) => ({
+        sku: p.skuComercial,
+        nombre: p.nombreProducto,
+        unidades: p._sum.cantidad ?? 0,
+        facturado: facturadoDe(p._sum.totalLinea),
       })),
-      pedidosPorDia: pedidosPorDia.map((d) => ({
-        dia: d.dia.toISOString().slice(0, 10),
-        cantidad: Number(d.total),
-      })),
+      empresas: empresas.map((e) => ({ id: e.id, razonSocial: e.razonSocial, marca: e.marcaCatalogo })),
     };
 
-    await this.redis.setEx(ESTADISTICAS_CACHE_KEY, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
+    await this.redis.setEx(cacheKey, ESTADISTICAS_CACHE_TTL_SEGUNDOS, JSON.stringify(resultado));
     return resultado;
   }
 
