@@ -744,8 +744,7 @@
     "enEstaPantalla": "Auf dieser Seite",
     "preguntasGenerales": "Allgemeine Fragen",
     "masInfo": "Mehr Informationen",
-    "contacto": "Nicht gefunden, was Sie suchen?",
-    "escribirSoporte": "Support schreiben",
+    "contacto": "Nicht gefunden, was Sie suchen? Schreiben Sie uns",
     "temas": {
       "inicio": "Startseite",
       "login": "Anmelden",
@@ -939,6 +938,18 @@
     "sinResultados": "Keine Frage enthält diese Wörter. Versuchen Sie kürzere oder sehen Sie sich die Themen an.",
     "otrosTemas": "Weitere Themen",
     "volverPantalla": "Zurück zu dieser Seite",
-    "volver": "Zurück"
+    "volver": "Zurück",
+    "contactos": {
+      "comercial": {
+        "titulo": "Vertrieb",
+        "texto": "Informationen, Preise und Angebote",
+        "mensaje": "Hallo, ich habe eine Vertriebsanfrage."
+      },
+      "incidencias": {
+        "titulo": "Störungen",
+        "texto": "Probleme mit einer Bestellung oder dem Portal",
+        "mensaje": "Hallo, ich möchte eine Störung melden."
+      }
+    }
   }
 }

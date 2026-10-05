@@ -744,8 +744,7 @@
     "enEstaPantalla": "In questa schermata",
     "preguntasGenerales": "Domande generali",
     "masInfo": "Maggiori informazioni",
-    "contacto": "Non trovi quello che cerchi?",
-    "escribirSoporte": "Scrivi al supporto",
+    "contacto": "Non trovi quello che cerchi? Scrivici",
     "temas": {
       "inicio": "Home",
       "login": "Accesso",
@@ -939,6 +938,18 @@
     "sinResultados": "Nessuna domanda contiene queste parole. Prova con parole più brevi o consulta gli argomenti.",
     "otrosTemas": "Altri argomenti",
     "volverPantalla": "Torna a questa schermata",
-    "volver": "Indietro"
+    "volver": "Indietro",
+    "contactos": {
+      "comercial": {
+        "titulo": "Commerciale",
+        "texto": "informazioni, prezzi e offerte",
+        "mensaje": "Buongiorno, ho una richiesta commerciale."
+      },
+      "incidencias": {
+        "titulo": "Assistenza",
+        "texto": "problemi con un ordine o con il portale",
+        "mensaje": "Buongiorno, vorrei segnalare un problema."
+      }
+    }
   }
 }

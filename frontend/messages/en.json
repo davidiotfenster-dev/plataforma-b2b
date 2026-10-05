@@ -744,8 +744,7 @@
     "enEstaPantalla": "On this screen",
     "preguntasGenerales": "General questions",
     "masInfo": "More information",
-    "contacto": "Cannot find what you are looking for?",
-    "escribirSoporte": "Write to support",
+    "contacto": "Can't find what you need? Get in touch",
     "temas": {
       "inicio": "Home",
       "login": "Sign in",
@@ -939,6 +938,18 @@
     "sinResultados": "No question matches those words. Try shorter ones or browse the topics.",
     "otrosTemas": "Other topics",
     "volverPantalla": "Back to this screen",
-    "volver": "Back"
+    "volver": "Back",
+    "contactos": {
+      "comercial": {
+        "titulo": "Sales",
+        "texto": "information, prices and offers",
+        "mensaje": "Hello, I have a sales enquiry."
+      },
+      "incidencias": {
+        "titulo": "Support",
+        "texto": "problems with an order or with the portal",
+        "mensaje": "Hello, I would like to report an issue."
+      }
+    }
   }
 }

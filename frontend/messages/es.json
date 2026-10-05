@@ -744,8 +744,7 @@
     "enEstaPantalla": "En esta pantalla",
     "preguntasGenerales": "Preguntas generales",
     "masInfo": "Más información",
-    "contacto": "¿No encuentras lo que buscas?",
-    "escribirSoporte": "Escribir a soporte",
+    "contacto": "¿No encuentras lo que buscas? Escríbenos",
     "temas": {
       "inicio": "Inicio",
       "login": "Iniciar sesión",
@@ -939,6 +938,18 @@
     "sinResultados": "No hay ninguna pregunta con esas palabras. Prueba con otras más cortas o revisa los temas.",
     "otrosTemas": "Otros temas",
     "volverPantalla": "Volver a esta pantalla",
-    "volver": "Volver"
+    "volver": "Volver",
+    "contactos": {
+      "comercial": {
+        "titulo": "Comercial",
+        "texto": "información, precios y ofertas",
+        "mensaje": "Hola, tengo una consulta comercial."
+      },
+      "incidencias": {
+        "titulo": "Incidencias",
+        "texto": "problemas con un pedido o con el portal",
+        "mensaje": "Hola, quiero comunicar una incidencia."
+      }
+    }
   }
 }

@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ChevronDown, CircleHelp, Mail, Search, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, CircleHelp, Mail, MessageCircle, Search, X } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
 import {
   PREGUNTAS_GENERALES,
@@ -15,10 +15,7 @@ import {
   temaDeRuta,
   type TemaAyuda,
 } from "./temas";
-
-/// Correo de soporte para el enlace de contacto. Sin configurar
-/// (`NEXT_PUBLIC_SOPORTE_EMAIL`), el enlace no se enseña.
-const SOPORTE_EMAIL = process.env.NEXT_PUBLIC_SOPORTE_EMAIL;
+import { CONTACTOS, WHATSAPP } from "./contacto";
 
 /// Minúsculas y sin tildes, para que «busqueda» encuentre «búsqueda».
 function normalizar(texto: string) {
@@ -57,10 +54,12 @@ function PanelAyuda({
   temaRuta,
   temas,
   generales,
+  conContacto,
 }: {
   temaRuta: TemaAyuda | null;
   temas: readonly TemaAyuda[];
   generales: readonly string[];
+  conContacto: boolean;
 }) {
   const t = useTranslations("ayuda");
   const [busqueda, setBusqueda] = useState("");
@@ -161,16 +160,40 @@ function PanelAyuda({
         </>
       )}
 
-      {SOPORTE_EMAIL && (
+      {conContacto && (
         <div className="border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm">
-          <p className="text-neutral-600">{t("contacto")}</p>
-          <a
-            href={`mailto:${SOPORTE_EMAIL}`}
-            className="mt-1 inline-flex items-center gap-1.5 font-medium text-neutral-900 underline"
-          >
-            <Mail className="size-4" aria-hidden />
-            {t("escribirSoporte")}
-          </a>
+          <h3 className="mb-2 font-medium text-neutral-800">{t("contacto")}</h3>
+          <ul className="space-y-3">
+            {CONTACTOS.map((c) => (
+              <li key={c.id}>
+                <p className="text-neutral-900">
+                  <span className="font-medium">{t(`contactos.${c.id}.titulo`)}</span>
+                  <span className="text-neutral-500"> · {t(`contactos.${c.id}.texto`)}</span>
+                </p>
+                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                  <a
+                    href={`mailto:${c.email}`}
+                    className="inline-flex items-center gap-1.5 text-neutral-900 underline underline-offset-2 hover:text-neutral-600"
+                  >
+                    <Mail className="size-4 shrink-0" aria-hidden />
+                    {c.email}
+                  </a>
+                  {WHATSAPP && (
+                    <a
+                      href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(t(`contactos.${c.id}.mensaje`))}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`WhatsApp · ${t(`contactos.${c.id}.titulo`)}`}
+                      className="inline-flex items-center gap-1.5 text-green-700 underline underline-offset-2 hover:text-green-900"
+                    >
+                      <MessageCircle className="size-4 shrink-0" aria-hidden />
+                      WhatsApp
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </>
@@ -180,8 +203,9 @@ function PanelAyuda({
 /// Botón flotante de ayuda (abajo a la derecha) para todos los usuarios: abre un
 /// panel con las preguntas de la pantalla en la que estás, unas generales, un
 /// buscador y el resto de temas de su tipo de usuario (el personal de IoT FENSTER
-/// ve los del panel; clientes y visitantes, los del portal). No toca datos de
-/// nadie: es contenido fijo, en el idioma de la interfaz.
+/// ve los del panel; clientes y visitantes, los del portal, y al pie cómo
+/// contactar con IoT FENSTER). No toca datos de nadie: es contenido fijo, en el
+/// idioma de la interfaz.
 export function AyudaBurbuja() {
   const t = useTranslations("ayuda");
   const pathname = usePathname();
@@ -237,7 +261,7 @@ export function AyudaBurbuja() {
               <X className="size-4" aria-hidden />
             </button>
           </div>
-          <PanelAyuda temaRuta={temaRuta} temas={temas} generales={generales} />
+          <PanelAyuda temaRuta={temaRuta} temas={temas} generales={generales} conContacto={!personal} />
         </div>
       )}
 

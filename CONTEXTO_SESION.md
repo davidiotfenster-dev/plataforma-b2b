@@ -257,9 +257,11 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
   en la ficha de la empresa.
 - **Para añadir ayuda a una pantalla nueva**: añadir el tema y sus ids en `temas.ts`,
   la ruta en `temaDeRuta`, y los textos en los 5 idiomas.
-- **Contacto de soporte**: el enlace "Escribir a soporte" está preparado pero oculto
-  hasta definir `NEXT_PUBLIC_SOPORTE_EMAIL` (variable de entorno del frontend, se
-  aplica al compilar). David aún no tiene el correo o teléfono.
+- **Contacto** (2026-10-05, datos de David): al pie de la ayuda, solo para clientes y
+  visitantes. Comercial (información, precios y ofertas): info@iotfenster.com.
+  Incidencias: soporte@iotfenster.com. Cada uno con botón de WhatsApp y un mensaje ya
+  escrito; el número va en `frontend/src/components/ayuda/contacto.ts` (`WHATSAPP`) y,
+  mientras esté vacío, los botones no salen. David aún no ha dado el número.
 - Dos respuestas suponen que los emails funcionan (recuperar contraseña y verificar
   correo); revisarlas al activar los emails del registro (ver pendientes).
 

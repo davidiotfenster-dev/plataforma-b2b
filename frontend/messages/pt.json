@@ -744,8 +744,7 @@
     "enEstaPantalla": "Neste ecrã",
     "preguntasGenerales": "Perguntas gerais",
     "masInfo": "Mais informações",
-    "contacto": "Não encontra o que procura?",
-    "escribirSoporte": "Escrever ao suporte",
+    "contacto": "Não encontra o que procura? Escreva-nos",
     "temas": {
       "inicio": "Início",
       "login": "Iniciar sessão",
@@ -939,6 +938,18 @@
     "sinResultados": "Nenhuma pergunta contém essas palavras. Tente palavras mais curtas ou consulte os temas.",
     "otrosTemas": "Outros temas",
     "volverPantalla": "Voltar a este ecrã",
-    "volver": "Voltar"
+    "volver": "Voltar",
+    "contactos": {
+      "comercial": {
+        "titulo": "Comercial",
+        "texto": "informações, preços e ofertas",
+        "mensaje": "Olá, tenho uma questão comercial."
+      },
+      "incidencias": {
+        "titulo": "Incidências",
+        "texto": "problemas com uma encomenda ou com o portal",
+        "mensaje": "Olá, quero comunicar uma incidência."
+      }
+    }
   }
 }
