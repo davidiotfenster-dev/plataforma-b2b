@@ -4,6 +4,9 @@ import { useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ApiError } from "@/lib/api";
 
+/// A partir de aquí se pregunta antes de guardar: un cero de más (10 → 100) es fácil de teclear.
+const CANTIDAD_A_CONFIRMAR = 1_000;
+
 /// Igual que el tope del servidor (`CANTIDAD_MAXIMA_POR_LINEA`).
 export const CANTIDAD_MAXIMA = 100_000;
 
@@ -45,6 +48,10 @@ export function CampoCantidad({
     setError(null);
     const cantidad = Number(limpio);
     if (cantidad === valor) {
+      setTexto(String(valor));
+      return;
+    }
+    if (cantidad >= CANTIDAD_A_CONFIRMAR && !window.confirm(t("quantityHugeConfirm", { cantidad: new Intl.NumberFormat(locale).format(cantidad) }))) {
       setTexto(String(valor));
       return;
     }

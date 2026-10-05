@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <ControlAcceso>{children}</ControlAcceso>
             </main>
             <footer className="border-t border-neutral-200 bg-white">
-              <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-6 py-4 text-sm text-neutral-500">
+              <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-6 pb-16 pt-4 text-sm text-neutral-500">
                 <Marca subtitulo={tNav("subtitle")} className="!text-sm" />
                 <nav aria-label={tLegal("navLabel")} className="flex flex-wrap gap-x-4 gap-y-1">
                   {PAGINAS_LEGALES.map(({ href, clave }) => (

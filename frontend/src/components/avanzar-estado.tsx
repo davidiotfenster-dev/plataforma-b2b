@@ -57,18 +57,21 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
       >
         <input
           placeholder={t("carrierPlaceholder")}
+          aria-label={t("carrierPlaceholder")}
           value={transportista}
           onChange={(e) => setTransportista(e.target.value)}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
           placeholder={t("trackingNumberPlaceholder")}
+          aria-label={t("trackingNumberPlaceholder")}
           value={numeroExpedicion}
           onChange={(e) => setNumeroExpedicion(e.target.value)}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
         <input
           placeholder={t("trackingUrlPlaceholder")}
+          aria-label={t("trackingUrlPlaceholder")}
           value={trackingUrl}
           onChange={(e) => setTrackingUrl(e.target.value)}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"

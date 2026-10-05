@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -159,6 +159,15 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
 
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
+
+  // Cerrar o recargar la pestaña con datos sin guardar pide confirmación (el navegador pone el texto).
+  const sinGuardar = cambiado && !guardado;
+  useEffect(() => {
+    if (!sinGuardar) return;
+    const avisar = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", avisar);
+    return () => window.removeEventListener("beforeunload", avisar);
+  }, [sinGuardar]);
 
   function cambiar(nombre: string, valor: string) {
     setGuardado(false);

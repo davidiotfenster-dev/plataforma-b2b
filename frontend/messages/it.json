@@ -102,7 +102,9 @@
     "doneTitle": "Password aggiornata",
     "doneBody": "La tua password è stata aggiornata correttamente. Ora puoi accedere.",
     "backToLogin": "Vai al login",
-    "genericError": "Errore durante la reimpostazione della password"
+    "genericError": "Errore durante la reimpostazione della password",
+    "repeatPassword": "Ripeti la nuova password",
+    "passwordMismatch": "Le due password non coincidono."
   },
   "verificarEmail": {
     "verifying": "Verifica della tua email in corso…",
@@ -206,7 +208,8 @@
     "quantityError": "Non è stato possibile modificare la quantità.",
     "quantityOf": "Quantità di {producto}",
     "unavailable": "Questo prodotto non è più disponibile.",
-    "unavailableBlock": "Rimuovi dal carrello i prodotti non più disponibili per continuare."
+    "unavailableBlock": "Rimuovi dal carrello i prodotti non più disponibili per continuare.",
+    "quantityHugeConfirm": "Sei sicuro di volere {cantidad} unità di questo prodotto?"
   },
   "checkout": {
     "loading": "Caricamento…",
@@ -256,7 +259,8 @@
     "noResults": "Nessun ordine corrisponde ai filtri.",
     "itemsCount": "{n, plural, one {# articolo} other {# articoli}}",
     "moreProducts": "+{n} altri",
-    "trackShipment": "Traccia la spedizione"
+    "trackShipment": "Traccia la spedizione",
+    "invertedRange": "La data «Dal» è successiva ad «Al»."
   },
   "pedidoDetalle": {
     "loading": "Caricamento ordine…",

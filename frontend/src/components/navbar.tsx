@@ -3,11 +3,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { BarChart3, Boxes, CircleUser, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, Users, type LucideIcon } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
 import { api } from "@/lib/api";
+import type { ResumenCarrito } from "@/lib/types";
 import { puedeComprar } from "@/lib/acceso";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Marca } from "@/components/marca";
@@ -25,6 +26,26 @@ function BotonSalir({ onClick, etiqueta, email, className = "" }: { onClick: () 
     >
       <LogOut className="size-4" /> {etiqueta}
     </button>
+  );
+}
+
+/// Número de artículos del carrito junto al enlace, para saber que se ha añadido algo
+/// sin entrar. Comparte la consulta ["carrito"] con el carrito y el catálogo, que la actualizan al añadir.
+function EnlaceCarrito({ etiqueta }: { etiqueta: string }) {
+  const { data: carrito } = useQuery<ResumenCarrito>({
+    queryKey: ["carrito"],
+    queryFn: () => api.get<ResumenCarrito>("/carrito/resumen"),
+  });
+  const articulos = carrito?.items.reduce((suma, linea) => suma + linea.cantidad, 0) ?? 0;
+  return (
+    <NavLink href="/carrito" icono={ShoppingCart}>
+      {etiqueta}
+      {articulos > 0 && (
+        <span className="ml-1 rounded-full bg-teal-600 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-white" aria-label={`${articulos}`}>
+          {articulos > 999 ? "999+" : articulos}
+        </span>
+      )}
+    </NavLink>
   );
 }
 
@@ -106,7 +127,7 @@ export function Navbar() {
               {perfil.rol !== "ADMIN_FENSTER" && perfil.rol !== "COMERCIAL" && (
                 <>
                   <NavLink href="/catalogo" icono={LayoutGrid}>{t("catalogo")}</NavLink>
-                  {puedeComprar(perfil.rol) && <NavLink href="/carrito" icono={ShoppingCart}>{t("carrito")}</NavLink>}
+                  {puedeComprar(perfil.rol) && <EnlaceCarrito etiqueta={t("carrito")} />}
                   <NavLink href="/pedidos" icono={Package}>{t("pedidos")}</NavLink>
                   {perfil.rol === "PARTNER_ADMIN" && <NavLink href="/equipo" icono={Users}>{t("usuarios")}</NavLink>}
                 </>

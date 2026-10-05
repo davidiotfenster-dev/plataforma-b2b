@@ -11,6 +11,7 @@ import {
   Max,
   Min,
   ValidateNested,
+  MaxLength,
 } from 'class-validator';
 
 class ItemAsignarProductoDto {
@@ -19,10 +20,12 @@ class ItemAsignarProductoDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
   skuComercial!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreComercial!: string;
 
   @IsNumber()

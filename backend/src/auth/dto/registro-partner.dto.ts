@@ -7,6 +7,7 @@ import {
   IsString,
   Matches,
   MinLength,
+  MaxLength,
 } from 'class-validator';
 import { Recortar } from '../../common/dto/recortar.js';
 import { CIF_MENSAJE, CIF_REGEX, DOMINIO_REGEX, DominioCorporativo } from '../../partners/dto/validadores-ficha-cliente.js';
@@ -15,6 +16,7 @@ import { Idioma } from '../../generated/prisma/enums.js';
 export class RegistroPartnerDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   razonSocial!: string;
 
   @Recortar()
@@ -25,10 +27,12 @@ export class RegistroPartnerDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   direccionFiscal!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   pais!: string;
 
   /// Dominio corporativo de la empresa (p. ej. "empresa.com"). El email del

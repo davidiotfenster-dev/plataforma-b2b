@@ -11,6 +11,7 @@ function ResetearPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [passwordNueva, setPasswordNueva] = useState("");
+  const [passwordRepetida, setPasswordRepetida] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -19,6 +20,11 @@ function ResetearPasswordForm() {
     e.preventDefault();
     if (!token) return;
     setError(null);
+    // Una errata al escribirla dejaría la cuenta con una contraseña que nadie conoce.
+    if (passwordNueva !== passwordRepetida) {
+      setError(t("passwordMismatch"));
+      return;
+    }
     setCargando(true);
     try {
       await api.post("/auth/resetear-password", { token, passwordNueva });
@@ -69,6 +75,21 @@ function ResetearPasswordForm() {
             minLength={10}
             value={passwordNueva}
             onChange={(e) => setPasswordNueva(e.target.value)}
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label htmlFor="resetear-password-repetir" className="mb-1 block text-sm font-medium text-neutral-700">
+            {t("repeatPassword")}
+          </label>
+          <input
+            id="resetear-password-repetir"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={10}
+            value={passwordRepetida}
+            onChange={(e) => setPasswordRepetida(e.target.value)}
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
           />
         </div>

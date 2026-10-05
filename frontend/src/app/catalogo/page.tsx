@@ -147,8 +147,15 @@ export default function CatalogoPage() {
     // El catálogo se sale del ancho normal de la página para aprovechar pantallas grandes.
     <div className="relative left-1/2 w-[calc(100vw-2rem)] sm:w-[min(1700px,calc(100vw-6rem))] -translate-x-1/2">
       <h1 className="mb-6 text-2xl font-semibold text-neutral-900">{t("title")}</h1>
+      {/* Fijo y sobre la página: así se ve también al añadir desde una tarjeta de más abajo,
+          y no empuja el catálogo hacia abajo al aparecer y desaparecer. */}
       {mensaje && (
-        <div className="mb-4 rounded-md bg-green-50 px-4 py-2 text-sm text-green-700">{mensaje}</div>
+        <div
+          role="status"
+          className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-md bg-green-600 px-4 py-2 text-sm text-white shadow-lg"
+        >
+          {mensaje}
+        </div>
       )}
       {agregar.isError && (
         <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">

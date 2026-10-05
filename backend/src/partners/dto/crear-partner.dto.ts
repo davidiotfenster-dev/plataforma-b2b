@@ -1,4 +1,4 @@
-import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MinLength, MaxLength } from 'class-validator';
 import { Recortar } from '../../common/dto/recortar.js';
 import {
   CODIGO_POSTAL_MENSAJE,
@@ -20,6 +20,7 @@ import {
 export class CrearPartnerDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   razonSocial!: string;
 
   @Recortar()
@@ -30,10 +31,12 @@ export class CrearPartnerDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   direccionFiscal!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   pais!: string;
 
   @IsString()

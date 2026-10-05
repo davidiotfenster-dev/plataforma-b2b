@@ -102,7 +102,9 @@
     "doneTitle": "Passwort aktualisiert",
     "doneBody": "Ihr Passwort wurde erfolgreich aktualisiert. Sie können sich jetzt anmelden.",
     "backToLogin": "Zur Anmeldung",
-    "genericError": "Fehler beim Zurücksetzen des Passworts"
+    "genericError": "Fehler beim Zurücksetzen des Passworts",
+    "repeatPassword": "Neues Passwort wiederholen",
+    "passwordMismatch": "Die beiden Passwörter stimmen nicht überein."
   },
   "verificarEmail": {
     "verifying": "Ihre E-Mail-Adresse wird bestätigt…",
@@ -206,7 +208,8 @@
     "quantityError": "Die Menge konnte nicht geändert werden.",
     "quantityOf": "Menge von {producto}",
     "unavailable": "Dieses Produkt ist nicht mehr verfügbar.",
-    "unavailableBlock": "Entfernen Sie nicht mehr verfügbare Produkte aus dem Warenkorb, um fortzufahren."
+    "unavailableBlock": "Entfernen Sie nicht mehr verfügbare Produkte aus dem Warenkorb, um fortzufahren.",
+    "quantityHugeConfirm": "Möchten Sie wirklich {cantidad} Stück dieses Produkts?"
   },
   "checkout": {
     "loading": "Wird geladen…",
@@ -256,7 +259,8 @@
     "noResults": "Keine Bestellung entspricht den Filtern.",
     "itemsCount": "{n, plural, one {# Artikel} other {# Artikel}}",
     "moreProducts": "+{n} weitere",
-    "trackShipment": "Sendung verfolgen"
+    "trackShipment": "Sendung verfolgen",
+    "invertedRange": "Das Datum „Von“ liegt nach „Bis“."
   },
   "pedidoDetalle": {
     "loading": "Bestellung wird geladen…",

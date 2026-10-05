@@ -288,6 +288,9 @@ export class PedidosService {
       where.estado = query.estado;
     }
 
+    if (query.desde && query.hasta && query.desde > query.hasta) {
+      throw new BadRequestException({ message: 'La fecha «desde» no puede ser posterior a «hasta».', codigo: 'RANGO_FECHAS_INVERTIDO' });
+    }
     if (query.desde || query.hasta) {
       where.createdAt = {
         ...(query.desde ? { gte: inicioDelDia(query.desde) } : {}),

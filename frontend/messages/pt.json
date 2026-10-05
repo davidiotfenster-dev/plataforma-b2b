@@ -102,7 +102,9 @@
     "doneTitle": "Palavra-passe atualizada",
     "doneBody": "A sua palavra-passe foi atualizada com sucesso. Já pode iniciar sessão.",
     "backToLogin": "Ir para o login",
-    "genericError": "Erro ao repor a palavra-passe"
+    "genericError": "Erro ao repor a palavra-passe",
+    "repeatPassword": "Repita a nova palavra-passe",
+    "passwordMismatch": "As duas palavras-passe não coincidem."
   },
   "verificarEmail": {
     "verifying": "A verificar o seu email…",
@@ -206,7 +208,8 @@
     "quantityError": "Não foi possível alterar a quantidade.",
     "quantityOf": "Quantidade de {producto}",
     "unavailable": "Este produto já não está disponível.",
-    "unavailableBlock": "Remova do carrinho os produtos que já não estão disponíveis para continuar."
+    "unavailableBlock": "Remova do carrinho os produtos que já não estão disponíveis para continuar.",
+    "quantityHugeConfirm": "Tem a certeza de que quer {cantidad} unidades deste produto?"
   },
   "checkout": {
     "loading": "A carregar…",
@@ -256,7 +259,8 @@
     "noResults": "Nenhuma encomenda corresponde aos filtros.",
     "itemsCount": "{n, plural, one {# artigo} other {# artigos}}",
     "moreProducts": "+{n} mais",
-    "trackShipment": "Acompanhar envio"
+    "trackShipment": "Acompanhar envio",
+    "invertedRange": "A data «De» é posterior a «Até»."
   },
   "pedidoDetalle": {
     "loading": "A carregar encomenda…",

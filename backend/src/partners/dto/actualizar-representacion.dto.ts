@@ -1,14 +1,16 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, Min, MaxLength } from 'class-validator';
 
 export class ActualizarRepresentacionDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
   skuComercial?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreComercial?: string;
 
   @IsOptional()
