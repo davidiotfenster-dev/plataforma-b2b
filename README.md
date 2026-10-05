@@ -182,6 +182,7 @@ Para enseñar la aplicación a alguien fuera de la red se usan túneles de Cloud
 | [`CONTEXTO_SESION.md`](CONTEXTO_SESION.md) | Estado del trabajo y demo por túnel |
 | [`INFORME_TECNICO.md`](INFORME_TECNICO.md) | Informe técnico |
 | [`PROGRESO.md`](PROGRESO.md) | Bitácora de avance |
+| [`docs/crm/`](docs/crm/README.md) | CRM comercial con Zoho: funcionalidades, conexión con la plataforma, correos y maqueta |
 
 ## Pendiente
 
