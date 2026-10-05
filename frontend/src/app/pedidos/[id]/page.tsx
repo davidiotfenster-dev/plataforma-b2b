@@ -14,12 +14,14 @@ import { DescargarPdf } from "@/components/descargar-pdf";
 import { EstadoBadge } from "@/components/estado-badge";
 import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 import { fechaHora, LineaTiempoPedido } from "@/components/linea-tiempo-pedido";
+import { usePrecio } from "@/lib/formato";
 
 export default function PedidoDetallePage() {
   const params = useParams<{ id: string }>();
   const t = useTranslations("pedidoDetalle");
   const tAyuda = useTranslations("ayuda");
   const locale = useLocale();
+  const precio = usePrecio();
   const queryClient = useQueryClient();
   const { data: me } = useMe();
   const [errorPdf, setErrorPdf] = useState(false);
@@ -106,7 +108,7 @@ export default function PedidoDetallePage() {
               <ul className="ml-5 list-disc">
                 {resultado.preciosCambiados.map((cambio) => (
                   <li key={cambio.nombre}>
-                    {t("reorderPriceLine", { nombre: cambio.nombre, anterior: cambio.anterior, actual: cambio.actual })}
+                    {t("reorderPriceLine", { nombre: cambio.nombre, anterior: precio(cambio.anterior), actual: precio(cambio.actual) })}
                   </li>
                 ))}
               </ul>
@@ -195,18 +197,18 @@ export default function PedidoDetallePage() {
                       <div className="min-w-0">
                         <p className="font-medium text-neutral-900">{item.nombreProducto}</p>
                         <p className="text-xs text-neutral-400">{item.skuComercial}</p>
-                        <p className="text-xs text-neutral-500 sm:hidden">{t("unitPrice", { precio: item.precioNetoUnitario })}</p>
+                        <p className="text-xs text-neutral-500 sm:hidden">{t("unitPrice", { precio: precio(item.precioNetoUnitario) })}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-neutral-600">{item.cantidad}</td>
                   <td className="hidden px-4 py-3 text-neutral-600 sm:table-cell">
-                    <p>{item.precioNetoUnitario} €</p>
+                    <p>{precio(item.precioNetoUnitario)}</p>
                     {descuento > 0 && (
-                      <p className="text-xs text-neutral-400">{t("pvpDiscount", { pvp: item.pvpHistorico, descuento })}</p>
+                      <p className="text-xs text-neutral-400">{t("pvpDiscount", { pvp: precio(item.pvpHistorico), descuento })}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-medium text-neutral-900">{item.totalLinea} €</td>
+                  <td className="px-4 py-3 font-medium text-neutral-900">{precio(item.totalLinea)}</td>
                 </tr>
               );
             })}
@@ -214,7 +216,7 @@ export default function PedidoDetallePage() {
         </table>
       </div>
       <p className="mt-4 text-right text-lg font-semibold text-neutral-900">
-        {t("totalLabel", { total: order.totalNeto })}
+        {t("totalLabel", { total: precio(order.totalNeto) })}
       </p>
     </div>
   );

@@ -164,7 +164,7 @@
     "quantity": "Menge",
     "total": "Gesamt",
     "removeLine": "Position entfernen",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "continueToCheckout": "Weiter zur Kasse"
   },
   "checkout": {
@@ -179,7 +179,7 @@
     "confirming": "Wird bestätigt…",
     "confirm": "Bestellung bestätigen",
     "disclaimer": "Mit der Bestätigung wird die Bestellung mit eingefrorenen Preisen erfasst. Es erfolgt keine Online-Zahlung: die Abwicklung erfolgt gegen den angegebenen Bestellauftrag.",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "confirmError": "Fehler beim Bestätigen der Bestellung",
     "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut.",
     "requiredFields": "Geben Sie die Lieferadresse und die PO-Nummer ein, um die Bestellung zu bestätigen."
@@ -232,7 +232,7 @@
     "quantity": "Menge",
     "netPrice": "Nettopreis",
     "total": "Gesamt",
-    "totalLabel": "Gesamt: {total} €",
+    "totalLabel": "Gesamt: {total}",
     "back": "Meine Bestellungen",
     "placedOn": "Bestellt am {fecha}",
     "placedBy": "Aufgegeben von {nombre} ({email})",
@@ -247,13 +247,13 @@
     "goToCart": "Zum Warenkorb",
     "reorderUnavailable": "Nicht mehr verfügbar und nicht hinzugefügt: {productos}.",
     "reorderPriceChanges": "Der Preis hat sich geändert bei:",
-    "reorderPriceLine": "{nombre}: vorher {anterior} €, jetzt {actual} €",
+    "reorderPriceLine": "{nombre}: vorher {anterior}, jetzt {actual}",
     "timelineLabel": "Bestellfortschritt",
     "cancelledTitle": "Bestellung storniert",
     "cancelledOn": "Storniert am {fecha}",
     "cancelReason": "Grund: {motivo}",
-    "unitPrice": "{precio} € / Stk.",
-    "pvpDiscount": "UVP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / Stk.",
+    "pvpDiscount": "UVP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "Sprache des PDFs"
   },
   "adminPartners": {

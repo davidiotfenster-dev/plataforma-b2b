@@ -12,11 +12,13 @@ import { AvanzarEstado } from "@/components/avanzar-estado";
 import { ForzarEstado } from "@/components/forzar-estado";
 import { DescargarPdf } from "@/components/descargar-pdf";
 import { fechaHora, LineaTiempoPedido } from "@/components/linea-tiempo-pedido";
+import { usePrecio } from "@/lib/formato";
 
 export default function AdminPedidoDetallePage() {
   const params = useParams<{ id: string }>();
   const t = useTranslations("pedidoDetalle");
   const locale = useLocale();
+  const precio = usePrecio();
   const [errorPdf, setErrorPdf] = useState(false);
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: ["admin-pedidos", params.id],
@@ -129,15 +131,15 @@ export default function AdminPedidoDetallePage() {
                   <p className="text-xs text-neutral-400">{item.skuComercial}</p>
                 </td>
                 <td className="px-4 py-3 text-neutral-600">{item.cantidad}</td>
-                <td className="px-4 py-3 text-neutral-600">{item.precioNetoUnitario} €</td>
-                <td className="px-4 py-3 font-medium text-neutral-900">{item.totalLinea} €</td>
+                <td className="px-4 py-3 text-neutral-600">{precio(item.precioNetoUnitario)}</td>
+                <td className="px-4 py-3 font-medium text-neutral-900">{precio(item.totalLinea)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="mt-4 text-right text-lg font-semibold text-neutral-900">
-        {t("totalLabel", { total: order.totalNeto })}
+        {t("totalLabel", { total: precio(order.totalNeto) })}
       </p>
     </div>
   );

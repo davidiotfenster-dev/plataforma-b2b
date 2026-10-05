@@ -24,6 +24,7 @@ import {
 import type { ProductoBaseAdmin, RepresentacionDeBase } from "@/lib/types";
 import { AsignarPanel } from "./asignar-panel";
 import { SoloAdmin } from "@/components/solo-admin";
+import { usePrecio } from "@/lib/formato";
 
 type FiltroRapido = "todos" | "sinAsignar" | "sinCodigos";
 type Vista = "aparato" | "marca";
@@ -104,6 +105,7 @@ function Miniatura({ producto, tamano = "h-8 w-8" }: { producto: ProductoBaseAdm
 
 function DetalleProducto({ producto, onAsignar }: { producto: ProductoBaseAdmin; onAsignar: () => void }) {
   const t = useTranslations("adminCatalogoBase");
+  const precio = usePrecio();
   const queryClient = useQueryClient();
   const [nombre, setNombre] = useState(producto.nombreTecnico);
   const [error, setError] = useState<string | null>(null);
@@ -266,7 +268,7 @@ function DetalleProducto({ producto, onAsignar }: { producto: ProductoBaseAdmin;
                     {a.skuComercial} · {a.nombreComercial}
                   </span>
                 </Link>
-                <span className="text-neutral-700">{Number(a.pvpBase).toFixed(2)} €</span>
+                <span className="text-neutral-700">{precio(a.pvpBase)}</span>
                 {!a.activo && <span className="rounded bg-neutral-200 px-1.5 py-0.5 text-neutral-500">{t("inactive")}</span>}
               </li>
             ))}

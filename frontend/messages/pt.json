@@ -164,7 +164,7 @@
     "quantity": "Quantidade",
     "total": "Total",
     "removeLine": "Remover linha",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "continueToCheckout": "Continuar para o checkout"
   },
   "checkout": {
@@ -179,7 +179,7 @@
     "confirming": "A confirmar…",
     "confirm": "Confirmar encomenda",
     "disclaimer": "Ao confirmar, a encomenda fica registada com os preços congelados. Não é efetuado pagamento online: a gestão é feita contra a ordem de compra indicada.",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "confirmError": "Erro ao confirmar a encomenda",
     "pricesChanged": "Os preços do seu carrinho mudaram. Atualizámos o resumo: verifique o novo total e confirme novamente.",
     "requiredFields": "Indique a morada de envio e o PO Number para confirmar a encomenda."
@@ -232,7 +232,7 @@
     "quantity": "Quantidade",
     "netPrice": "Preço líquido",
     "total": "Total",
-    "totalLabel": "Total: {total} €",
+    "totalLabel": "Total: {total}",
     "back": "As minhas encomendas",
     "placedOn": "Realizada em {fecha}",
     "placedBy": "Feita por {nombre} ({email})",
@@ -247,13 +247,13 @@
     "goToCart": "Ir para o carrinho",
     "reorderUnavailable": "Já não estão disponíveis e não foram adicionados: {productos}.",
     "reorderPriceChanges": "O preço mudou em:",
-    "reorderPriceLine": "{nombre}: antes {anterior} €, agora {actual} €",
+    "reorderPriceLine": "{nombre}: antes {anterior}, agora {actual}",
     "timelineLabel": "Progresso da encomenda",
     "cancelledTitle": "Encomenda cancelada",
     "cancelledOn": "Cancelada em {fecha}",
     "cancelReason": "Motivo: {motivo}",
-    "unitPrice": "{precio} € / un.",
-    "pvpDiscount": "PVP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / un.",
+    "pvpDiscount": "PVP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "Idioma do PDF"
   },
   "adminPartners": {

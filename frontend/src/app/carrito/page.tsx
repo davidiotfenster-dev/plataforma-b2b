@@ -7,10 +7,12 @@ import { Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ResumenCarrito } from "@/lib/types";
 import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
+import { usePrecio } from "@/lib/formato";
 
 export default function CarritoPage() {
   const queryClient = useQueryClient();
   const t = useTranslations("carrito");
+  const precio = usePrecio();
   const tAyuda = useTranslations("ayuda");
   const { data: carrito, isLoading } = useQuery<ResumenCarrito>({
     queryKey: ["carrito"],
@@ -72,7 +74,7 @@ export default function CarritoPage() {
                   <p className="font-medium text-neutral-900">{item.nombreComercial}</p>
                   <p className="text-xs text-neutral-400">{item.skuComercial}</p>
                 </td>
-                <td className="px-4 py-3 text-neutral-700">{item.precioNetoUnitario} €</td>
+                <td className="px-4 py-3 text-neutral-700">{precio(item.precioNetoUnitario)}</td>
                 <td className="px-4 py-3">
                   <input
                     type="number"
@@ -87,7 +89,7 @@ export default function CarritoPage() {
                     className="w-20 rounded-md border border-neutral-300 px-2 py-1"
                   />
                 </td>
-                <td className="px-4 py-3 font-medium text-neutral-900">{item.totalLinea} €</td>
+                <td className="px-4 py-3 font-medium text-neutral-900">{precio(item.totalLinea)}</td>
                 <td className="px-4 py-3 text-right">
                   <button
                     onClick={() => eliminar.mutate(item.id)}
@@ -104,7 +106,7 @@ export default function CarritoPage() {
       </div>
 
       <div className="mt-6 flex items-center justify-between">
-        <p className="text-lg font-semibold text-neutral-900">{t("totalLabel", { total: carrito.totalPedido })}</p>
+        <p className="text-lg font-semibold text-neutral-900">{t("totalLabel", { total: precio(carrito.totalPedido) })}</p>
         <Link
           href="/checkout"
           className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"

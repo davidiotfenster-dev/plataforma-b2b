@@ -6,11 +6,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { api, ApiError } from "@/lib/api";
 import type { Order, ResumenCarrito } from "@/lib/types";
+import { usePrecio } from "@/lib/formato";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const t = useTranslations("checkout");
+  const precio = usePrecio();
   const { data: carrito, isLoading } = useQuery<ResumenCarrito>({
     queryKey: ["carrito"],
     queryFn: () => api.get<ResumenCarrito>("/carrito/resumen"),
@@ -75,15 +77,15 @@ export default function CheckoutPage() {
               <div>
                 <p className="font-medium text-neutral-900">{item.nombreComercial}</p>
                 <p className="text-xs text-neutral-400">
-                  {item.cantidad} × {item.precioNetoUnitario} €
+                  {item.cantidad} × {precio(item.precioNetoUnitario)}
                 </p>
               </div>
-              <p className="font-medium text-neutral-900">{item.totalLinea} €</p>
+              <p className="font-medium text-neutral-900">{precio(item.totalLinea)}</p>
             </div>
           ))}
         </div>
         <p className="mt-4 text-right text-lg font-semibold text-neutral-900">
-          {t("totalLabel", { total: carrito.totalPedido })}
+          {t("totalLabel", { total: precio(carrito.totalPedido) })}
         </p>
       </div>
 

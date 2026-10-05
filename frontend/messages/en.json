@@ -164,7 +164,7 @@
     "quantity": "Quantity",
     "total": "Total",
     "removeLine": "Remove line",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "continueToCheckout": "Continue to checkout"
   },
   "checkout": {
@@ -179,7 +179,7 @@
     "confirming": "Confirming…",
     "confirm": "Confirm order",
     "disclaimer": "On confirmation, the order is registered with prices frozen. No online payment is taken: it is settled against the purchase order provided.",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "confirmError": "Error confirming the order",
     "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again.",
     "requiredFields": "Enter the shipping address and the PO Number to confirm the order."
@@ -232,7 +232,7 @@
     "quantity": "Quantity",
     "netPrice": "Net price",
     "total": "Total",
-    "totalLabel": "Total: €{total}",
+    "totalLabel": "Total: {total}",
     "back": "My orders",
     "placedOn": "Placed on {fecha}",
     "placedBy": "Placed by {nombre} ({email})",
@@ -247,13 +247,13 @@
     "goToCart": "Go to cart",
     "reorderUnavailable": "No longer available and not added: {productos}.",
     "reorderPriceChanges": "The price has changed for:",
-    "reorderPriceLine": "{nombre}: was {anterior} €, now {actual} €",
+    "reorderPriceLine": "{nombre}: was {anterior}, now {actual}",
     "timelineLabel": "Order progress",
     "cancelledTitle": "Order cancelled",
     "cancelledOn": "Cancelled on {fecha}",
     "cancelReason": "Reason: {motivo}",
-    "unitPrice": "{precio} € / unit",
-    "pvpDiscount": "RRP {pvp} € · −{descuento} %",
+    "unitPrice": "{precio} / unit",
+    "pvpDiscount": "RRP {pvp} · −{descuento} %",
     "pdfLanguageTitle": "PDF language"
   },
   "adminPartners": {
