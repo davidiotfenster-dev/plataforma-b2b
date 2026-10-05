@@ -8,7 +8,9 @@
     "next": "Next",
     "pageOf": "Page {page} of {total}",
     "close": "Close",
-    "working": "Working…"
+    "working": "Working…",
+    "adminOnly": "This section is for administrators only.",
+    "backToCompanies": "Back to Companies"
   },
   "estados": {
     "RECIBIDO": "Received",
@@ -30,17 +32,28 @@
     "catalogo": "Catalog",
     "carrito": "Cart",
     "pedidos": "Orders",
-    "partners": "Partners",
+    "partners": "Companies",
     "logout": "Log out",
     "login": "Log in",
     "registro": "Register company",
     "language": "Language",
     "dashboard": "Dashboard",
-    "catalogoBase": "Products"
+    "catalogoBase": "Products",
+    "marcas": "Brands",
+    "signedInAs": "Signed in as",
+    "roleAdmin": "FENSTER administrator",
+    "roleComercial": "FENSTER sales"
   },
   "home": {
     "title": "IoT FENSTER Partner Portal",
-    "description": "B2B order management against a deferred purchase order. Log in with your partner account or register your company to request access."
+    "description": "B2B order management against a deferred purchase order. Log in with your partner account or register your company to request access.",
+    "badge": "B2B portal for distributors and installers",
+    "f1Title": "Your catalogue, your prices",
+    "f1Text": "Products authorised for your company, with your price list and discount already applied.",
+    "f2Title": "Order with your PO number",
+    "f2Text": "Confirm orders against your purchase order. No online payment: deferred invoicing.",
+    "f3Title": "Tracking through delivery",
+    "f3Text": "Order status at every step, a PDF summary and the shipment tracking link."
   },
   "login": {
     "title": "Log in",
@@ -154,7 +167,30 @@
     "date": "Date",
     "poNumber": "PO number",
     "total": "Total",
-    "status": "Status"
+    "status": "Status",
+    "loadError": "We couldn't load your orders. Please try again.",
+    "viewCatalog": "View the catalog",
+    "products": "Products",
+    "summaryActive": "Orders in progress",
+    "summaryShipped": "Shipped in the last 7 days",
+    "summaryTotal": "Total orders",
+    "searchLabel": "Search orders",
+    "searchPlaceholder": "Search by PED code, PO Number or product…",
+    "statusFilter": "Filter by status",
+    "allStatuses": "All",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "sortLabel": "Sort by",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTotalHigh": "Total: high to low",
+    "sortTotalLow": "Total: low to high",
+    "clearFilters": "Clear filters",
+    "resultsCount": "{n, plural, one {# order} other {# orders}}",
+    "noResults": "No orders match the filters.",
+    "itemsCount": "{n, plural, one {# item} other {# items}}",
+    "moreProducts": "+{n} more",
+    "trackShipment": "Track shipment"
   },
   "pedidoDetalle": {
     "loading": "Loading order…",
@@ -171,12 +207,33 @@
     "quantity": "Quantity",
     "netPrice": "Net price",
     "total": "Total",
-    "totalLabel": "Total: €{total}"
+    "totalLabel": "Total: €{total}",
+    "back": "My orders",
+    "placedOn": "Placed on {fecha}",
+    "downloadPdf": "Download PDF",
+    "downloading": "Downloading…",
+    "downloadError": "The PDF could not be downloaded. Please try again.",
+    "reorder": "Reorder",
+    "reordering": "Adding…",
+    "reorderError": "The order could not be repeated. Please try again.",
+    "reorderDone": "{n, plural, one {# product was added to your cart at today''s price.} other {# products were added to your cart at today''s prices.}}",
+    "reorderNone": "No products could be added to your cart.",
+    "goToCart": "Go to cart",
+    "reorderUnavailable": "No longer available and not added: {productos}.",
+    "reorderPriceChanges": "The price has changed for:",
+    "reorderPriceLine": "{nombre}: was {anterior} €, now {actual} €",
+    "timelineLabel": "Order progress",
+    "cancelledTitle": "Order cancelled",
+    "cancelledOn": "Cancelled on {fecha}",
+    "cancelReason": "Reason: {motivo}",
+    "unitPrice": "{precio} € / unit",
+    "pvpDiscount": "RRP {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "PDF language"
   },
   "adminPartners": {
-    "title": "Partners",
-    "subtitle": "The companies that buy from IoT FENSTER: sign-ups, approvals, terms and catalog.",
-    "newPartner": "New partner",
+    "title": "Companies",
+    "subtitle": "Partners with their own sub-brand and distributors who buy under a partner's brand: sign-ups, terms and catalogue.",
+    "newPartner": "New company",
     "dismissMessage": "Dismiss message",
     "pendingBanner": "{n, plural, one {# partner is waiting for your approval.} other {# partners are waiting for your approval.}}",
     "reviewPending": "Review",
@@ -214,7 +271,12 @@
     "done": {
       "rechazar": "{partner}'s request has been rejected.",
       "suspender": "{partner} suspended: they cannot sign in or order until you reactivate them.",
-      "reactivar": "{partner} reactivated."
+      "reactivar": "{partner} reactivated.",
+      "archivar": "{partner} archived.",
+      "desarchivar": "{partner} unarchived.",
+      "eliminar": "{partner} deleted.",
+      "promocionar": "{partner} is now a Partner.",
+      "degradar": "{partner} is a Distributor again."
     },
     "confirm": {
       "rechazar": {
@@ -231,6 +293,26 @@
         "title": "Reactivate {partner}?",
         "body": "Their users will be able to sign in and place orders again.",
         "button": "Reactivate"
+      },
+      "archivar": {
+        "title": "Archive {partner}?",
+        "body": "It will disappear from the lists and its users will not be able to sign in. Its data and orders are kept, and you can unarchive it at any time. A company with unshipped orders cannot be archived.",
+        "button": "Archive"
+      },
+      "desarchivar": {
+        "title": "Unarchive {partner}?",
+        "body": "It will appear in the lists again and, if it was active, its users will be able to sign in again.",
+        "button": "Unarchive"
+      },
+      "promocionar": {
+        "title": "Promote {partner} to Partner?",
+        "body": "They become a Partner (own sub-brand), normally because their purchase volume justifies it. It is recorded in the audit log with the units bought so far, and you can undo it.",
+        "button": "Promote"
+      },
+      "degradar": {
+        "title": "Move {partner} back to Distributor?",
+        "body": "They stop being a Partner and become a Distributor. Their data and orders do not change. It is recorded in the audit log.",
+        "button": "Make Distributor"
       }
     },
     "approveTitle": "Approve {partner}",
@@ -244,7 +326,7 @@
     "assignCatalog": "Assign catalog",
     "cancel": "Cancel",
     "working": "Working…",
-    "backToList": "All partners",
+    "backToList": "All companies",
     "notFound": "This partner could not be found.",
     "incompleteBanner": "This partner has provisional data (tax ID, domain or address). Complete it so you can invoice and contact them.",
     "completeData": "Complete data",
@@ -306,13 +388,16 @@
       "nombreUsuario": "Contact name",
       "emailUsuario": "Sign-in email",
       "passwordUsuario": "Initial password",
-      "notas": "Notes"
+      "notas": "Notes",
+      "tipo": "Company type",
+      "marcaCatalogo": "Device brand"
     },
     "hints": {
       "dominioWeb": "Without http:// or www. Example: company.com",
       "marcaComercial": "Decides which names and SKUs they see when products are assigned: VBH, Procomsa…",
       "descuentoPorcentaje": "Applied to all their products except those with their own discount.",
-      "passwordUsuario": "At least 8 characters. You give it to the partner."
+      "passwordUsuario": "At least 8 characters. You give it to the partner.",
+      "marcaCatalogo": "Names and codes shown in their catalogue. Distributors use MySmartWindow by default."
     },
     "generatePassword": "Generate",
     "copy": "Copy",
@@ -321,7 +406,35 @@
     "missingRequired": "Required fields (*) are missing.",
     "createButton": "Create partner",
     "saving": "Saving…",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "partnersTitle": "Partners",
+    "partnersHelp": "companies with their own sub-brand of our devices",
+    "distribuidoresTitle": "Distributors",
+    "distribuidoresHelp": "companies that buy seeing the devices of their assigned brand",
+    "partnersEmpty": "No partners yet.",
+    "ownBrand": "{marca} sub-brand",
+    "statProducts": "Products",
+    "statOrders": "Orders",
+    "statDiscount": "Discount",
+    "colBrand": "Brand and terms",
+    "typePartner": "Partner",
+    "typeDistribuidor": "Distributor",
+    "typePartnerLong": "Partner (own sub-brand)",
+    "typeDistribuidorLong": "Distributor",
+    "tabArchived": "Archived",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "deleteAction": "Delete…",
+    "archivedBadge": "Archived",
+    "archivedBanner": "This company is archived: it does not appear in the lists and cannot sign in. Its data and orders are kept.",
+    "deleteTitle": "Delete {partner}",
+    "deleteBody": "The company, {usuarios, plural, one {its user} other {its # users}}, its catalog and its carts will be erased. This cannot be undone. It is only possible because it has no orders; if you prefer to keep its data, archive it.",
+    "deleteConfirmLabel": "Type “{partner}” to confirm",
+    "deleteButton": "Delete permanently",
+    "promote": "Promote to Partner",
+    "demote": "Make Distributor",
+    "volumeLine": "{unidades, plural, one {# unit} other {# units}} in {pedidos, plural, one {# order} other {# orders}}",
+    "promoteHint": "This distributor has already bought {unidades} units (threshold: {umbral}). Time to promote them to Partner?"
   },
   "adminPedidos": {
     "title": "Order fulfillment",
@@ -371,6 +484,22 @@
     "noGtin": "No GTIN",
     "unassigned": "Unassigned",
     "assign": "Assign",
+    "image": "Image",
+    "changeImage": "Change image",
+    "uploadImage": "Upload image",
+    "removeImage": "Remove image",
+    "removeImageConfirm": "Remove the image from {n} product(s)? Partners will see the default icon.",
+    "imageHelp": "PNG, JPG or WEBP, max 3 MB. The same photo is used for every brand.",
+    "collapseAll": "Collapse all",
+    "expandAll": "Expand all",
+    "groupBy": "Group by",
+    "byDevice": "Device",
+    "byBrand": "Brand",
+    "noBrand": "No partner brand",
+    "modelsCount": "{n} model(s)",
+    "productsCount": "{n} product(s)",
+    "assignedCount": "{a} of {n} assigned",
+    "assignedLabel": "Assigned",
     "assignToPartners": "Assign to partners",
     "selectedCount": "{n} selected",
     "clearSelection": "Clear selection",
@@ -412,7 +541,7 @@
     "confirmDiscard": "There are unassigned changes. Close and discard them?"
   },
   "adminPartnerCatalogo": {
-    "generalDiscount": "Partner's general discount: {descuento}%",
+    "generalDiscount": "Company general discount: {descuento}%",
     "loading": "Loading…",
     "assignedTitle": "Assigned products",
     "assignedEmpty": "This partner doesn't have any assigned products yet.",
@@ -443,10 +572,28 @@
     "delete": "Delete",
     "deleting": "Deleting…",
     "deleteConfirm": "Delete “{name}” from this partner's catalogue? It will also be removed from their carts. Existing orders are not affected.",
+    "deleteAll": "Delete all ({n})",
+    "deleteAllConfirm": "Delete all {n} products from this partner's catalogue? They will also be removed from their carts. Existing orders are not affected.",
     "searchAssigned": "Search assigned products…",
     "searchEmpty": "No product matches the search.",
     "discountShort": "Discount",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "hide": "Hide",
+    "show": "Show",
+    "hidden": "Hidden",
+    "hiddenInBrand": "Hidden in the brand",
+    "deleteExtras": "Delete extras ({n})",
+    "deleteExtrasConfirm": "Delete this company's {n} extra products? They will also be removed from their carts. Brand products and existing orders are not affected.",
+    "brandBanner": "Sees the {marca} brand catalogue: it updates on its own when the brand changes. Here you can adjust its discount or hide products.",
+    "brandEdit": "Edit the brand catalogue",
+    "brandChange": "Change brand (Details tab)",
+    "brandProductsTitle": "Products from its brand",
+    "hiddenCount": "{n} hidden",
+    "brandEmpty": "Its brand's catalogue is empty.",
+    "extrasTitle": "Extra products",
+    "extrasHelp": "Assigned by hand to this company only, outside its brand's catalogue. Name, SKU and price are edited here.",
+    "addExtraShow": "Add an extra product ({n} available)",
+    "addExtraHide": "Hide the list of products to add"
   },
   "adminDashboard": {
     "title": "Statistics dashboard",
@@ -502,5 +649,208 @@
     "unverified": "email not verified",
     "moreActions": "More actions",
     "deactivateConfirm": "Deactivate this user? They will not be able to sign in until you activate them again."
+  },
+  "adminMarcas": {
+    "title": "Brand catalogues",
+    "description": "Each sub-brand has a single catalogue: products, names, SKUs and prices. Every company on that brand (the partner and its distributors) sees it right away; each company only adjusts its discount or hides products.",
+    "genericError": "Could not save. Please try again.",
+    "sku": "SKU",
+    "name": "Name in the brand",
+    "pvp": "List price (€)",
+    "save": "Save",
+    "hide": "Hide",
+    "show": "Show",
+    "remove": "Remove",
+    "removeConfirm": "Remove “{name}” from the brand catalogue? It disappears from the catalogue and carts of its {n} companies. Existing orders are not affected.",
+    "hidden": "Hidden",
+    "namePlaceholder": "Name the brand sells it under",
+    "add": "Add",
+    "otherBrandsOnly": "Only named in other brands",
+    "filled": "{n} products added.",
+    "cardStats": "{productos} products · {partners} partner · {distribuidores} distributors",
+    "search": "Search by name or SKU…",
+    "clear": "Clear search",
+    "fill": "Add what is missing ({n})",
+    "appliesTo": "Changes apply right away to the {n} companies on the {marca} brand.",
+    "seeCompanies": "See companies",
+    "inCatalog": "In the {marca} catalogue",
+    "empty": "No products.",
+    "loading": "Loading…",
+    "canAdd": "Brand products that are missing",
+    "canAddHelp": "They have a name in this brand but are not in its catalogue. Check name, SKU and price and add them.",
+    "nothingToAdd": "Nothing missing.",
+    "hideOthers": "Hide products from other brands",
+    "showOthers": "Add a product from another brand ({n})"
+  },
+  "ayuda": {
+    "boton": "Help",
+    "abrir": "Open help",
+    "cerrar": "Close help",
+    "titulo": "Help",
+    "enEstaPantalla": "On this screen",
+    "preguntasGenerales": "General questions",
+    "masInfo": "More information",
+    "contacto": "Cannot find what you are looking for?",
+    "escribirSoporte": "Write to support",
+    "temas": {
+      "inicio": "Home",
+      "login": "Sign in",
+      "registro": "Company registration",
+      "catalogo": "Catalog",
+      "carrito": "Cart",
+      "checkout": "Confirm order",
+      "pedidos": "My orders",
+      "pedidoDetalle": "Order details",
+      "adminEmpresas": "Companies",
+      "adminFicha": "Company file",
+      "adminMarcas": "Brands",
+      "adminProductos": "Products",
+      "adminPedidos": "Orders",
+      "adminDashboard": "Statistics"
+    },
+    "puntual": {
+      "estados": "Received, Confirmed, In preparation, Prepared and Shipped are the steps of an order, in that order. Cancelled means it has been called off.",
+      "precioNeto": "Your unit price with the discount already applied. It is fixed when the order is confirmed.",
+      "precioNetoCarrito": "Your unit price with the discount already applied. It can change if the price list changes; once the order is confirmed it is fixed.",
+      "tipoEmpresa": "Partner: a distributor that buys more and has its own sub-brand. Distributor: buys seeing the devices of its assigned brand, MySmartWindow by default."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "What can I do in the portal?",
+        "r": "Browse your brand catalog with your prices, prepare a cart, confirm orders and follow their status until shipping. There is no online payment: orders are handled with your purchase order number (PO Number)."
+      },
+      "noEntro": {
+        "p": "I cannot sign in",
+        "r": "Check your email and password. If you have just registered your company, you cannot sign in until you verify your email and an IoT FENSTER administrator approves the registration; meanwhile you will see the same invalid credentials message."
+      },
+      "olvidePassword": {
+        "p": "I forgot my password",
+        "r": "Click “Forgot your password?” under the form to receive a link to create a new one."
+      },
+      "correoEmpresa": {
+        "p": "Which email should I use?",
+        "r": "The corporate email of your company administrator. It must belong to the same domain you give as the website domain (for example, name@yourcompany.com if the domain is yourcompany.com)."
+      },
+      "despuesDeEnviar": {
+        "p": "What happens after I send the request?",
+        "r": "You will verify your email and an IoT FENSTER administrator will review the request and set your terms (brand, price list and discount). Once approved, you can sign in with your email and password."
+      },
+      "precioVisto": {
+        "p": "Which price am I seeing?",
+        "r": "Your net price: the list RRP with your company discount already applied. Some products may have their own discount."
+      },
+      "productoFalta": {
+        "p": "I cannot find a product",
+        "r": "You only see the devices of the brand assigned to your company. If you need another one, ask your IoT FENSTER contact."
+      },
+      "variantes": {
+        "p": "What are the colored circles?",
+        "r": "Each circle is a variant of the same model. Choose the one you want before adding it to the cart."
+      },
+      "carritoGuardado": {
+        "p": "Is my cart saved?",
+        "r": "Yes. It stays saved in your account even if you sign out, until you confirm the order."
+      },
+      "preciosCambian": {
+        "p": "Can prices change?",
+        "r": "The cart always shows today prices. If a price changes while you have it open, it is updated and, when you confirm, we warn you so you can review the new total."
+      },
+      "poNumber": {
+        "p": "What is the PO Number?",
+        "r": "It is the number of your purchase order. It identifies this order both in your company and at IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "How do I pay?",
+        "r": "There is no online payment. When you confirm, the order is registered and handled with your purchase order."
+      },
+      "editarDespues": {
+        "p": "Can I change the order after confirming it?",
+        "r": "Not from the portal: when you confirm, prices and discounts are fixed. If you need a change, contact IoT FENSTER."
+      },
+      "estados": {
+        "p": "What does each status mean?",
+        "r": "Received: we have received it. Confirmed: IoT FENSTER has accepted it. In preparation: we are preparing it. Prepared: ready to go out. Shipped: it has left, with carrier and tracking link. Cancelled: it has been called off and you will see the reason."
+      },
+      "encontrarPedido": {
+        "p": "How do I find an order?",
+        "r": "Type the PED code, the PO Number or a product in the search box, and refine with the status and date filters. You can sort by date or by total."
+      },
+      "descargarPdf": {
+        "p": "How do I download the order summary?",
+        "r": "Click “Download PDF” and choose the language of the document before downloading it."
+      },
+      "repetirPedido": {
+        "p": "What does “Reorder” do?",
+        "r": "It adds the same lines to the cart at today prices and warns you about anything no longer available or with a changed price. It confirms nothing: you review the cart and confirm yourself."
+      },
+      "precioFijo": {
+        "p": "Why does the price of an order not change?",
+        "r": "When confirmed, the order keeps the RRP, discount and net price of that moment. They are not recalculated even if the price list changes later."
+      },
+      "partnerODistribuidor": {
+        "p": "Partner or distributor?",
+        "r": "A partner is a distributor that buys more and has its own sub-brand (VBH, Procomsa, MySmartWindow). A distributor buys seeing the devices of its assigned brand; MySmartWindow by default."
+      },
+      "aprobarSolicitud": {
+        "p": "How do I approve a request?",
+        "r": "Open the “Pending approval” tab and click Approve: set the trade brand, price list and discount. The company receives the catalog of its brand and its users will be able to sign in."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Suspend, archive or delete",
+        "r": "Suspending cuts access until you reactivate the company. Archiving hides it from the lists while keeping data and orders (not possible with unshipped orders). Deleting erases it completely and is only allowed if it has no orders."
+      },
+      "datosPorCompletar": {
+        "p": "What is “data to complete”?",
+        "r": "Companies loaded from a list carry provisional data (tax ID, domain or address “PENDIENTE”) until you complete their file."
+      },
+      "descuentoEmpresa": {
+        "p": "How does the discount work?",
+        "r": "The company discount applies to the list RRP of all its products. A product with its own discount uses that one instead of the general one."
+      },
+      "productosDeMarca": {
+        "p": "Brand products and extras",
+        "r": "Brand products come from the brand catalog and only allow discount and hide. Extras are assigned by hand and managed as usual."
+      },
+      "cambiosAplican": {
+        "p": "What happens if I change something here?",
+        "r": "Changes apply immediately to every company using that brand."
+      },
+      "anadirLoQueFalta": {
+        "p": "What does “Add what is missing” do?",
+        "r": "It adds to the brand the base products it does not have yet, with a suggested name you can edit."
+      },
+      "productoBase": {
+        "p": "What is a base product?",
+        "r": "The device itself. The same device is named differently depending on the brand (Connect-1, Wave-1, Icon1) but it is a single base product."
+      },
+      "subirImagenes": {
+        "p": "How do I add photos?",
+        "r": "Select one or several products and use “Upload image”. PNG, JPG or WebP up to 3 MB are accepted."
+      },
+      "avanzarPedido": {
+        "p": "How do I move an order forward?",
+        "r": "Only an administrator can change the status, one step at a time: Received, Confirmed, In preparation, Prepared and Shipped. When shipping, carrier, dispatch number and tracking link are requested."
+      },
+      "cancelarPedido": {
+        "p": "How do I cancel an order?",
+        "r": "It can be cancelled as long as it has not been shipped, giving a reason that the customer will see."
+      },
+      "corregirEstado": {
+        "p": "Can I correct a status?",
+        "r": "The administrator can force a status skipping the sequence, for exceptional cases."
+      },
+      "cifrasCanceladas": {
+        "p": "What do the figures count?",
+        "r": "The invoiced total and the charts by company and by day do not include cancelled orders."
+      },
+      "cambiarIdioma": {
+        "p": "How do I change the language?",
+        "r": "With the language selector in the top bar. It is remembered in your account."
+      },
+      "miCuenta": {
+        "p": "Which account am I signed in with?",
+        "r": "At the top right, above the bar, you see “Signed in as” with the email of the account in use."
+      }
+    }
   }
 }

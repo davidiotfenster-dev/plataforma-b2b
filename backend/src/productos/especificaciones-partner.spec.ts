@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { especificacionesParaPartner } from './especificaciones-partner.js';
+import { especificacionesParaPartner, varianteParaPartner } from './especificaciones-partner.js';
 
 describe('especificacionesParaPartner (lista blanca)', () => {
   it('solo devuelve lo que cuelga de `publicas`', () => {
@@ -27,5 +27,21 @@ describe('especificacionesParaPartner (lista blanca)', () => {
     expect(especificacionesParaPartner({ publicas: ['a'] })).toBeNull();
     expect(especificacionesParaPartner(null)).toBeNull();
     expect(especificacionesParaPartner(['a'])).toBeNull();
+  });
+});
+
+describe('varianteParaPartner', () => {
+  const json = (color: string) => ({ grupo: 'Connect-1 / Wave-1 / Icon1', color });
+  it('agrupa los colores del mismo modelo y no filtra texto de otras marcas', () => {
+    const b = varianteParaPartner(json('Blanco'), 'Connect-1 / Wave-1 / Icon1 Blanco', 'p1');
+    const n = varianteParaPartner(json('Negro'), 'Connect-1 / Wave-1 / Icon1 Negro', 'p1');
+    expect(b.modeloId).toBe(n.modeloId);
+    expect(b.color).toBe('Blanco');
+    expect(b.modeloId).not.toMatch(/wave|connect|icon/i);
+  });
+  it('el identificador cambia de un partner a otro', () => {
+    const a = varianteParaPartner(json('Blanco'), 'X Blanco', 'p1');
+    const b = varianteParaPartner(json('Blanco'), 'X Blanco', 'p2');
+    expect(a.modeloId).not.toBe(b.modeloId);
   });
 });

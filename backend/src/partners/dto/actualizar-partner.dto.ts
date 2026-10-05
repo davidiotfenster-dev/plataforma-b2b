@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
 import {
   CODIGO_POSTAL_MENSAJE,
   CODIGO_POSTAL_REGEX,
@@ -6,6 +6,7 @@ import {
   DOMINIO_REGEX,
   TELEFONO_MENSAJE,
   TELEFONO_REGEX,
+  MARCAS_CATALOGO,
 } from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
@@ -46,6 +47,15 @@ export class ActualizarPartnerDto {
   @IsString()
   @IsNotEmpty()
   marcaComercial?: string;
+
+  /// Ojo: `tipo` (Partner/Distribuidor) NO se edita aquí. Solo un admin puede cambiarlo,
+  /// y lo hace con `promocionar` / `degradar` para que quede en la auditoría.
+  /// Al no estar en este DTO, enviarlo da 400 (forbidNonWhitelisted).
+
+  /// Marca cuyos dispositivos ve la empresa.
+  @IsOptional()
+  @IsIn(MARCAS_CATALOGO)
+  marcaCatalogo?: (typeof MARCAS_CATALOGO)[number];
 
   @IsOptional()
   @IsString()

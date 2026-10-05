@@ -80,3 +80,90 @@ Nota de despliegue: el puerto 3004 (el del túnel de Cloudflare) sirve el fronte
 ## Botón "Borrar" en productos asignados (hecho)
 - Backend: `DELETE /partners/:id/catalogo/:repId` (ADMIN_FENSTER y COMERCIAL). Al borrar, el producto desaparece de los carritos del partner; los pedidos ya hechos conservan su "fotografía" (nombre, precio, descuento) y solo pierden el enlace al producto.
 - Panel: botón rojo "Borrar" junto a "Desactivar", con confirmación. Desactivar sigue existiendo (oculta el producto sin perder la asignación).
+
+## Mejoras de pantalla (hechas, 2026-09-29)
+- **Lista de asignados compacta** (Admin → Partners → Catálogo): una fila por producto en una sola tabla, buscador por nombre/SKU, "Guardar" solo activo si hay cambios, "Borrar" discreto con confirmación (se rellena de rojo al pasar el ratón), productos desactivados atenuados con etiqueta "Inactivo". Antes "Borrar" se salía de la tarjeta.
+- **Menú:** la sección activa se resalta (fondo gris claro, negrita y línea turquesa).
+- **Login rediseñado:** tarjeta con franja turquesa, iconos en los campos, ojo para ver la contraseña, aviso de error con icono, indicador de carga y enlace "Solicitar acceso" al registro.
+- **Componente `Marca`** (`frontend/src/components/marca.tsx`): el nombre "IoT FENSTER Portal Partner" con la misma tipografía en la barra superior y en un pie de página nuevo. Se probó también sobre la tarjeta del login y se quitó por repetido.
+- Textos nuevos en es/en/de/it/pt.
+
+## Comprobación de seguridad (hecha, 2026-09-30)
+24 pruebas contra el backend local (`localhost:3010`) con las cuentas de prueba de `SETUP.md`: **23 correctas, 1 fallo**.
+- Correcto: cookie `HttpOnly` y `Secure`; `DELETE` de asignaciones (401 sin sesión, 403 como partner, 404 con id inexistente o de otro partner, 400 con id mal formado o inyección SQL); el partner no puede entrar en `/productos-base` ni `/partners`; el catálogo del partner (22 productos revisados) no filtra `productoBaseId`, `skuIndustrial`, `nombreTecnico`, `pvpTarifa`, `referencias`, `gtin` ni `especificacionesJson`; un comercial no puede borrar en un partner ajeno; precio negativo y campo extra `partnerId` rechazados con 400.
+- Fallo: la cookie sale con `SameSite=None` porque `backend/.env` tiene `COOKIE_SAME_SITE="none"` para la demo por túnel. En producción debe ser `strict` (es el valor por defecto si la variable no existe).
+- No probado: pantallas con clics (asignar por marca, borrar), fuerza bruta en el login y revisión de cabeceras de Helmet.
+
+## Demo por túnel (2026-09-30)
+Tras reiniciarse el equipo, se recrearon los dos túneles de Cloudflare. URLs nuevas en `CONTEXTO_SESION.md`; `backend/.env` (`FRONTEND_URL`) y `frontend/.env.local` (`NEXT_PUBLIC_API_URL`) actualizados, frontend recompilado. Verificado desde fuera: frontend 200, backend 401 sin sesión y CORS correcto. **Al terminar la demo hay que devolver los `.env` a local** y cambiar la contraseña de la cuenta de administrador de prueba, que está escrita en `SETUP.md`.
+
+## Git y GitHub
+- Commits locales (rama `master`): `e2aaf9f` backend, `50b2d9e` frontend, `578eb8c` documentación, `868e0ba` README del proyecto.
+- Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git` (privado). Se cambió de SSH a HTTPS porque el equipo no tiene clave SSH registrada. `main` en GitHub está en `578eb8c`; falta subir el README: `git push origin master:main`.
+- No hace falta PR si se trabaja en solitario.
+- Queda sin guardar en git `backend/scripts/data/dispositivos.backup-antes-paso2.json` (copia temporal, se puede borrar).
+
+## Pendiente (resumen)
+1. Precio de tarifa de Connect-1/2 (Wave-1/2, Icon1/2), Pulsar+, Wave2S+, Wave3 Air y tapas ICON.
+2. GTIN de EVO, Connect Smart, C-WALL Flex, mandos y cables.
+3. Confirmar si el Pulsar con cable de 1,6 m de MySmartWindow es el mismo aparato que el Pulsar normal (ahora separado).
+4. Crear el partner MySmartWindow (necesita CIF y dirección) y guardar la marca en la ficha de cada partner.
+5. Asignación automática del catálogo al aprobar un partner nuevo.
+6. Probar en pantalla el botón "Asignar catálogo de una marca" y "Borrar".
+
+## Datos de PRUEBA en el catálogo (2026-09-30) — hay que sustituirlos por los reales
+Para poder probar el panel de un partner con todo el catálogo, se rellenó lo que faltaba en `dispositivos.json` y se cargó en la base (`npm run import:dispositivos`: 0 creados, 58 actualizados). Cada producto tocado lleva el campo `datosDePrueba` en el JSON.
+- **Precio de prueba 50 EUR** (`pvpTarifa`) en 23 productos sin precio en la tarifa: Connect/Wave/Icon 1, 1+, 2, 2+, 2S y 2S+ (12), tapas ICON (4), Pulsar+ (2), Wave3 Air (3) y Pulsar+ con cable 1,6 m (2).
+- **GTIN de prueba `TEST000000001`…`TEST000000022`** en las referencias que no tenían GTIN: cable 2 m (2 marcas), mando Witooth (3 marcas), EVO ×12, C-WALL Flex, Connect Smart White Box, botón Pulsar, cable Pulsar 1 m y cable datos EVO.
+- Para localizarlos: buscar `TEST0000` en el buscador del catálogo o `datosDePrueba` en el JSON. Al tener los datos reales, cambiarlos en el JSON y volver a cargar.
+
+## Botón "Borrar todos" en el catálogo del partner (2026-09-30)
+- Backend: `DELETE /partners/:id/catalogo` (ADMIN_FENSTER y COMERCIAL, mismas restricciones que el borrado individual). Borra todas las asignaciones del partner; desaparecen de sus carritos y los pedidos hechos conservan su "fotografía".
+- Panel (Admin → Partners → Catálogo): botón rojo "Borrar todos (N)" junto al título "Productos asignados", con confirmación. Solo aparece si hay productos asignados. Textos en es/en/de/it/pt.
+- Los botones existentes (asignar por marca, borrar uno, desactivar) se mantienen. Pendiente de probar en pantalla; hay que reiniciar el backend y recompilar el frontend.
+
+## Imágenes de producto gestionables por el admin (2026-09-30)
+- Base de datos: columna nueva `ProductoBase.imagenUrl` (migración `imagen_producto_base`). Una foto por aparato, la misma para las 3 marcas; `RepresentacionPartner.imagenUrl` tiene prioridad si existe.
+- Backend: `GET /imagenes/:archivo` (público, nombres UUID v4; solo png/jpg/webp), `POST /productos-base/imagen` (multipart `archivo` + `ids`, uno o varios productos) y `DELETE /productos-base/imagen` (`{ids}`), solo ADMIN_FENSTER. Se valida por los bytes del archivo, máximo 3 MB; se borra del disco la subida que ya no usa nadie.
+- Archivos: `backend/uploads/productos/` (variable `UPLOADS_DIR`). Las 6 fotos de serie `default-*.png` van en git; las subidas por el admin no.
+- Fotos de serie: connect-1 (1 y 1+), connect-2 (2, 2+, 2S, 2S+), pulsar (Pulsar, Pulsar+, cable 1,6 m, botón), c-wall (pulsadores de pared y Flex), evo (12 EVO) y mando. Sin foto: tapas ICON, cables, White Box.
+- `import:dispositivos` solo pone la foto de serie al CREAR un producto; nunca pisa lo que haya cambiado el admin.
+- Panel (Admin → Catálogo): miniatura en cada fila; en el detalle, "Subir/Cambiar imagen" y "Quitar imagen"; con varios seleccionados, los mismos botones en la barra inferior.
+- Grupos del catálogo plegables (clic en la cabecera) y botón "Plegar todo / Desplegar todo".
+
+## Partners y clientes (2026-09-30)
+- Base de datos: `Partner.tipo` (PARTNER / CLIENTE, por defecto CLIENTE) y `Partner.marcaCatalogo` (VBH / PROCOMSA / MYSMARTWINDOW, por defecto MYSMARTWINDOW). Migración `tipo_empresa_y_marca_catalogo`.
+- Script `backend/scripts/migrar-partners-clientes.ts` (idempotente, ya ejecutado): VBH y Procomsa → partner con su marca; se crea el partner **MySmartWindow** con datos provisionales (`PENDIENTE-MYSMARTWINDOW`, sale como "datos por completar") y 42 productos Connect a PVP de tarifa; las otras 12 empresas quedan como clientes con marca MySmartWindow.
+- Los pulsadores de pared con marca "C-WALL" cuentan como marca MySmartWindow; sus nombres pasan a "C-WALL SKY" / "C-WALL SHUTTER" (antes los dos "Pulsador empotrable en pared").
+- Admin: el menú "Partners" pasa a "Empresas". La lista muestra arriba las tarjetas de los partners (color por marca, productos, pedidos, descuento) y debajo la tabla de clientes con su marca. En la ficha: insignias Partner/Cliente y marca; en "Datos → Comercial" se eligen el tipo y la marca. El botón "Asignar catálogo de una marca" usa la marca de la ficha.
+- Pendiente: catálogo por marca (hoy cada empresa sigue con su lista propia; a los clientes no se les ha asignado aún el catálogo Connect), respuestas de dirección (documento "Portal B2B: partners y clientes") y datos reales de MySmartWindow.
+
+## Catálogo por marca (2026-09-30)
+- Base de datos: tabla nueva `ProductoMarca` (marca, producto base, SKU, nombre, PVP, activo) = catálogo de cada submarca; `RepresentacionPartner.productoMarcaId` enlaza la fila de cada empresa con su producto de marca (nulo = producto extra asignado a mano). Migración `catalogo_por_marca`. Copia de la base antes del cambio: `%TEMP%/backups/fenster-antes-catalogo-marca.dump` (`pg_dump -Fc`).
+- Backend: módulo `catalogo-marca` (`GET /catalogos-marca/:marca`, `POST :marca/productos`, `POST :marca/rellenar`, `PATCH|DELETE productos/:id`, solo ADMIN_FENSTER). Cada cambio se aplica al momento a todas las empresas de la marca (`sincronizarEmpresa`). También se sincroniza al crear una empresa, al aprobarla y al cambiarle la marca.
+- Reglas: en una empresa, los productos de su marca solo admiten descuento y ocultar (400 si se intenta renombrar, cambiar SKU/PVP o borrar); los extras se gestionan como antes. Lo oculto en la marca desaparece para todas sus empresas y no se puede pedir. "Borrar todos" pasa a "Borrar extras".
+- Cambiar la marca de una empresa: salen los productos de la marca anterior (también de su carrito; los pedidos no cambian) y entran los de la nueva. Un extra del mismo producto que uno de la nueva marca pasa a ser de la marca (y se va si luego cambia otra vez de marca).
+- Carga inicial (`npx tsx scripts/poblar-catalogos-marca.ts`, idempotente): Wave 41, ICON 35, Connect 42 productos; todas las empresas enlazadas. Los 12 productos Wave que el Partner Ficticio (cliente MySmartWindow) tenía a mano desaparecieron en la prueba de cambio de marca.
+- Pantallas: menú nuevo "Marcas" (Catálogos de marca: tarjeta por marca con productos y empresas, tabla editable, "Añadir lo que falta" y productos que faltan con nombre propuesto). Catálogo de cada empresa: aviso de su marca, "Productos de su marca" (descuento y ocultar) y "Productos extra". Lista de Empresas más ancha y con los clientes también en tarjetas (borde del color de su marca).
+- Probado contra el backend local (13 comprobaciones: propagación de PVP, ocultar, carrito, permisos, cambio de marca, sin fuga de campos internos). Pantallas sin probar con clics.
+
+## Prueba completa por roles (2026-09-30)
+- Se probó contra una copia local (backend en 3011 y frontend en 3006, misma base de datos, sin túnel), para no teclear contraseñas en una web externa. Los datos de prueba ("PRUEBA-AUTO": 2 empresas y 2 pedidos) se borraron al terminar.
+- API: 83 comprobaciones de admin, comercial y cuenta de empresa, 82 correctas; la única fallida era un error de la prueba (el catálogo global tiene 59 productos base, no 58, por `IND-VENTANA-001`).
+- Pantallas: admin (Empresas, Marcas con cambio de precio guardado y revertido, cambio de marca desde la ficha, Productos, Pedidos, Estadísticas), comercial (solo ve su cliente, menú Empresas y Pedidos) y cliente (catálogo por modelo con color, carrito, checkout y pedido PED-000120; vista móvil sin scroll horizontal).
+- Corregido tras la prueba: Marcas, Productos y Estadísticas muestran "solo para administradores" si entra un comercial por URL (antes se quedaban cargando); el enlace "Editar el catálogo de la marca" y la sección Partners vacía ya no le salen al comercial; textos "Todas las empresas" y "Descuento general de la empresa"; tarjetas del catálogo más anchas en el móvil.
+- Arreglado después: las etiquetas de checkout, registro, recuperar y restablecer contraseña están enlazadas a sus campos (y los errores se anuncian con `role="alert"`).
+- Numeración de pedidos sin huecos: ya no usa la secuencia `pedido_codigo_seq` (migración `numeracion_pedidos_sin_huecos` la borra). El código es el último PED existente + 1, calculado dentro de la transacción con un bloqueo de PostgreSQL (`src/pedidos/codigo-pedido.ts`). Una confirmación fallida no gasta número y, tras borrar los últimos pedidos, sus números se reutilizan. Probado con 5 confirmaciones simultáneas: PED-000007 a PED-000011, distintos y seguidos. El siguiente pedido real será PED-000007.
+
+## Barra superior (2026-09-30)
+- "Salir" es un botón con borde (rojo al pasar el ratón o con el teclado) y queda siempre arriba a la derecha.
+- Escritorio (≥1280 px): una fila → marca | secciones | idioma + Salir. Tablet (768–1279 px): fila 1 marca … idioma + Salir, fila 2 secciones. Móvil: fila 1 marca … Salir, debajo secciones e idioma.
+- El email del usuario no cabía en la barra principal: se muestra en una franja fina encima ("Sesión iniciada como <email> · <empresa o rol>", a la derecha, visible en escritorio, tablet y móvil) y además queda en el tooltip de "Salir" y en su etiqueta para lectores de pantalla.
+- Medido con admin en 1440, 1280, 1024, 768 y 375 px: sin scroll horizontal y cada bloque en su fila.
+
+
+---
+
+## Nota 2026-10-02: «cliente» se llama ahora «distribuidor»
+
+Este diario es de fechas anteriores y no se reescribe. Donde diga `CLIENTE` o «cliente» como tipo de empresa, léase `DISTRIBUIDOR` / «distribuidor»: el valor se renombró con la migración `20261002150000_renombrar_tipo_empresa_cliente_a_distribuidor`. Ver `CONTEXTO_SESION.md`.

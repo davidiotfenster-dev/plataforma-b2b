@@ -8,7 +8,9 @@
     "next": "Siguiente",
     "pageOf": "Página {page} de {total}",
     "close": "Cerrar",
-    "working": "Trabajando…"
+    "working": "Trabajando…",
+    "adminOnly": "Esta sección es solo para administradores.",
+    "backToCompanies": "Volver a Empresas"
   },
   "estados": {
     "RECIBIDO": "Recibido",
@@ -30,17 +32,28 @@
     "catalogo": "Catálogo",
     "carrito": "Carrito",
     "pedidos": "Pedidos",
-    "partners": "Partners",
+    "partners": "Empresas",
     "logout": "Salir",
     "login": "Iniciar sesión",
     "registro": "Registrar empresa",
     "language": "Idioma",
     "dashboard": "Estadísticas",
-    "catalogoBase": "Productos"
+    "catalogoBase": "Productos",
+    "marcas": "Marcas",
+    "signedInAs": "Sesión iniciada como",
+    "roleAdmin": "Administrador FENSTER",
+    "roleComercial": "Comercial FENSTER"
   },
   "home": {
     "title": "Portal Partner IoT FENSTER",
-    "description": "Gestión de pedidos B2B por orden de compra diferida. Inicia sesión con tu cuenta de partner o registra tu empresa para solicitar acceso."
+    "description": "Gestión de pedidos B2B por orden de compra diferida. Inicia sesión con tu cuenta de partner o registra tu empresa para solicitar acceso.",
+    "badge": "Portal B2B para distribuidores e instaladores",
+    "f1Title": "Tu catálogo, tus precios",
+    "f1Text": "Productos autorizados para tu empresa con tu tarifa y descuento ya aplicados.",
+    "f2Title": "Pedido con tu nº de PO",
+    "f2Text": "Confirma el pedido con tu orden de compra. Sin pagos en línea: facturación diferida.",
+    "f3Title": "Seguimiento hasta la entrega",
+    "f3Text": "Estado del pedido en cada paso, PDF del resumen y enlace de seguimiento del envío."
   },
   "login": {
     "title": "Iniciar sesión",
@@ -154,7 +167,30 @@
     "date": "Fecha",
     "poNumber": "PO Number",
     "total": "Total",
-    "status": "Estado"
+    "status": "Estado",
+    "loadError": "No se han podido cargar tus pedidos. Inténtalo de nuevo.",
+    "viewCatalog": "Ver el catálogo",
+    "products": "Productos",
+    "summaryActive": "Pedidos en curso",
+    "summaryShipped": "Enviados en los últimos 7 días",
+    "summaryTotal": "Pedidos en total",
+    "searchLabel": "Buscar pedidos",
+    "searchPlaceholder": "Buscar por código PED, PO Number o producto…",
+    "statusFilter": "Filtrar por estado",
+    "allStatuses": "Todos",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "sortLabel": "Ordenar por",
+    "sortNewest": "Más recientes primero",
+    "sortOldest": "Más antiguos primero",
+    "sortTotalHigh": "Total: de mayor a menor",
+    "sortTotalLow": "Total: de menor a mayor",
+    "clearFilters": "Quitar filtros",
+    "resultsCount": "{n, plural, one {# pedido} other {# pedidos}}",
+    "noResults": "Ningún pedido coincide con los filtros.",
+    "itemsCount": "{n, plural, one {# artículo} other {# artículos}}",
+    "moreProducts": "+{n} más",
+    "trackShipment": "Seguir envío"
   },
   "pedidoDetalle": {
     "loading": "Cargando pedido…",
@@ -171,12 +207,33 @@
     "quantity": "Cantidad",
     "netPrice": "Precio neto",
     "total": "Total",
-    "totalLabel": "Total: {total} €"
+    "totalLabel": "Total: {total} €",
+    "back": "Mis pedidos",
+    "placedOn": "Realizado el {fecha}",
+    "downloadPdf": "Descargar PDF",
+    "downloading": "Descargando…",
+    "downloadError": "No se ha podido descargar el PDF. Inténtalo de nuevo.",
+    "reorder": "Repetir pedido",
+    "reordering": "Añadiendo…",
+    "reorderError": "No se ha podido repetir el pedido. Inténtalo de nuevo.",
+    "reorderDone": "{n, plural, one {Se ha añadido # producto al carrito, con el precio de hoy.} other {Se han añadido # productos al carrito, con los precios de hoy.}}",
+    "reorderNone": "No se ha podido añadir ningún producto al carrito.",
+    "goToCart": "Ir al carrito",
+    "reorderUnavailable": "Ya no están disponibles y no se han añadido: {productos}.",
+    "reorderPriceChanges": "Ha cambiado el precio de:",
+    "reorderPriceLine": "{nombre}: antes {anterior} €, ahora {actual} €",
+    "timelineLabel": "Progreso del pedido",
+    "cancelledTitle": "Pedido cancelado",
+    "cancelledOn": "Cancelado el {fecha}",
+    "cancelReason": "Motivo: {motivo}",
+    "unitPrice": "{precio} € / ud.",
+    "pvpDiscount": "PVP {pvp} € · −{descuento} %",
+    "pdfLanguageTitle": "Idioma del PDF"
   },
   "adminPartners": {
-    "title": "Partners",
-    "subtitle": "Las empresas que compran a IoT FENSTER: altas, aprobaciones, condiciones y catálogo.",
-    "newPartner": "Nuevo partner",
+    "title": "Empresas",
+    "subtitle": "Partners con submarca propia y distribuidores que compran con la marca de un partner: altas, condiciones y catálogo.",
+    "newPartner": "Nueva empresa",
     "dismissMessage": "Cerrar aviso",
     "pendingBanner": "{n, plural, one {# partner espera tu aprobación.} other {# partners esperan tu aprobación.}}",
     "reviewPending": "Revisar",
@@ -214,7 +271,12 @@
     "done": {
       "rechazar": "Solicitud de {partner} rechazada.",
       "suspender": "{partner} suspendido: no podrá entrar ni pedir hasta que lo reactives.",
-      "reactivar": "{partner} reactivado."
+      "reactivar": "{partner} reactivado.",
+      "archivar": "{partner} archivada.",
+      "desarchivar": "{partner} desarchivada.",
+      "eliminar": "{partner} eliminada.",
+      "promocionar": "{partner} ahora es Partner.",
+      "degradar": "{partner} vuelve a ser Distribuidor."
     },
     "confirm": {
       "rechazar": {
@@ -231,6 +293,26 @@
         "title": "¿Reactivar a {partner}?",
         "body": "Sus usuarios volverán a poder entrar y hacer pedidos.",
         "button": "Reactivar"
+      },
+      "archivar": {
+        "title": "¿Archivar a {partner}?",
+        "body": "Dejará de aparecer en las listas y sus usuarios no podrán entrar. Se conservan sus datos y pedidos, y puedes desarchivarla cuando quieras. No se puede archivar una empresa con pedidos sin enviar.",
+        "button": "Archivar"
+      },
+      "desarchivar": {
+        "title": "¿Desarchivar a {partner}?",
+        "body": "Volverá a aparecer en las listas y, si estaba activa, sus usuarios podrán entrar de nuevo.",
+        "button": "Desarchivar"
+      },
+      "promocionar": {
+        "title": "¿Promocionar a {partner} a Partner?",
+        "body": "Pasa a ser Partner (submarca propia), normalmente porque su volumen de compra lo justifica. Queda registrado en la auditoría con las unidades compradas hasta hoy, y puedes revertirlo.",
+        "button": "Promocionar"
+      },
+      "degradar": {
+        "title": "¿Devolver a {partner} a Distribuidor?",
+        "body": "Deja de ser Partner y pasa a Distribuidor. Sus datos y pedidos no cambian. Queda registrado en la auditoría.",
+        "button": "Pasar a Distribuidor"
       }
     },
     "approveTitle": "Aprobar a {partner}",
@@ -244,7 +326,7 @@
     "assignCatalog": "Asignar catálogo",
     "cancel": "Cancelar",
     "working": "Trabajando…",
-    "backToList": "Todos los partners",
+    "backToList": "Todas las empresas",
     "notFound": "No se ha encontrado este partner.",
     "incompleteBanner": "Este partner tiene datos provisionales (CIF, dominio o dirección). Complétalos para poder facturarle y contactar con él.",
     "completeData": "Completar datos",
@@ -306,13 +388,16 @@
       "nombreUsuario": "Nombre del contacto",
       "emailUsuario": "Email de acceso",
       "passwordUsuario": "Contraseña inicial",
-      "notas": "Notas"
+      "notas": "Notas",
+      "tipo": "Tipo de empresa",
+      "marcaCatalogo": "Marca de los dispositivos"
     },
     "hints": {
       "dominioWeb": "Sin http:// ni www. Ejemplo: empresa.com",
       "marcaComercial": "Decide qué nombres y SKU ve al asignarle productos: VBH, Procomsa…",
       "descuentoPorcentaje": "Se aplica a todos sus productos salvo los que tengan un descuento propio.",
-      "passwordUsuario": "Mínimo 8 caracteres. Se la comunicas tú al partner."
+      "passwordUsuario": "Mínimo 8 caracteres. Se la comunicas tú al partner.",
+      "marcaCatalogo": "Nombres y códigos que verá en su catálogo. Un distribuidor usa MySmartWindow por defecto."
     },
     "generatePassword": "Generar",
     "copy": "Copiar",
@@ -321,7 +406,35 @@
     "missingRequired": "Faltan campos obligatorios (*).",
     "createButton": "Crear partner",
     "saving": "Guardando…",
-    "saveChanges": "Guardar cambios"
+    "saveChanges": "Guardar cambios",
+    "partnersTitle": "Partners",
+    "partnersHelp": "empresas con submarca propia de nuestros dispositivos",
+    "distribuidoresTitle": "Distribuidores",
+    "distribuidoresHelp": "empresas que compran viendo los dispositivos de la marca asignada",
+    "partnersEmpty": "Todavía no hay partners.",
+    "ownBrand": "Submarca {marca}",
+    "statProducts": "Productos",
+    "statOrders": "Pedidos",
+    "statDiscount": "Descuento",
+    "colBrand": "Marca y condiciones",
+    "typePartner": "Partner",
+    "typeDistribuidor": "Distribuidor",
+    "typePartnerLong": "Partner (submarca propia)",
+    "typeDistribuidorLong": "Distribuidor",
+    "tabArchived": "Archivadas",
+    "archive": "Archivar",
+    "unarchive": "Desarchivar",
+    "deleteAction": "Eliminar…",
+    "archivedBadge": "Archivada",
+    "archivedBanner": "Esta empresa está archivada: no aparece en las listas ni puede entrar. Sus datos y pedidos se conservan.",
+    "deleteTitle": "Eliminar {partner}",
+    "deleteBody": "Se borrarán la empresa, {usuarios, plural, one {su usuario} other {sus # usuarios}}, su catálogo y sus carritos. No se puede deshacer. Solo es posible porque no tiene pedidos; si prefieres conservar sus datos, archívala.",
+    "deleteConfirmLabel": "Escribe «{partner}» para confirmar",
+    "deleteButton": "Eliminar definitivamente",
+    "promote": "Promocionar a Partner",
+    "demote": "Pasar a Distribuidor",
+    "volumeLine": "{unidades, plural, one {# unidad} other {# unidades}} en {pedidos, plural, one {# pedido} other {# pedidos}}",
+    "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?"
   },
   "adminPedidos": {
     "title": "Fulfillment de pedidos",
@@ -371,6 +484,22 @@
     "noGtin": "Sin GTIN",
     "unassigned": "Sin asignar",
     "assign": "Asignar",
+    "image": "Imagen",
+    "changeImage": "Cambiar imagen",
+    "uploadImage": "Subir imagen",
+    "removeImage": "Quitar imagen",
+    "removeImageConfirm": "¿Quitar la imagen de {n} producto(s)? Los partners verán el icono por defecto.",
+    "imageHelp": "PNG, JPG o WEBP, máximo 3 MB. La misma foto sirve para todas las marcas.",
+    "collapseAll": "Plegar todo",
+    "expandAll": "Desplegar todo",
+    "groupBy": "Agrupar por",
+    "byDevice": "Aparato",
+    "byBrand": "Marca",
+    "noBrand": "Sin marca de partner",
+    "modelsCount": "{n} modelo(s)",
+    "productsCount": "{n} producto(s)",
+    "assignedCount": "{a} de {n} asignados",
+    "assignedLabel": "Asignados",
     "assignToPartners": "Asignar a partners",
     "selectedCount": "{n} seleccionado(s)",
     "clearSelection": "Quitar selección",
@@ -412,7 +541,7 @@
     "confirmDiscard": "Hay cambios sin asignar. ¿Cerrar y descartarlos?"
   },
   "adminPartnerCatalogo": {
-    "generalDiscount": "Descuento general del partner: {descuento}%",
+    "generalDiscount": "Descuento general de la empresa: {descuento}%",
     "loading": "Cargando…",
     "assignedTitle": "Productos asignados",
     "assignedEmpty": "Este partner todavía no tiene productos asignados.",
@@ -443,10 +572,28 @@
     "delete": "Borrar",
     "deleting": "Borrando…",
     "deleteConfirm": "¿Borrar «{name}» del catálogo de este partner? Se quitará también de sus carritos. Los pedidos ya hechos no se tocan.",
+    "deleteAll": "Borrar todos ({n})",
+    "deleteAllConfirm": "¿Borrar los {n} productos del catálogo de este partner? Se quitarán también de sus carritos. Los pedidos ya hechos no se tocan.",
     "searchAssigned": "Buscar en los asignados…",
     "searchEmpty": "Ningún producto coincide con la búsqueda.",
     "discountShort": "Descuento",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "hidden": "Oculto",
+    "hiddenInBrand": "Oculto en la marca",
+    "deleteExtras": "Borrar extras ({n})",
+    "deleteExtrasConfirm": "¿Borrar los {n} productos extra de esta empresa? Se quitarán también de sus carritos. Los productos de su marca y los pedidos ya hechos no se tocan.",
+    "brandBanner": "Ve el catálogo de la marca {marca}: se actualiza solo cuando cambia la marca. Aquí puedes ajustar su descuento u ocultarle productos.",
+    "brandEdit": "Editar el catálogo de la marca",
+    "brandChange": "Cambiar de marca (pestaña Datos)",
+    "brandProductsTitle": "Productos de su marca",
+    "hiddenCount": "{n} ocultos",
+    "brandEmpty": "El catálogo de su marca está vacío.",
+    "extrasTitle": "Productos extra",
+    "extrasHelp": "Asignados a mano solo a esta empresa, fuera del catálogo de su marca. Nombre, SKU y precio se editan aquí.",
+    "addExtraShow": "Añadir un producto extra ({n} disponibles)",
+    "addExtraHide": "Ocultar la lista de productos para añadir"
   },
   "adminDashboard": {
     "title": "Panel de estadísticas",
@@ -502,5 +649,208 @@
     "unverified": "email sin verificar",
     "moreActions": "Más acciones",
     "deactivateConfirm": "¿Desactivar este usuario? Dejará de poder entrar hasta que lo actives de nuevo."
+  },
+  "adminMarcas": {
+    "title": "Catálogos de marca",
+    "description": "Cada submarca tiene un único catálogo: productos, nombres, SKU y precios. Todas las empresas de esa marca (el partner y sus distribuidores) lo ven al momento; cada empresa solo ajusta su descuento u oculta productos.",
+    "genericError": "No se ha podido guardar. Inténtalo de nuevo.",
+    "sku": "SKU",
+    "name": "Nombre en la marca",
+    "pvp": "PVP (€)",
+    "save": "Guardar",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "remove": "Quitar",
+    "removeConfirm": "¿Quitar «{name}» del catálogo de la marca? Desaparece del catálogo y de los carritos de sus {n} empresas. Los pedidos ya hechos no se tocan.",
+    "hidden": "Oculto",
+    "namePlaceholder": "Nombre con que lo vende la marca",
+    "add": "Añadir",
+    "otherBrandsOnly": "Solo tiene nombre en otras marcas",
+    "filled": "{n} productos añadidos.",
+    "cardStats": "{productos} productos · {partners} partner · {distribuidores} distribuidores",
+    "search": "Buscar por nombre o SKU…",
+    "clear": "Borrar búsqueda",
+    "fill": "Añadir lo que falta ({n})",
+    "appliesTo": "Los cambios se aplican al momento a las {n} empresas con marca {marca}.",
+    "seeCompanies": "Ver empresas",
+    "inCatalog": "En el catálogo {marca}",
+    "empty": "No hay productos.",
+    "loading": "Cargando…",
+    "canAdd": "Productos de la marca que faltan",
+    "canAddHelp": "Tienen nombre en esta marca pero no están en su catálogo. Revisa nombre, SKU y precio y añádelos.",
+    "nothingToAdd": "No falta ninguno.",
+    "hideOthers": "Ocultar productos de otras marcas",
+    "showOthers": "Añadir un producto de otra marca ({n})"
+  },
+  "ayuda": {
+    "boton": "Ayuda",
+    "abrir": "Abrir la ayuda",
+    "cerrar": "Cerrar la ayuda",
+    "titulo": "Ayuda",
+    "enEstaPantalla": "En esta pantalla",
+    "preguntasGenerales": "Preguntas generales",
+    "masInfo": "Más información",
+    "contacto": "¿No encuentras lo que buscas?",
+    "escribirSoporte": "Escribir a soporte",
+    "temas": {
+      "inicio": "Inicio",
+      "login": "Iniciar sesión",
+      "registro": "Registro de empresa",
+      "catalogo": "Catálogo",
+      "carrito": "Carrito",
+      "checkout": "Confirmar pedido",
+      "pedidos": "Mis pedidos",
+      "pedidoDetalle": "Detalle del pedido",
+      "adminEmpresas": "Empresas",
+      "adminFicha": "Ficha de la empresa",
+      "adminMarcas": "Marcas",
+      "adminProductos": "Productos",
+      "adminPedidos": "Pedidos",
+      "adminDashboard": "Estadísticas"
+    },
+    "puntual": {
+      "estados": "Recibido, Confirmado, En preparación, Preparado y Enviado son los pasos de un pedido, en ese orden. Cancelado significa que se ha anulado.",
+      "precioNeto": "Tu precio unitario con el descuento ya aplicado. Queda fijado al confirmar el pedido.",
+      "precioNetoCarrito": "Tu precio unitario con el descuento ya aplicado. Puede cambiar si cambia la tarifa; al confirmar el pedido queda fijado.",
+      "tipoEmpresa": "Partner: distribuidor que compra más y tiene submarca propia. Distribuidor: compra viendo los dispositivos de la marca asignada, por defecto MySmartWindow."
+    },
+    "q": {
+      "quePuedoHacer": {
+        "p": "¿Qué puedo hacer en el portal?",
+        "r": "Consultar el catálogo de tu marca con tus precios, preparar un carrito, confirmar pedidos y seguir su estado hasta el envío. No hay pago en línea: los pedidos se gestionan con tu número de orden de compra (PO Number)."
+      },
+      "noEntro": {
+        "p": "No puedo entrar",
+        "r": "Revisa el correo y la contraseña. Si acabas de registrar tu empresa, no podrás entrar hasta que verifiques tu correo y un administrador de IoT FENSTER apruebe el alta; mientras tanto verás el mismo aviso de credenciales no válidas."
+      },
+      "olvidePassword": {
+        "p": "He olvidado mi contraseña",
+        "r": "Pulsa «¿Olvidaste tu contraseña?» debajo del formulario para recibir un enlace con el que crear una nueva."
+      },
+      "correoEmpresa": {
+        "p": "¿Qué correo debo usar?",
+        "r": "El correo corporativo del administrador de tu empresa. Debe pertenecer al mismo dominio que indicas como dominio web (por ejemplo, nombre@tuempresa.com si el dominio es tuempresa.com)."
+      },
+      "despuesDeEnviar": {
+        "p": "¿Qué pasa después de enviar la solicitud?",
+        "r": "Verificarás tu correo y un administrador de IoT FENSTER revisará la solicitud y fijará tus condiciones (marca, tarifa y descuento). Cuando esté aprobada podrás entrar con tu correo y tu contraseña."
+      },
+      "precioVisto": {
+        "p": "¿Qué precio estoy viendo?",
+        "r": "Tu precio neto: el PVP de tarifa con el descuento de tu empresa ya aplicado. Algunos productos pueden tener un descuento propio."
+      },
+      "productoFalta": {
+        "p": "No encuentro un producto",
+        "r": "Solo ves los dispositivos de la marca asignada a tu empresa. Si necesitas otro, pídeselo a tu contacto en IoT FENSTER."
+      },
+      "variantes": {
+        "p": "¿Qué son los círculos de color?",
+        "r": "Cada círculo es una variante del mismo modelo. Elige la que quieras antes de añadirlo al carrito."
+      },
+      "carritoGuardado": {
+        "p": "¿Se guarda mi carrito?",
+        "r": "Sí. Queda guardado en tu cuenta aunque cierres la sesión, hasta que confirmes el pedido."
+      },
+      "preciosCambian": {
+        "p": "¿Pueden cambiar los precios?",
+        "r": "El carrito siempre muestra los precios de hoy. Si un precio cambia mientras lo tienes abierto, se actualiza y, al confirmar, te avisamos para que revises el nuevo total."
+      },
+      "poNumber": {
+        "p": "¿Qué es el PO Number?",
+        "r": "Es el número de tu orden de compra. Sirve para identificar este pedido tanto en tu empresa como en IoT FENSTER."
+      },
+      "comoSePaga": {
+        "p": "¿Cómo se paga?",
+        "r": "No hay pago en línea. Al confirmar, el pedido queda registrado y se gestiona con tu orden de compra."
+      },
+      "editarDespues": {
+        "p": "¿Puedo cambiar el pedido después de confirmarlo?",
+        "r": "No desde el portal: al confirmar, los precios y los descuentos quedan fijados. Si necesitas un cambio, contacta con IoT FENSTER."
+      },
+      "estados": {
+        "p": "¿Qué significa cada estado?",
+        "r": "Recibido: lo hemos recibido. Confirmado: IoT FENSTER lo ha aceptado. En preparación: lo estamos preparando. Preparado: listo para salir. Enviado: ya ha salido, con transportista y enlace de seguimiento. Cancelado: se ha anulado y verás el motivo."
+      },
+      "encontrarPedido": {
+        "p": "¿Cómo encuentro un pedido?",
+        "r": "Escribe en el buscador el código PED, el PO Number o un producto, y afina con los filtros de estado y fechas. Puedes ordenar por fecha o por total."
+      },
+      "descargarPdf": {
+        "p": "¿Cómo descargo el resumen del pedido?",
+        "r": "Pulsa «Descargar PDF» y elige el idioma del documento antes de bajarlo."
+      },
+      "repetirPedido": {
+        "p": "¿Qué hace «Repetir pedido»?",
+        "r": "Añade al carrito las mismas líneas con los precios de hoy y te avisa de lo que ya no está disponible o ha cambiado de precio. No confirma nada: revisas el carrito y confirmas tú."
+      },
+      "precioFijo": {
+        "p": "¿Por qué el precio de un pedido no cambia?",
+        "r": "Al confirmar, el pedido guarda el PVP, el descuento y el precio neto de ese momento. No se recalculan aunque la tarifa cambie después."
+      },
+      "partnerODistribuidor": {
+        "p": "¿Partner o distribuidor?",
+        "r": "Un partner es un distribuidor que compra más y tiene submarca propia (VBH, Procomsa, MySmartWindow). Un distribuidor compra viendo los dispositivos de la marca asignada; por defecto, MySmartWindow."
+      },
+      "aprobarSolicitud": {
+        "p": "¿Cómo apruebo una solicitud?",
+        "r": "Abre la pestaña «Pendiente de aprobación» y pulsa Aprobar: fija la marca comercial, la tarifa y el descuento. La empresa recibe el catálogo de su marca y sus usuarios podrán entrar."
+      },
+      "suspenderArchivarEliminar": {
+        "p": "Suspender, archivar o eliminar",
+        "r": "Suspender corta el acceso hasta que reactives la empresa. Archivar la oculta de las listas conservando datos y pedidos (no se puede con pedidos sin enviar). Eliminar la borra del todo y solo se permite si no tiene pedidos."
+      },
+      "datosPorCompletar": {
+        "p": "¿Qué son los «datos por completar»?",
+        "r": "Las empresas cargadas desde un listado llevan datos provisionales (CIF, dominio o dirección «PENDIENTE») hasta que completas su ficha."
+      },
+      "descuentoEmpresa": {
+        "p": "¿Cómo funciona el descuento?",
+        "r": "El descuento de la empresa se aplica al PVP de tarifa de todos sus productos. Un producto con descuento propio usa ese en lugar del general."
+      },
+      "productosDeMarca": {
+        "p": "Productos de su marca y extras",
+        "r": "Los productos de su marca vienen del catálogo de la marca y solo admiten descuento y ocultar. Los extras se asignan a mano y se gestionan como siempre."
+      },
+      "cambiosAplican": {
+        "p": "¿Qué pasa si cambio algo aquí?",
+        "r": "Los cambios se aplican al momento a todas las empresas que usan esa marca."
+      },
+      "anadirLoQueFalta": {
+        "p": "¿Qué hace «Añadir lo que falta»?",
+        "r": "Añade a la marca los productos base que todavía no tiene, con un nombre propuesto que puedes editar."
+      },
+      "productoBase": {
+        "p": "¿Qué es un producto base?",
+        "r": "El aparato en sí. Un mismo aparato se llama distinto según la marca (Connect-1, Wave-1, Icon1) pero es un único producto base."
+      },
+      "subirImagenes": {
+        "p": "¿Cómo pongo las fotos?",
+        "r": "Selecciona uno o varios productos y usa «Subir imagen». Se admiten PNG, JPG o WebP de hasta 3 MB."
+      },
+      "avanzarPedido": {
+        "p": "¿Cómo avanzo un pedido?",
+        "r": "Solo un administrador puede cambiar el estado, un paso cada vez: Recibido, Confirmado, En preparación, Preparado y Enviado. Al enviarlo se piden transportista, número de expedición y enlace de seguimiento."
+      },
+      "cancelarPedido": {
+        "p": "¿Cómo cancelo un pedido?",
+        "r": "Se puede cancelar mientras no esté enviado, indicando un motivo que verá el cliente."
+      },
+      "corregirEstado": {
+        "p": "¿Puedo corregir un estado?",
+        "r": "El administrador puede forzar un estado saltándose la secuencia, para casos excepcionales."
+      },
+      "cifrasCanceladas": {
+        "p": "¿Qué cuentan las cifras?",
+        "r": "El total facturado y los gráficos por empresa y por día no incluyen los pedidos cancelados."
+      },
+      "cambiarIdioma": {
+        "p": "¿Cómo cambio el idioma?",
+        "r": "Con el selector de idioma de la barra superior. Se recuerda en tu cuenta."
+      },
+      "miCuenta": {
+        "p": "¿Con qué cuenta he entrado?",
+        "r": "Arriba a la derecha, sobre la barra, ves «Sesión iniciada como» con el correo de la cuenta en uso."
+      }
+    }
   }
 }

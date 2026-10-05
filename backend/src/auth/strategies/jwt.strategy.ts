@@ -5,7 +5,7 @@ import { Strategy, type StrategyOptions } from 'passport-jwt';
 import type { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { UsuarioAutenticado } from '../../common/decorators/current-user.decorator.js';
-import { EstadoPartner } from '../../generated/prisma/enums.js';
+import { EstadoPartner, RolUsuario } from '../../generated/prisma/enums.js';
 
 export const JWT_COOKIE_NAME = 'fenster_session';
 
@@ -36,7 +36,7 @@ function extraerJwtDeCookie(req: Request): string | null {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    configService: ConfigService,
+    private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
   ) {
     const secret = configService.get<string>('jwtSecret');
@@ -68,7 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         sesionInvalidadaEn: true,
         rol: true,
         partnerId: true,
-        partner: { select: { estado: true } },
+        partner: { select: { estado: true, archivadoEn: true } },
       },
     });
 
@@ -80,9 +80,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
+    /// Con el rol COMERCIAL apagado (`COMERCIAL_ACTIVO`), una sesión de comercial ya
+    /// abierta deja de valer al instante. Así no hay que tocar los `@Roles(COMERCIAL)`
+    /// de los controladores: quedan inertes y se reactivan con el interruptor.
+    if (usuario.rol === RolUsuario.COMERCIAL && !this.configService.get<boolean>('comercialActivo')) {
+      throw new UnauthorizedException();
+    }
+
     /// Un usuario de partner deja de poder operar en cuanto su partner deja de
     /// estar ACTIVO (suspendido, rechazado...), aunque su cookie siga viva.
-    if (usuario.partnerId && usuario.partner?.estado !== EstadoPartner.ACTIVO) {
+    if (usuario.partnerId && (usuario.partner?.estado !== EstadoPartner.ACTIVO || usuario.partner.archivadoEn)) {
       throw new UnauthorizedException();
     }
 

@@ -9,6 +9,7 @@ import 'dotenv/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Prisma, PrismaClient } from '../src/generated/prisma/client.js';
+import { siguienteCodigoPedido } from '../src/pedidos/codigo-pedido.js';
 import { EstadoPartner, EstadoPedido, RolUsuario } from '../src/generated/prisma/enums.js';
 
 const SALT_ROUNDS = 12;
@@ -140,8 +141,7 @@ async function main() {
         const createdAt = new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000);
         const estadoPedido = aleatorio(ESTADOS_PEDIDO_DEMO);
 
-        const [{ nextval }] = await prisma.$queryRaw<{ nextval: bigint }[]>`SELECT nextval('pedido_codigo_seq')`;
-        const codigoPed = `PED-${nextval.toString().padStart(6, '0')}`;
+        const codigoPed = await siguienteCodigoPedido(prisma);
 
         const lineasRep = barajar(representaciones).slice(0, entero(1, Math.min(3, representaciones.length)));
         let totalNeto = new Prisma.Decimal(0);

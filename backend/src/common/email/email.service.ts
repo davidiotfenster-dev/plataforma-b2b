@@ -25,7 +25,13 @@ export class EmailService {
   /// negocio (confirmación de pedido) por falta de credenciales de email.
   async enviar(destinatario: string, asunto: string, cuerpoHtml: string, adjuntos: AdjuntoEmail[] = []): Promise<void> {
     if (!this.resend) {
-      this.logger.warn(`[DEV] Email no enviado (falta RESEND_API_KEY). Para: ${destinatario} · Asunto: ${asunto}`);
+      /// Sin clave no sale nada. Se deja el enlace del correo en el log para poder completar
+      /// a mano el flujo en desarrollo (verificar email, restablecer contraseña).
+      const enlaces = cuerpoHtml.match(/https?:\/\/[^\s"'<]+/g);
+      this.logger.warn(
+        `[DEV] Email no enviado (falta RESEND_API_KEY). Para: ${destinatario} · Asunto: ${asunto}` +
+          (enlaces ? ` · Enlace: ${enlaces[0]}` : ''),
+      );
       return;
     }
 

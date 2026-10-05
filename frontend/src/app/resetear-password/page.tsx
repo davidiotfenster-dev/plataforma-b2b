@@ -58,9 +58,13 @@ function ResetearPasswordForm() {
       <h1 className="mb-6 text-2xl font-semibold text-neutral-900">{t("title")}</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-neutral-700">{t("newPassword")}</label>
+          <label htmlFor="resetear-password" className="mb-1 block text-sm font-medium text-neutral-700">
+            {t("newPassword")}
+          </label>
           <input
+            id="resetear-password"
             type="password"
+            autoComplete="new-password"
             required
             minLength={10}
             value={passwordNueva}
@@ -68,7 +72,11 @@ function ResetearPasswordForm() {
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
           />
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-red-600">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={cargando}

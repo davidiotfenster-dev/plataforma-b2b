@@ -8,7 +8,10 @@ import { useTranslations } from "next-intl";
 import { Check, Copy, Wand2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { Campo, CampoTexto, Seccion } from "@/components/campo";
-import type { CrearPartnerInput, Partner } from "@/lib/types";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
+import { useMe } from "@/hooks/use-me";
+import { MARCA_INFO, MARCAS_CATALOGO, TIPOS_EMPRESA } from "@/lib/marcas";
+import type { CrearPartnerInput, MarcaCatalogo, Partner, TipoEmpresa } from "@/lib/types";
 
 type Valores = Record<string, string>;
 
@@ -95,6 +98,8 @@ const CAMPOS_OPCIONALES_TEXTO = [
 function valoresIniciales(partner?: Partner): Valores {
   const texto = (v: string | null | undefined) => v ?? "";
   return {
+    tipo: partner?.tipo ?? "DISTRIBUIDOR",
+    marcaCatalogo: partner?.marcaCatalogo ?? "MYSMARTWINDOW",
     razonSocial: partner?.razonSocial ?? "",
     cif: partner?.cif ?? "",
     direccionFiscal: partner?.direccionFiscal ?? "",
@@ -138,9 +143,14 @@ function generarPassword(): string {
 /// campos, con su etiqueta, agrupados por temas.
 export function PartnerForm({ partner }: { partner?: Partner }) {
   const t = useTranslations("adminPartners");
+  const tAyuda = useTranslations("ayuda");
   const router = useRouter();
   const queryClient = useQueryClient();
   const modoAlta = !partner;
+  // Solo un admin elige el tipo, y solo al dar de alta. Después, distribuidor <-> partner se cambia
+  // con "Promocionar" / "Pasar a Distribuidor" en la ficha (queda auditado); un comercial siempre da de alta distribuidores.
+  const { data: perfil } = useMe();
+  const puedeElegirTipo = modoAlta && perfil?.rol === "ADMIN_FENSTER";
   const inicial = useMemo(() => valoresIniciales(partner), [partner]);
   const [valores, setValores] = useState<Valores>(inicial);
   const [error, setError] = useState<string | null>(null);
@@ -167,6 +177,8 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
 
       if (modoAlta) {
         const carga: CrearPartnerInput = {
+          ...(puedeElegirTipo && { tipo: valores.tipo as TipoEmpresa }),
+          marcaCatalogo: valores.marcaCatalogo as MarcaCatalogo,
           razonSocial: texto("razonSocial"),
           cif: texto("cif"),
           direccionFiscal: texto("direccionFiscal"),
@@ -185,6 +197,7 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
       }
 
       const carga: Record<string, unknown> = {
+        marcaCatalogo: valores.marcaCatalogo,
         razonSocial: texto("razonSocial"),
         cif: texto("cif"),
         direccionFiscal: texto("direccionFiscal"),
@@ -242,6 +255,49 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
               onChange={(e) => cambiar(campo.nombre, e.target.value)}
             />
           ))}
+
+          {seccion.clave === "comercial" && (
+            <>
+              {puedeElegirTipo && (
+                <div className="sm:col-span-3">
+                  <label htmlFor="tipo-empresa" className="mb-1 flex items-center gap-1 text-sm font-medium text-neutral-700">
+                    {t("fields.tipo")}
+                    <AyudaPuntual texto={tAyuda("puntual.tipoEmpresa")} />
+                  </label>
+                  <select
+                    id="tipo-empresa"
+                    value={valores.tipo}
+                    onChange={(e) => cambiar("tipo", e.target.value)}
+                    className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+                  >
+                    {TIPOS_EMPRESA.map((tipo) => (
+                      <option key={tipo} value={tipo}>
+                        {t(tipo === "PARTNER" ? "typePartnerLong" : "typeDistribuidorLong")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="sm:col-span-3">
+                <label htmlFor="marca-catalogo" className="mb-1 block text-sm font-medium text-neutral-700">
+                  {t("fields.marcaCatalogo")}
+                </label>
+                <select
+                  id="marca-catalogo"
+                  value={valores.marcaCatalogo}
+                  onChange={(e) => cambiar("marcaCatalogo", e.target.value)}
+                  className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+                >
+                  {MARCAS_CATALOGO.map((m) => (
+                    <option key={m} value={m}>
+                      {MARCA_INFO[m].etiqueta} · {MARCA_INFO[m].submarca}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-neutral-500">{t("hints.marcaCatalogo")}</p>
+              </div>
+            </>
+          )}
 
           {seccion.clave === "primerUsuario" && (
             <div className="sm:col-span-6">

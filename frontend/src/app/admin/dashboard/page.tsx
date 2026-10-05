@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
 import type { Estadisticas } from "@/lib/types";
+import { SoloAdmin } from "@/components/solo-admin";
 
 const COLOR_ESTADO: Record<string, string> = {
   RECIBIDO: "#a3a3a3",
@@ -15,7 +16,7 @@ const COLOR_ESTADO: Record<string, string> = {
   CANCELADO: "#ef4444",
 };
 
-export default function AdminDashboardPage() {
+function AdminDashboardPageContenido() {
   const t = useTranslations("adminDashboard");
   const tEstados = useTranslations("estados");
   const { data, isLoading } = useQuery<Estadisticas>({
@@ -88,5 +89,13 @@ export default function AdminDashboardPage() {
         {data.porPartner.length === 0 && <p className="text-sm text-neutral-400">{t("noData")}</p>}
       </div>
     </div>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <SoloAdmin>
+      <AdminDashboardPageContenido />
+    </SoloAdmin>
   );
 }

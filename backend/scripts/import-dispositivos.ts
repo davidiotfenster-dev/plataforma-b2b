@@ -26,6 +26,9 @@ interface Dispositivo {
   pvpTarifa?: number | null;
   /// 'todos' = se asigna a cualquier partner aunque no tenga nombre en su marca (mandos, EVO, cables...).
   ambito?: string;
+  /// Foto de serie (`/imagenes/default-*.png`). Solo se pone al CREAR el producto:
+  /// después la gestiona el admin desde el catálogo y la importación no la toca.
+  imagen?: string;
 }
 
 /// SKU que ya no existen en el catálogo (fusionados con otro aparato o
@@ -44,13 +47,13 @@ async function main() {
   let actualizados = 0;
 
   try {
-    for (const { skuIndustrial, nombreTecnico, pvpTarifa, ...resto } of datos) {
+    for (const { skuIndustrial, nombreTecnico, pvpTarifa, imagen, ...resto } of datos) {
       const especificacionesJson = resto as unknown as Prisma.InputJsonValue;
       const existente = await prisma.productoBase.findUnique({ where: { skuIndustrial } });
       await prisma.productoBase.upsert({
         where: { skuIndustrial },
         update: { nombreTecnico, especificacionesJson, pvpTarifa: pvpTarifa ?? null },
-        create: { skuIndustrial, nombreTecnico, especificacionesJson, pvpTarifa: pvpTarifa ?? null },
+        create: { skuIndustrial, nombreTecnico, especificacionesJson, pvpTarifa: pvpTarifa ?? null, imagenUrl: imagen ?? null },
       });
       if (existente) actualizados++;
       else creados++;

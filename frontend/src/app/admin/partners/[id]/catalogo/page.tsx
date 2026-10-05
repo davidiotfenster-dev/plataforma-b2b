@@ -1,12 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { api, ApiError } from "@/lib/api";
-import { FAMILIAS_DE_MARCA, familiasDelPartner, propuestaCatalogoDeMarca, sugerenciaManual } from "@/lib/catalogo-admin";
+import { sugerenciaManual } from "@/lib/catalogo-admin";
+import { InsigniaMarca, MARCA_INFO } from "@/lib/marcas";
 import type { Partner, ProductoBaseAdmin, RepresentacionAdmin } from "@/lib/types";
+import { useMe } from "@/hooks/use-me";
 import { PartnerHeader } from "../../partner-header";
 
 function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: RepresentacionAdmin; partnerId: string; descuentoGeneral: string }) {
@@ -19,15 +22,15 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
   const [error, setError] = useState<string | null>(null);
 
   function claveInvalidar() {
-    queryClient.invalidateQueries({ queryKey: ["admin-partner-catalogo", partnerId] });
+    queryClient.invalidateQueries({
+      queryKey: ["admin-partner-catalogo", partnerId],
+    });
   }
 
   const guardar = useMutation({
     mutationFn: () =>
       api.patch(`/partners/${partnerId}/catalogo/${rep.id}`, {
-        skuComercial,
-        nombreComercial,
-        pvpBase: Number(pvpBase),
+        ...(rep.productoMarcaId ? {} : { skuComercial, nombreComercial, pvpBase: Number(pvpBase) }),
         descuentoOverride: descuentoOverride === "" ? null : Number(descuentoOverride),
       }),
     onSuccess: claveInvalidar,
@@ -35,7 +38,10 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
   });
 
   const alternarActivo = useMutation({
-    mutationFn: () => api.patch(`/partners/${partnerId}/catalogo/${rep.id}`, { activo: !rep.activo }),
+    mutationFn: () =>
+      api.patch(`/partners/${partnerId}/catalogo/${rep.id}`, {
+        activo: !rep.activo,
+      }),
     onSuccess: claveInvalidar,
     onError: (err) => setError(err instanceof ApiError ? err.message : t("genericError")),
   });
@@ -50,6 +56,8 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
     onError: (err) => setError(err instanceof ApiError ? err.message : t("genericError")),
   });
 
+  // De su marca: nombre, SKU y PVP los fija el catálogo de la marca; aquí solo descuento y ocultar.
+  const deMarca = !!rep.productoMarcaId;
   const cambiado =
     skuComercial !== rep.skuComercial ||
     nombreComercial !== rep.nombreComercial ||
@@ -60,25 +68,44 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
 
   return (
     <div className={`px-3 py-2 ${rep.activo ? "" : "bg-neutral-50"}`}>
-      <div className={`grid grid-cols-2 items-center gap-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_84px_120px_auto] ${rep.activo ? "" : "opacity-60"}`}>
-        <input value={skuComercial} onChange={(e) => setSkuComercial(e.target.value)} placeholder={t("commercialSku")} className={entrada} />
-        <input value={nombreComercial} onChange={(e) => setNombreComercial(e.target.value)} placeholder={t("commercialName")} className={entrada} />
-        <input
-          type="number"
-          min={0}
-          step="0.01"
-          value={pvpBase}
-          onChange={(e) => setPvpBase(e.target.value)}
-          placeholder={t("pvpBase")}
-          className={entrada}
-        />
+      <div
+        className={`grid grid-cols-2 items-center gap-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_84px_120px_auto] ${rep.activo ? "" : "opacity-60"}`}
+      >
+        {deMarca ? (
+          <>
+            <span className="truncate font-mono text-xs text-neutral-600">{rep.skuComercial}</span>
+            <span className="truncate text-sm text-neutral-900">{rep.nombreComercial}</span>
+            <span className="text-sm text-neutral-700">{Number(rep.pvpBase).toFixed(2)} €</span>
+          </>
+        ) : (
+          <>
+            <input value={skuComercial} onChange={(e) => setSkuComercial(e.target.value)} placeholder={t("commercialSku")} className={entrada} />
+            <input
+              value={nombreComercial}
+              onChange={(e) => setNombreComercial(e.target.value)}
+              placeholder={t("commercialName")}
+              className={entrada}
+            />
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              value={pvpBase}
+              onChange={(e) => setPvpBase(e.target.value)}
+              placeholder={t("pvpBase")}
+              className={entrada}
+            />
+          </>
+        )}
         <input
           type="number"
           min={0}
           max={100}
           value={descuentoOverride}
           onChange={(e) => setDescuentoOverride(e.target.value)}
-          placeholder={t("discountOverridePlaceholder", { general: descuentoGeneral })}
+          placeholder={t("discountOverridePlaceholder", {
+            general: descuentoGeneral,
+          })}
           className={entrada}
         />
         <div className="col-span-2 flex items-center justify-end gap-1.5 lg:col-span-1">
@@ -102,26 +129,31 @@ function FilaAsignada({ rep, partnerId, descuentoGeneral }: { rep: Representacio
               rep.activo ? "border-neutral-300 text-neutral-600 hover:bg-neutral-100" : "border-green-300 text-green-700 hover:bg-green-50"
             }`}
           >
-            {rep.activo ? t("deactivate") : t("activate")}
+            {deMarca ? (rep.activo ? t("hide") : t("show")) : rep.activo ? t("deactivate") : t("activate")}
           </button>
-          <button
-            onClick={() => {
-              if (!window.confirm(t("deleteConfirm", { name: rep.nombreComercial }))) return;
-              setError(null);
-              borrar.mutate();
-            }}
-            disabled={ocupado}
-            title={t("delete")}
-            aria-label={t("delete")}
-            className="h-8 rounded-md border border-transparent px-2.5 text-xs font-medium text-red-600 hover:border-red-200 hover:bg-red-50 disabled:opacity-50"
-          >
-            {borrar.isPending ? t("deleting") : t("delete")}
-          </button>
+          {!deMarca && (
+            <button
+              onClick={() => {
+                if (!window.confirm(t("deleteConfirm", { name: rep.nombreComercial }))) return;
+                setError(null);
+                borrar.mutate();
+              }}
+              disabled={ocupado}
+              title={t("delete")}
+              aria-label={t("delete")}
+              className="h-8 rounded-md border border-transparent px-2.5 text-xs font-medium text-red-600 hover:border-red-200 hover:bg-red-50 disabled:opacity-50"
+            >
+              {borrar.isPending ? t("deleting") : t("delete")}
+            </button>
+          )}
         </div>
       </div>
       <p className="mt-1 text-[11px] text-neutral-400">
         {rep.productoBase.nombreTecnico} · {rep.productoBase.skuIndustrial}
-        {!rep.activo && <span className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-neutral-600">{t("inactive")}</span>}
+        {!rep.activo && <span className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-neutral-600">{deMarca ? t("hidden") : t("inactive")}</span>}
+        {rep.productoMarca && !rep.productoMarca.activo && (
+          <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-700">{t("hiddenInBrand")}</span>
+        )}
       </p>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
@@ -152,7 +184,9 @@ function FilaAsignar({ producto, partnerId, partner }: { producto: ProductoBaseA
         ],
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-partner-catalogo", partnerId] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-partner-catalogo", partnerId],
+      });
       // Los contadores "sin asignar" / "partners" del catálogo global dependen de esto.
       queryClient.invalidateQueries({ queryKey: ["admin-productos-base"] });
       setAbierto(false);
@@ -190,7 +224,9 @@ function FilaAsignar({ producto, partnerId, partner }: { producto: ProductoBaseA
 
   return (
     <div className="rounded-lg border border-neutral-300 bg-neutral-50 p-3">
-      <p className="mb-2 text-xs text-neutral-500">{producto.nombreTecnico} · SKU {producto.skuIndustrial}</p>
+      <p className="mb-2 text-xs text-neutral-500">
+        {producto.nombreTecnico} · SKU {producto.skuIndustrial}
+      </p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
         <input
           value={skuComercial}
@@ -246,65 +282,36 @@ function FilaAsignar({ producto, partnerId, partner }: { producto: ProductoBaseA
   );
 }
 
-function AsignarPorMarca({ productos, partnerId, partner }: { productos: ProductoBaseAdmin[]; partnerId: string; partner: Partner | null }) {
+function BorrarTodo({ total, partnerId }: { total: number; partnerId: string }) {
   const t = useTranslations("adminPartnerCatalogo");
   const queryClient = useQueryClient();
-  const detectada = partner ? familiasDelPartner(partner)[0] ?? "" : "";
-  const [elegida, setElegida] = useState<string | null>(null);
-  const familia = elegida ?? detectada;
   const [error, setError] = useState<string | null>(null);
 
-  const propuesta = useMemo(() => (familia ? propuestaCatalogoDeMarca(productos, [familia]) : null), [productos, familia]);
-
-  const asignar = useMutation({
-    mutationFn: () => api.post(`/partners/${partnerId}/catalogo`, { items: propuesta?.items ?? [] }),
+  const borrarTodo = useMutation({
+    mutationFn: () => api.delete(`/partners/${partnerId}/catalogo`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-partner-catalogo", partnerId] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-partner-catalogo", partnerId],
+      });
       queryClient.invalidateQueries({ queryKey: ["admin-productos-base"] });
     },
     onError: (err) => setError(err instanceof ApiError ? err.message : t("genericError")),
   });
 
   return (
-    <div className="mb-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-      <h2 className="text-sm font-medium text-neutral-900">{t("brandTitle")}</h2>
-      <p className="mt-1 text-xs text-neutral-500">{t("brandHelp")}</p>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <label className="text-xs text-neutral-600" htmlFor="marca-catalogo">
-          {t("brandLabel")}
-        </label>
-        <select
-          id="marca-catalogo"
-          value={familia}
-          onChange={(e) => {
-            setElegida(e.target.value);
-            setError(null);
-          }}
-          className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm"
-        >
-          <option value="">{t("brandNone")}</option>
-          {FAMILIAS_DE_MARCA.map((f) => (
-            <option key={f.clave} value={f.clave}>
-              {f.etiqueta}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => {
-            setError(null);
-            asignar.mutate();
-          }}
-          disabled={asignar.isPending || !propuesta || propuesta.items.length === 0}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
-        >
-          {asignar.isPending ? t("brandAssigning") : t("brandAssign", { n: propuesta?.items.length ?? 0 })}
-        </button>
-      </div>
-      {propuesta && propuesta.items.length === 0 && <p className="mt-2 text-xs text-neutral-500">{t("brandNothing")}</p>}
-      {propuesta && propuesta.sinPrecio.length > 0 && (
-        <p className="mt-2 text-xs text-amber-700">{t("brandNoPrice", { n: propuesta.sinPrecio.length })}</p>
-      )}
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => {
+          if (!window.confirm(t("deleteExtrasConfirm", { n: total }))) return;
+          setError(null);
+          borrarTodo.mutate();
+        }}
+        disabled={borrarTodo.isPending}
+        className="h-8 rounded-md border border-red-200 px-3 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+      >
+        {borrarTodo.isPending ? t("deleting") : t("deleteExtras", { n: total })}
+      </button>
+      {error && <span className="text-xs text-red-600">{error}</span>}
     </div>
   );
 }
@@ -313,6 +320,7 @@ export default function AdminPartnerCatalogoPage() {
   const params = useParams<{ id: string }>();
   const partnerId = params.id;
   const t = useTranslations("adminPartnerCatalogo");
+  const { data: perfil } = useMe();
 
   const { data: partner } = useQuery<Partner>({
     queryKey: ["admin-partner", partnerId],
@@ -330,6 +338,7 @@ export default function AdminPartnerCatalogoPage() {
   });
 
   const [filtro, setFiltro] = useState("");
+  const [verAnadir, setVerAnadir] = useState(false);
   const representacionesFiltradas = useMemo(() => {
     const q = filtro.trim().toLowerCase();
     if (!q || !representaciones) return representaciones ?? [];
@@ -337,6 +346,11 @@ export default function AdminPartnerCatalogoPage() {
       [r.skuComercial, r.nombreComercial, r.productoBase.nombreTecnico, r.productoBase.skuIndustrial].some((v) => v.toLowerCase().includes(q)),
     );
   }, [representaciones, filtro]);
+
+  const deSuMarca = representacionesFiltradas.filter((r) => r.productoMarcaId);
+  const extras = representacionesFiltradas.filter((r) => !r.productoMarcaId);
+  const totalExtras = representaciones?.filter((r) => !r.productoMarcaId).length ?? 0;
+  const ocultos = representaciones?.filter((r) => r.productoMarcaId && !r.activo).length ?? 0;
 
   const productosDisponibles = useMemo(() => {
     if (!productosBase) return [];
@@ -348,10 +362,32 @@ export default function AdminPartnerCatalogoPage() {
     <div>
       <PartnerHeader partnerId={partnerId} activa="catalogo" />
       <p className="mb-6 text-sm text-neutral-500">
-        {t("generalDiscount", { descuento: partner ? Number(partner.descuentoPorcentaje) : "…" })}
+        {t("generalDiscount", {
+          descuento: partner ? Number(partner.descuentoPorcentaje) : "…",
+        })}
       </p>
 
-      <h2 className="mb-3 text-sm font-medium text-neutral-900">{t("assignedTitle")}</h2>
+      {partner && (
+        <div
+          className={`mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-t-4 border-neutral-200 bg-white px-4 py-3 shadow-sm ${MARCA_INFO[partner.marcaCatalogo].borde}`}
+        >
+          <InsigniaMarca marca={partner.marcaCatalogo} />
+          <p className="min-w-0 flex-1 text-sm text-neutral-600">
+            {t("brandBanner", {
+              marca: MARCA_INFO[partner.marcaCatalogo].submarca,
+            })}
+          </p>
+          {perfil?.rol === "ADMIN_FENSTER" && (
+            <Link href="/admin/marcas" className="text-sm font-medium text-neutral-900 underline">
+              {t("brandEdit")}
+            </Link>
+          )}
+          <Link href={`/admin/partners/${partnerId}`} className="text-sm text-neutral-600 underline">
+            {t("brandChange")}
+          </Link>
+        </div>
+      )}
+
       {cargandoRepresentaciones ? (
         <p className="text-neutral-500">{t("loading")}</p>
       ) : (
@@ -362,10 +398,44 @@ export default function AdminPartnerCatalogoPage() {
               value={filtro}
               onChange={(e) => setFiltro(e.target.value)}
               placeholder={t("searchAssigned")}
-              className="mb-2 h-8 w-full max-w-sm rounded-md border border-neutral-300 px-2 text-sm focus:border-neutral-500 focus:outline-none"
+              className="mb-3 h-8 w-full max-w-sm rounded-md border border-neutral-300 px-2 text-sm focus:border-neutral-500 focus:outline-none"
             />
           )}
-          {representacionesFiltradas.length > 0 && (
+
+          <h2 className="mb-2 text-sm font-medium text-neutral-900">
+            {t("brandProductsTitle")} <span className="font-normal text-neutral-400">{deSuMarca.length}</span>
+            {ocultos > 0 && <span className="ml-2 text-xs font-normal text-neutral-500">{t("hiddenCount", { n: ocultos })}</span>}
+          </h2>
+          {deSuMarca.length > 0 ? (
+            <div className="mb-8 overflow-hidden rounded-lg border border-neutral-200 bg-white">
+              <div
+                className="hidden gap-2 border-b border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-500 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_84px_120px_auto]"
+                aria-hidden="true"
+              >
+                <span>{t("commercialSku")}</span>
+                <span>{t("commercialName")}</span>
+                <span>{t("pvpBase")}</span>
+                <span>{t("discountShort")}</span>
+                <span className="w-[214px]" />
+              </div>
+              <div className="divide-y divide-neutral-100">
+                {deSuMarca.map((rep) => (
+                  <FilaAsignada key={rep.id} rep={rep} partnerId={partnerId} descuentoGeneral={partner?.descuentoPorcentaje ?? "0"} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="mb-8 text-sm text-neutral-500">{filtro ? t("searchEmpty") : t("brandEmpty")}</p>
+          )}
+
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-medium text-neutral-900">
+              {t("extrasTitle")} <span className="font-normal text-neutral-400">{extras.length}</span>
+            </h2>
+            {totalExtras > 0 && <BorrarTodo total={totalExtras} partnerId={partnerId} />}
+          </div>
+          <p className="mb-2 text-xs text-neutral-500">{t("extrasHelp")}</p>
+          {extras.length > 0 && (
             <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
               <div
                 className="hidden gap-2 border-b border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-500 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_84px_120px_auto]"
@@ -378,31 +448,32 @@ export default function AdminPartnerCatalogoPage() {
                 <span className="w-[214px]" />
               </div>
               <div className="divide-y divide-neutral-100">
-                {representacionesFiltradas.map((rep) => (
+                {extras.map((rep) => (
                   <FilaAsignada key={rep.id} rep={rep} partnerId={partnerId} descuentoGeneral={partner?.descuentoPorcentaje ?? "0"} />
                 ))}
               </div>
             </div>
           )}
-          {representaciones && representaciones.length > 0 && representacionesFiltradas.length === 0 && (
-            <p className="text-sm text-neutral-500">{t("searchEmpty")}</p>
-          )}
-          {representaciones?.length === 0 && <p className="text-neutral-500">{t("assignedEmpty")}</p>}
         </div>
       )}
 
-      <AsignarPorMarca productos={productosDisponibles} partnerId={partnerId} partner={partner ?? null} />
-
-      <h2 className="mb-3 text-sm font-medium text-neutral-900">{t("availableTitle")}</h2>
-      {cargandoProductosBase ? (
-        <p className="text-neutral-500">{t("loading")}</p>
-      ) : (
-        <div className="space-y-2">
-          {productosDisponibles.map((producto) => (
-            <FilaAsignar key={producto.id} producto={producto} partnerId={partnerId} partner={partner ?? null} />
-          ))}
-          {productosDisponibles.length === 0 && <p className="text-neutral-500">{t("availableEmpty")}</p>}
-        </div>
+      <button onClick={() => setVerAnadir((v) => !v)} className="mb-3 text-sm font-medium text-neutral-900 underline">
+        {verAnadir ? t("addExtraHide") : t("addExtraShow", { n: productosDisponibles.length })}
+      </button>
+      {verAnadir && (
+        <>
+          <h2 className="mb-3 text-sm font-medium text-neutral-900">{t("availableTitle")}</h2>
+          {cargandoProductosBase ? (
+            <p className="text-neutral-500">{t("loading")}</p>
+          ) : (
+            <div className="space-y-2">
+              {productosDisponibles.map((producto) => (
+                <FilaAsignar key={producto.id} producto={producto} partnerId={partnerId} partner={partner ?? null} />
+              ))}
+              {productosDisponibles.length === 0 && <p className="text-neutral-500">{t("availableEmpty")}</p>}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

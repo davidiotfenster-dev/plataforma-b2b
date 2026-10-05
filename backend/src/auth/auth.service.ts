@@ -11,8 +11,20 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CatalogoMarcaService } from '../catalogo-marca/catalogo-marca.service.js';
 import { EmailService } from '../common/email/email.service.js';
-import { asuntoResetPassword, cuerpoResetPassword } from '../common/email/plantillas-email.js';
+import {
+  asuntoCuentaAprobada,
+  asuntoCuentaRechazada,
+  asuntoNuevaSolicitud,
+  asuntoResetPassword,
+  asuntoVerificacionEmail,
+  cuerpoCuentaAprobada,
+  cuerpoCuentaRechazada,
+  cuerpoNuevaSolicitud,
+  cuerpoResetPassword,
+  cuerpoVerificacionEmail,
+} from '../common/email/plantillas-email.js';
 import { EstadoPartner, Idioma, RolUsuario } from '../generated/prisma/enums.js';
 import { Prisma } from '../generated/prisma/client.js';
 import type { RegistroPartnerDto } from './dto/registro-partner.dto.js';
@@ -42,6 +54,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly catalogoMarca: CatalogoMarcaService,
   ) {}
 
   async registrarPartner(dto: RegistroPartnerDto): Promise<{ partnerId: string; userId: string }> {
@@ -83,22 +96,11 @@ export class AuthService {
           },
         });
 
-        const token = await this.jwtService.signAsync(
-          { sub: user.id, tipo: 'verificacion-email' },
-          {
-            expiresIn: this.configService.get<string>(
-              'emailVerificationTokenExpiresIn',
-            ) as `${number}${'s' | 'm' | 'h' | 'd'}`,
-          },
-        );
-        const { exp } = this.jwtService.decode<{ exp: number }>(token);
+        const { token, expira } = await this.firmarTokenVerificacion(user.id);
 
         await tx.user.update({
           where: { id: user.id },
-          data: {
-            tokenVerificacion: token,
-            tokenVerificacionExpira: new Date(exp * 1000),
-          },
+          data: { tokenVerificacion: token, tokenVerificacionExpira: expira },
         });
 
         return { partnerId: partner.id, userId: user.id, token };
@@ -119,14 +121,100 @@ export class AuthService {
       throw error;
     }
 
-    /// Envío de email pendiente de integrar Resend/SendGrid: se registra en
-    /// log de desarrollo para poder completar el flujo manualmente (ver
-    /// Tarea 9 de TAREAS.md). Nunca se devuelve el token en la respuesta HTTP.
-    this.logger.warn(
-      `[DEV] Token de verificación de email para user ${userId}: ${tokenVerificacion}`,
-    );
+    /// El token solo viaja por el correo: nunca se devuelve en la respuesta HTTP.
+    /// Sin RESEND_API_KEY el enlace queda en el log de desarrollo (ver EmailService).
+    await this.enviarVerificacion({ email: dto.emailAdmin, idioma: dto.idioma ?? Idioma.ES }, tokenVerificacion);
 
     return { partnerId, userId };
+  }
+
+  private async firmarTokenVerificacion(userId: string): Promise<{ token: string; expira: Date }> {
+    const token = await this.jwtService.signAsync(
+      { sub: userId, tipo: 'verificacion-email' },
+      {
+        expiresIn: this.configService.get<string>(
+          'emailVerificationTokenExpiresIn',
+        ) as `${number}${'s' | 'm' | 'h' | 'd'}`,
+      },
+    );
+    const { exp } = this.jwtService.decode<{ exp: number }>(token);
+    return { token, expira: new Date(exp * 1000) };
+  }
+
+  private async enviarVerificacion(destino: { email: string; idioma: Idioma }, token: string): Promise<void> {
+    const enlace = `${this.configService.get<string>('frontendUrl')}/verificar-email?token=${token}`;
+    await this.emailService.enviar(
+      destino.email,
+      asuntoVerificacionEmail(destino.idioma),
+      cuerpoVerificacionEmail(destino.idioma, enlace),
+    );
+  }
+
+  /// "No me llegó el correo": emite un token nuevo (el anterior deja de valer) y lo
+  /// reenvía. No hace nada, y no lo dice, si el email no existe, ya está verificado o
+  /// la empresa ya pasó esa fase: así no se averigua qué correos están registrados.
+  async reenviarVerificacion(email: string): Promise<void> {
+    const usuario = await this.prisma.user.findUnique({ where: { email }, include: { partner: true } });
+    if (
+      !usuario ||
+      usuario.emailVerificadoEn ||
+      usuario.partner?.estado !== EstadoPartner.PENDIENTE_VERIFICACION_EMAIL
+    ) {
+      return;
+    }
+
+    const { token, expira } = await this.firmarTokenVerificacion(usuario.id);
+    await this.prisma.user.update({
+      where: { id: usuario.id },
+      data: { tokenVerificacion: token, tokenVerificacionExpira: expira },
+    });
+    await this.enviarVerificacion(usuario, token);
+  }
+
+  /// Avisa por correo a los administradores de que hay una solicitud esperando. Es un
+  /// aviso: si falla, no debe estropear la verificación que el usuario acaba de hacer.
+  private async avisarNuevaSolicitud(partner: { id: string; razonSocial: string; pais: string }): Promise<void> {
+    try {
+      const admins = await this.prisma.user.findMany({
+        where: { rol: RolUsuario.ADMIN_FENSTER, activo: true },
+        select: { email: true },
+      });
+      const enlace = `${this.configService.get<string>('frontendUrl')}/admin/partners/${partner.id}`;
+      await Promise.all(
+        admins.map((admin) =>
+          this.emailService.enviar(
+            admin.email,
+            asuntoNuevaSolicitud(partner.razonSocial),
+            cuerpoNuevaSolicitud(partner.razonSocial, partner.pais, enlace),
+          ),
+        ),
+      );
+    } catch (error) {
+      this.logger.error(`No se pudo avisar de la nueva solicitud ${partner.id}: ${(error as Error).message}`);
+    }
+  }
+
+  /// Avisa a los usuarios (con correo verificado) de la empresa de que su alta se ha
+  /// aprobado o rechazado. Igual que el aviso interno, nunca rompe la acción del admin.
+  private async avisarResolucionAlta(partnerId: string, aprobada: boolean): Promise<void> {
+    try {
+      const usuarios = await this.prisma.user.findMany({
+        where: { partnerId, emailVerificadoEn: { not: null } },
+        select: { email: true, idioma: true },
+      });
+      const enlaceLogin = `${this.configService.get<string>('frontendUrl')}/login`;
+      await Promise.all(
+        usuarios.map((u) =>
+          this.emailService.enviar(
+            u.email,
+            aprobada ? asuntoCuentaAprobada(u.idioma) : asuntoCuentaRechazada(u.idioma),
+            aprobada ? cuerpoCuentaAprobada(u.idioma, enlaceLogin) : cuerpoCuentaRechazada(u.idioma),
+          ),
+        ),
+      );
+    } catch (error) {
+      this.logger.error(`No se pudo avisar de la resolución del alta ${partnerId}: ${(error as Error).message}`);
+    }
   }
 
   async verificarEmail(token: string): Promise<{ partnerId: string }> {
@@ -181,6 +269,8 @@ export class AuthService {
       throw error;
     }
 
+    await this.avisarNuevaSolicitud(user.partner);
+
     return { partnerId: user.partnerId };
   }
 
@@ -210,6 +300,9 @@ export class AuthService {
         data: { activo: true },
       }),
     ]);
+    // Al entrar ya ve el catálogo de su marca (MySmartWindow por defecto).
+    await this.catalogoMarca.sincronizarEmpresa(partnerId);
+    await this.avisarResolucionAlta(partnerId, true);
   }
 
   async rechazarPartner(partnerId: string): Promise<void> {
@@ -225,6 +318,7 @@ export class AuthService {
       where: { id: partnerId },
       data: { estado: EstadoPartner.RECHAZADO },
     });
+    await this.avisarResolucionAlta(partnerId, false);
   }
 
   async validarCredenciales(email: string, password: string): Promise<UsuarioValidado> {
@@ -252,12 +346,18 @@ export class AuthService {
       throw credencialesInvalidas();
     }
 
+    /// Rol COMERCIAL apagado por ahora (`COMERCIAL_ACTIVO`): se avisa con un mensaje
+    /// claro, y solo tras acertar la contraseña, para no revelar qué emails son de comerciales.
+    if (user.rol === RolUsuario.COMERCIAL && !this.configService.get<boolean>('comercialActivo')) {
+      throw new UnauthorizedException('El acceso de comerciales está desactivado por ahora');
+    }
+
     /// ADMIN_FENSTER y COMERCIAL son personal interno de IoT FENSTER, sin
     /// partner asociado: solo los roles PARTNER_* exigen partner ACTIVO y
     /// email verificado.
     const esPersonalInterno = user.rol === RolUsuario.ADMIN_FENSTER || user.rol === RolUsuario.COMERCIAL;
     if (!esPersonalInterno) {
-      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO) {
+      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
         throw credencialesInvalidas();
       }
     }
