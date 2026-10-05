@@ -8,6 +8,8 @@ import { Cpu, ShoppingCart } from "lucide-react";
 import { api, ApiError, urlImagen } from "@/lib/api";
 import { muestraDeColor } from "@/lib/catalogo-admin";
 import type { Producto, ResumenCarrito } from "@/lib/types";
+import { useMe } from "@/hooks/use-me";
+import { puedeComprar as puedeComprarRol } from "@/lib/acceso";
 import { PrecioProducto } from "@/components/precio-producto";
 
 interface Modelo {
@@ -40,10 +42,12 @@ function TarjetaModelo({
   modelo,
   onAgregar,
   ocupado,
+  puedeComprar,
 }: {
   modelo: Modelo;
   onAgregar: (id: string) => void;
   ocupado: boolean;
+  puedeComprar: boolean;
 }) {
   const t = useTranslations("catalogo");
   const router = useRouter();
@@ -91,16 +95,18 @@ function TarjetaModelo({
       </div>
       <div className="mt-auto pt-4">
         <PrecioProducto producto={producto} />
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAgregar(producto.id);
-          }}
-          disabled={ocupado}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
-        >
-          <ShoppingCart className="size-4" /> {t("addToCart")}
-        </button>
+        {puedeComprar && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAgregar(producto.id);
+            }}
+            disabled={ocupado}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+          >
+            <ShoppingCart className="size-4" /> {t("addToCart")}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -113,6 +119,9 @@ export default function CatalogoPage() {
     queryFn: () => api.get<Producto[]>("/catalogo"),
   });
   const queryClient = useQueryClient();
+  const { data: perfil } = useMe();
+  // Mientras no se sabe el rol no se enseña el botón: así no parpadea a quien solo consulta.
+  const puedeComprar = perfil ? puedeComprarRol(perfil.rol) : false;
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   const agregar = useMutation({
@@ -148,7 +157,7 @@ export default function CatalogoPage() {
       )}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {modelos.map((modelo) => (
-          <TarjetaModelo key={modelo.clave} modelo={modelo} onAgregar={(id) => agregar.mutate(id)} ocupado={agregar.isPending} />
+          <TarjetaModelo key={modelo.clave} modelo={modelo} onAgregar={(id) => agregar.mutate(id)} ocupado={agregar.isPending} puedeComprar={puedeComprar} />
         ))}
       </div>
     </div>

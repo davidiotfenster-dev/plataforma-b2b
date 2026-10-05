@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { BarChart3, Boxes, CircleUser, LayoutGrid, LogOut, Package, ShieldCheck, ShoppingCart, Tags, Users, type LucideIcon } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
 import { api } from "@/lib/api";
+import { puedeComprar } from "@/lib/acceso";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Marca } from "@/components/marca";
 
@@ -105,7 +106,7 @@ export function Navbar() {
               {perfil.rol !== "ADMIN_FENSTER" && perfil.rol !== "COMERCIAL" && (
                 <>
                   <NavLink href="/catalogo" icono={LayoutGrid}>{t("catalogo")}</NavLink>
-                  <NavLink href="/carrito" icono={ShoppingCart}>{t("carrito")}</NavLink>
+                  {puedeComprar(perfil.rol) && <NavLink href="/carrito" icono={ShoppingCart}>{t("carrito")}</NavLink>}
                   <NavLink href="/pedidos" icono={Package}>{t("pedidos")}</NavLink>
                   {perfil.rol === "PARTNER_ADMIN" && <NavLink href="/equipo" icono={Users}>{t("usuarios")}</NavLink>}
                 </>

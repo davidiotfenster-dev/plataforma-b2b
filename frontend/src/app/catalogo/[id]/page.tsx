@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { ArrowLeft, FileText, ShoppingCart } from "lucide-react";
 import { api, ApiError, urlImagen } from "@/lib/api";
 import type { ProductoDetalle, ResumenCarrito } from "@/lib/types";
+import { useMe } from "@/hooks/use-me";
+import { puedeComprar as puedeComprarRol } from "@/lib/acceso";
 import { PrecioProducto } from "@/components/precio-producto";
 
 export default function ProductoDetallePage() {
@@ -13,6 +15,8 @@ export default function ProductoDetallePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const t = useTranslations("catalogoDetalle");
+  const { data: perfil } = useMe();
+  const puedeComprar = perfil ? puedeComprarRol(perfil.rol) : false;
   const { data: producto, isLoading } = useQuery<ProductoDetalle>({
     queryKey: ["catalogo", params.id],
     queryFn: () => api.get<ProductoDetalle>(`/catalogo/${params.id}`),
@@ -54,22 +58,24 @@ export default function ProductoDetallePage() {
             <PrecioProducto producto={producto} />
           </div>
 
-          {agregar.isError && (
+          {puedeComprar && agregar.isError && (
             <div className="mt-3 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
               {agregar.error instanceof ApiError ? agregar.error.message : t("addError")}
             </div>
           )}
-          {agregar.isSuccess && (
+          {puedeComprar && agregar.isSuccess && (
             <div className="mt-3 rounded-md bg-green-50 px-4 py-2 text-sm text-green-700">{t("added")}</div>
           )}
 
-          <button
-            onClick={() => agregar.mutate()}
-            disabled={agregar.isPending}
-            className="mt-4 flex items-center justify-center gap-2 rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
-          >
-            <ShoppingCart className="size-4" /> {t("addToCart")}
-          </button>
+          {puedeComprar && (
+            <button
+              onClick={() => agregar.mutate()}
+              disabled={agregar.isPending}
+              className="mt-4 flex items-center justify-center gap-2 rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+            >
+              <ShoppingCart className="size-4" /> {t("addToCart")}
+            </button>
+          )}
 
           {producto.documentacionUrl && (
             <a
