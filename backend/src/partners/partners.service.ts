@@ -32,6 +32,16 @@ const CONTADORES_PARTNER = {
   _count: { select: { usuarios: true, representaciones: true, ordenes: true } },
 } satisfies Prisma.PartnerInclude;
 
+/// Dice qué dato ya existe (CIF, correo del usuario o código de cliente) en vez
+/// de un "campo único" genérico: quien da el alta necesita saber qué corregir.
+export function mensajeDuplicado(error: Prisma.PrismaClientKnownRequestError): string {
+  const meta = JSON.stringify(error.meta ?? {}).toLowerCase();
+  if (meta.includes('cif')) return 'Ya hay una empresa dada de alta con ese CIF.';
+  if (meta.includes('email')) return 'Ya hay un usuario con ese correo electrónico.';
+  if (meta.includes('codigocliente') || meta.includes('codigo_cliente')) return 'Ya hay una empresa con ese código de cliente.';
+  return 'Ya existe una empresa o un usuario con alguno de esos datos.';
+}
+
 @Injectable()
 export class PartnersService {
   private readonly logger = new Logger(PartnersService.name);
@@ -114,8 +124,7 @@ export class PartnersService {
       return creado.partner;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const campo = (error.meta?.target as string[] | undefined)?.join(', ') ?? 'campo único';
-        throw new ConflictException(`Ya existe un partner o usuario con ese valor en: ${campo}`);
+        throw new ConflictException(mensajeDuplicado(error));
       }
       throw error;
     }
@@ -267,8 +276,7 @@ export class PartnersService {
       return actualizado;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const campo = (error.meta?.target as string[] | undefined)?.join(', ') ?? 'campo único';
-        throw new ConflictException(`Ya existe otro partner con ese valor en: ${campo}`);
+        throw new ConflictException(mensajeDuplicado(error));
       }
       throw error;
     }

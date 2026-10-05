@@ -73,7 +73,10 @@ export class AuthService {
   ) {}
 
   async registrarPartner(dto: RegistroPartnerDto): Promise<{ partnerId: string; userId: string }> {
-    if (dominioDeEmail(dto.emailAdmin) !== dto.dominioWeb.toLowerCase()) {
+    // El correo puede ser del dominio de la empresa o de un subdominio suyo (ana@mail.empresa.com).
+    const dominioEmail = dominioDeEmail(dto.emailAdmin);
+    const dominioEmpresa = dto.dominioWeb.toLowerCase();
+    if (dominioEmail !== dominioEmpresa && !dominioEmail.endsWith(`.${dominioEmpresa}`)) {
       throw new BadRequestException(
         'El email del administrador debe pertenecer al dominio corporativo indicado (dominioWeb)',
       );

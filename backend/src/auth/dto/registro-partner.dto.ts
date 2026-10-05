@@ -8,6 +8,8 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
+import { CIF_MENSAJE, CIF_REGEX, DOMINIO_REGEX, DominioCorporativo } from '../../partners/dto/validadores-ficha-cliente.js';
 import { Idioma } from '../../generated/prisma/enums.js';
 
 export class RegistroPartnerDto {
@@ -15,8 +17,10 @@ export class RegistroPartnerDto {
   @IsNotEmpty()
   razonSocial!: string;
 
+  @Recortar()
   @IsString()
   @IsNotEmpty()
+  @Matches(CIF_REGEX, { message: CIF_MENSAJE })
   cif!: string;
 
   @IsString()
@@ -32,9 +36,8 @@ export class RegistroPartnerDto {
   /// correo corporativo" que exige CLAUDE.md.
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i, {
-    message: 'dominioWeb debe ser un dominio válido (p. ej. empresa.com)',
-  })
+  @Matches(DOMINIO_REGEX, { message: 'dominioWeb debe ser un dominio válido (p. ej. empresa.com)' })
+  @DominioCorporativo()
   dominioWeb!: string;
 
   @IsEmail()

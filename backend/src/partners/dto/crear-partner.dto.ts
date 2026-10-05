@@ -1,7 +1,11 @@
 import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MinLength } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
 import {
   CODIGO_POSTAL_MENSAJE,
   CODIGO_POSTAL_REGEX,
+  CIF_MENSAJE,
+  CIF_REGEX,
+  DominioCorporativo,
   DOMINIO_MENSAJE,
   DOMINIO_REGEX,
   TELEFONO_MENSAJE,
@@ -18,8 +22,10 @@ export class CrearPartnerDto {
   @IsNotEmpty()
   razonSocial!: string;
 
+  @Recortar()
   @IsString()
   @IsNotEmpty()
+  @Matches(CIF_REGEX, { message: CIF_MENSAJE })
   cif!: string;
 
   @IsString()
@@ -33,6 +39,7 @@ export class CrearPartnerDto {
   @IsString()
   @IsNotEmpty()
   @Matches(DOMINIO_REGEX, { message: DOMINIO_MENSAJE })
+  @DominioCorporativo()
   dominioWeb!: string;
 
   @IsOptional()

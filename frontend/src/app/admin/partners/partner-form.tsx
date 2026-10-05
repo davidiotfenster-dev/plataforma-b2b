@@ -199,13 +199,15 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
       const carga: Record<string, unknown> = {
         marcaCatalogo: valores.marcaCatalogo,
         razonSocial: texto("razonSocial"),
-        cif: texto("cif"),
         direccionFiscal: texto("direccionFiscal"),
         pais: texto("pais"),
-        dominioWeb: texto("dominioWeb"),
         descuentoPorcentaje: Number(valores.descuentoPorcentaje || 0),
         iva: numero("iva"),
       };
+      // CIF y dominio se validan al cambiarlos: una ficha antigua con un dato que hoy
+      // no pasaría la validación sigue pudiéndose editar sin tocar esos campos.
+      if (texto("cif") !== partner!.cif) carga.cif = texto("cif");
+      if (texto("dominioWeb") !== partner!.dominioWeb) carga.dominioWeb = texto("dominioWeb");
       // Vaciar un campo opcional lo borra (null), salvo marca y tarifa, que no admiten borrarse.
       for (const campo of CAMPOS_OPCIONALES_TEXTO) {
         carga[campo] = texto(campo) === "" ? (campo === "marcaComercial" || campo === "tarifa" ? undefined : null) : texto(campo);
