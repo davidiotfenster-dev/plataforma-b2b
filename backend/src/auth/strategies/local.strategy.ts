@@ -13,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     /// Un cuerpo JSON puede traer números u objetos: sin este filtro bcrypt
     /// lanza una excepción y el cliente recibe un 500 en vez de un 401.
     if (typeof email !== 'string' || typeof password !== 'string') {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException({ message: 'Credenciales inválidas', codigo: 'CREDENCIALES_INVALIDAS' });
     }
     return this.authService.validarCredenciales(email, password);
   }

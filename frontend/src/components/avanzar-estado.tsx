@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, recargarSiCambio } from "@/lib/api";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { EstadoPedido, Order } from "@/lib/types";
 
@@ -41,7 +41,10 @@ export function AvanzarEstado({ order, invalidateKeys }: { order: Order; invalid
       setMostrarExpedicion(false);
       setConfirmando(false);
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("advanceError")),
+    onError: (err) => {
+      setError(err instanceof ApiError ? err.message : t("advanceError"));
+      recargarSiCambio(err, invalidateKeys, queryClient);
+    },
   });
 
   if (!siguiente) return null;

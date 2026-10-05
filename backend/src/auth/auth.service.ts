@@ -362,7 +362,7 @@ export class AuthService {
     });
 
     const credencialesInvalidas = () =>
-      new UnauthorizedException('Credenciales inválidas');
+      new UnauthorizedException({ message: 'Credenciales inválidas', codigo: 'CREDENCIALES_INVALIDAS' });
 
     if (!user) {
       /// Se ejecuta un hash igualmente para no filtrar por timing si el

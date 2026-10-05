@@ -774,7 +774,7 @@ export class PedidosService {
     }
 
     if (dto.estado === order.estado) {
-      throw new BadRequestException('El pedido ya está en ese estado.');
+      throw new BadRequestException({ message: 'El pedido ya está en ese estado.', codigo: 'PEDIDO_YA_EN_ESTADO' });
     }
 
     const esCancelacion = dto.estado === EstadoPedido.CANCELADO;
@@ -795,9 +795,10 @@ export class PedidosService {
       /// estrictamente lineal. Reactivar un pedido cancelado siempre requiere
       /// `forzar`, ya que no forma parte de la secuencia lineal.
       if (!dto.forzar && (veniaCancelado || indiceNuevo !== indiceActual + 1)) {
-        throw new ConflictException(
-          `Transición de estado inválida: ${order.estado} -> ${dto.estado}. Solo se permite avanzar un paso en la secuencia.`,
-        );
+        throw new ConflictException({
+          message: `Transición de estado inválida: ${order.estado} -> ${dto.estado}. Solo se permite avanzar un paso en la secuencia.`,
+          codigo: 'TRANSICION_INVALIDA',
+        });
       }
     }
 
@@ -850,7 +851,10 @@ export class PedidosService {
       ]);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new ConflictException('El pedido ha cambiado de estado mientras lo editabas. Recarga y vuelve a intentarlo.');
+        throw new ConflictException({
+          message: 'El pedido ha cambiado de estado mientras lo editabas. Recarga y vuelve a intentarlo.',
+          codigo: 'PEDIDO_CAMBIADO',
+        });
       }
       throw error;
     }

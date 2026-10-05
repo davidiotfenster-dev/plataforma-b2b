@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, recargarSiCambio } from "@/lib/api";
 import { ESTADOS_PEDIDO, type EstadoPedido, type Order } from "@/lib/types";
 
 export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalidateKeys: unknown[][] }) {
@@ -31,7 +31,10 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       setConfirmando(false);
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("forceError")),
+    onError: (err) => {
+      setError(err instanceof ApiError ? err.message : t("forceError"));
+      recargarSiCambio(err, invalidateKeys, queryClient);
+    },
   });
 
   return (

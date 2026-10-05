@@ -1,3 +1,6 @@
+import type { QueryClient } from "@tanstack/react-query";
+import { CODIGOS_PEDIDO_CAMBIADO, mensajeDeError } from "@/lib/errores";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3010";
 
 export class ApiError extends Error {
@@ -43,7 +46,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const body = await res.json().catch(() => ({ message: res.statusText }));
     // Nest devuelve una lista de textos cuando falla la validación de varios campos.
     const mensaje = Array.isArray(body.message) ? body.message.join(" · ") : body.message;
-    throw new ApiError(res.status, mensaje ?? "Error de red", body.codigo);
+    throw new ApiError(res.status, mensajeDeError(res.status, body.codigo, mensaje ?? "Error de red"), body.codigo);
   }
 
   if (res.status === 204) {
@@ -71,7 +74,7 @@ export async function descargarArchivo(path: string, nombre: string): Promise<vo
   if (!res.ok) {
     comprobarSesion(res, path);
     const body = await res.json().catch(() => ({ message: res.statusText }));
-    throw new ApiError(res.status, body.message ?? "Error de red", body.codigo);
+    throw new ApiError(res.status, mensajeDeError(res.status, body.codigo, body.message ?? "Error de red"), body.codigo);
   }
   const url = URL.createObjectURL(await res.blob());
   const enlace = document.createElement("a");
@@ -87,4 +90,12 @@ export async function descargarArchivo(path: string, nombre: string): Promise<vo
 export function urlImagen(ruta: string | null | undefined): string | null {
   if (!ruta) return null;
   return ruta.startsWith("/imagenes/") ? `${API_URL}${ruta}` : ruta;
+}
+
+/// Si el fallo es que otra persona cambió el pedido, vuelve a pedir su estado real
+/// para que la pantalla no siga enseñando botones de un estado que ya no es el actual.
+export function recargarSiCambio(err: unknown, claves: unknown[][], queryClient: QueryClient): void {
+  if (err instanceof ApiError && err.code && CODIGOS_PEDIDO_CAMBIADO.includes(err.code)) {
+    for (const queryKey of claves) queryClient.invalidateQueries({ queryKey });
+  }
 }

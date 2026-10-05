@@ -70,7 +70,8 @@ describe('AuthService.validarCredenciales — rol COMERCIAL', () => {
 
     it('con la contraseña equivocada no revela nada de la cuenta', async () => {
       const respuesta = await codigoDe(partnerUser('PENDIENTE_APROBACION'), 'otra-clave');
-      expect(respuesta?.codigo).toBeUndefined();
+      // Solo el código genérico: no distingue una cuenta pendiente de una que no existe.
+      expect(respuesta?.codigo).toBe('CREDENCIALES_INVALIDAS');
       expect(respuesta?.message).toBe('Credenciales inválidas');
     });
 
