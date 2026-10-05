@@ -623,7 +623,8 @@
       "orders": "Orders",
       "avgOrder": "Average order",
       "pending": "Not shipped",
-      "cancelled": "{n, plural, =0 {No cancellations} one {# cancelled (not counted)} other {# cancelled (not counted)}}"
+      "cancelled": "{n, plural, =0 {No cancellations} one {# cancelled (not counted)} other {# cancelled (not counted)}}",
+      "units": "Units sold"
     },
     "vsPrevious": {
       "label": "vs previous period",
@@ -636,7 +637,8 @@
     },
     "measure": {
       "facturado": "Revenue",
-      "pedidos": "Orders"
+      "pedidos": "Orders",
+      "unidades": "Units"
     },
     "byStatus": "Orders by status",
     "byBrand": "Revenue by brand",
@@ -654,7 +656,8 @@
       "button": "Download Excel",
       "downloading": "Preparing…",
       "hint": "Downloads the figures with the current filters as Excel, plus the list of orders in the period"
-    }
+    },
+    "unitsN": "{n, plural, one {# unit} other {# units}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Carrier",

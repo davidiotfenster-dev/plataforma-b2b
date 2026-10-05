@@ -149,12 +149,12 @@ export type GranularidadEstadisticas = "day" | "week" | "month";
 /// los pedidos cancelados solo cuentan en `porEstado` y `kpis.cancelados`.
 export interface Estadisticas {
   periodo: { desde: string; hasta: string; granularidad: GranularidadEstadisticas };
-  kpis: { pedidos: number; facturado: number; ticketMedio: number; sinEnviar: number; cancelados: number };
-  periodoAnterior: { pedidos: number; facturado: number };
-  serie: { tramo: string; pedidos: number; facturado: number }[];
+  kpis: { pedidos: number; facturado: number; ticketMedio: number; unidades: number; sinEnviar: number; cancelados: number };
+  periodoAnterior: { pedidos: number; facturado: number; unidades: number };
+  serie: { tramo: string; pedidos: number; unidades: number; facturado: number }[];
   porEstado: { estado: EstadoPedido; cantidad: number; facturado: number }[];
-  porMarca: { marca: MarcaCatalogo; pedidos: number; facturado: number }[];
-  topEmpresas: { partnerId: string; razonSocial: string; marca: MarcaCatalogo | null; pedidos: number; facturado: number }[];
+  porMarca: { marca: MarcaCatalogo; pedidos: number; unidades: number; facturado: number }[];
+  topEmpresas: { partnerId: string; razonSocial: string; marca: MarcaCatalogo | null; pedidos: number; unidades: number; facturado: number }[];
   topProductos: { sku: string; nombre: string; unidades: number; facturado: number }[];
   empresas: { id: string; razonSocial: string; marca: MarcaCatalogo }[];
 }

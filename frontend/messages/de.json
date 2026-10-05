@@ -623,7 +623,8 @@
       "orders": "Bestellungen",
       "avgOrder": "Ø Bestellung",
       "pending": "Nicht versendet",
-      "cancelled": "{n, plural, =0 {Keine Stornierungen} one {# storniert (zählt nicht)} other {# storniert (zählen nicht)}}"
+      "cancelled": "{n, plural, =0 {Keine Stornierungen} one {# storniert (zählt nicht)} other {# storniert (zählen nicht)}}",
+      "units": "Verkaufte Stück"
     },
     "vsPrevious": {
       "label": "ggü. Vorzeitraum",
@@ -636,7 +637,8 @@
     },
     "measure": {
       "facturado": "Umsatz",
-      "pedidos": "Bestellungen"
+      "pedidos": "Bestellungen",
+      "unidades": "Stück"
     },
     "byStatus": "Bestellungen nach Status",
     "byBrand": "Umsatz nach Marke",
@@ -654,7 +656,8 @@
       "button": "Excel herunterladen",
       "downloading": "Wird vorbereitet…",
       "hint": "Lädt die Zahlen mit den aktuellen Filtern als Excel herunter, dazu die Liste der Bestellungen im Zeitraum"
-    }
+    },
+    "unitsN": "{n, plural, one {# Stk.} other {# Stk.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Spediteur",

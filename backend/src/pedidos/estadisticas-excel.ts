@@ -39,17 +39,29 @@ export interface DatosEstadisticas {
     pedidos: number;
     facturado: number;
     ticketMedio: number;
+    unidades: number;
     sinEnviar: number;
     cancelados: number;
   };
-  periodoAnterior: { pedidos: number; facturado: number };
-  serie: { tramo: string; pedidos: number; facturado: number }[];
+  periodoAnterior: { pedidos: number; facturado: number; unidades: number };
+  serie: {
+    tramo: string;
+    pedidos: number;
+    unidades: number;
+    facturado: number;
+  }[];
   porEstado: { estado: EstadoPedido; cantidad: number; facturado: number }[];
-  porMarca: { marca: string; pedidos: number; facturado: number }[];
+  porMarca: {
+    marca: string;
+    pedidos: number;
+    unidades: number;
+    facturado: number;
+  }[];
   topEmpresas: {
     razonSocial: string;
     marca: MarcaCatalogo | null;
     pedidos: number;
+    unidades: number;
     facturado: number;
   }[];
   topProductos: {
@@ -67,7 +79,7 @@ export interface PedidoExportado {
   poNumber: string;
   totalNeto: Prisma.Decimal;
   partner: { razonSocial: string; marcaCatalogo: MarcaCatalogo };
-  _count: { items: number };
+  items: { cantidad: number }[];
 }
 
 const fecha = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -140,6 +152,11 @@ export async function generarExcelEstadisticas(
       datos.kpis.ticketMedio,
       variacion(datos.kpis.ticketMedio, ticketAnterior),
     ],
+    [
+      'Unidades vendidas',
+      datos.kpis.unidades,
+      variacion(datos.kpis.unidades, datos.periodoAnterior.unidades),
+    ],
     ['Pedidos sin enviar', datos.kpis.sinEnviar],
     ['Pedidos cancelados (no cuentan)', datos.kpis.cancelados],
     [],
@@ -153,9 +170,9 @@ export async function generarExcelEstadisticas(
   resumen.getCell('B4').numFmt = 'dd/mm/yyyy';
   for (const fila of [9, 11])
     resumen.getCell(`B${fila}`).numFmt = FORMATO_EUROS;
-  for (const fila of [9, 10, 11])
+  for (const fila of [9, 10, 11, 12])
     resumen.getCell(`C${fila}`).numFmt = FORMATO_PORCENTAJE;
-  resumen.getCell('A15').font = { italic: true, color: { argb: 'FF737373' } };
+  resumen.getCell('A16').font = { italic: true, color: { argb: 'FF737373' } };
 
   hojaTabla(
     libro,
@@ -168,6 +185,7 @@ export async function generarExcelEstadisticas(
         numFmt: 'dd/mm/yyyy',
       },
       { header: 'Pedidos', key: 'pedidos', width: 12 },
+      { header: 'Unidades', key: 'unidades', width: 12 },
       {
         header: 'Facturación',
         key: 'facturado',
@@ -200,6 +218,7 @@ export async function generarExcelEstadisticas(
     [
       { header: 'Marca', key: 'marca', width: 26 },
       { header: 'Pedidos', key: 'pedidos', width: 12 },
+      { header: 'Unidades', key: 'unidades', width: 12 },
       {
         header: 'Facturación',
         key: 'facturado',
@@ -227,6 +246,7 @@ export async function generarExcelEstadisticas(
       { header: 'Empresa', key: 'razonSocial', width: 36 },
       { header: 'Marca', key: 'marca', width: 26 },
       { header: 'Pedidos', key: 'pedidos', width: 12 },
+      { header: 'Unidades', key: 'unidades', width: 12 },
       {
         header: 'Facturación',
         key: 'facturado',
@@ -265,6 +285,7 @@ export async function generarExcelEstadisticas(
       { header: 'Estado', key: 'estado', width: 16 },
       { header: 'PO Number', key: 'po', width: 18 },
       { header: 'Líneas', key: 'lineas', width: 10 },
+      { header: 'Unidades', key: 'unidades', width: 12 },
       { header: 'Total neto', key: 'total', width: 16, numFmt: FORMATO_EUROS },
     ],
     pedidos.map((p) => ({
@@ -274,7 +295,8 @@ export async function generarExcelEstadisticas(
       marca: marca(p.partner.marcaCatalogo),
       estado: NOMBRE_ESTADO[p.estado],
       po: p.poNumber,
-      lineas: p._count.items,
+      lineas: p.items.length,
+      unidades: p.items.reduce((acc, i) => acc + i.cantidad, 0),
       total: Number(p.totalNeto),
     })),
   );

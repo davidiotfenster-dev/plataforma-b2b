@@ -33,6 +33,9 @@ function rangoDePreset(preset: Exclude<Preset, "custom">): { desde: string; hast
 
 const COLOR_SERIE = "#0284c7";
 
+type Medida = "facturado" | "pedidos" | "unidades";
+const MEDIDAS: Medida[] = ["facturado", "pedidos", "unidades"];
+
 function AdminDashboardPageContenido() {
   const t = useTranslations("adminDashboard");
   const tEstados = useTranslations("estados");
@@ -43,7 +46,7 @@ function AdminDashboardPageContenido() {
   const [rango, setRango] = useState(() => rangoDePreset("30d"));
   const [marca, setMarca] = useState<MarcaCatalogo | "">("");
   const [partnerId, setPartnerId] = useState("");
-  const [medida, setMedida] = useState<"facturado" | "pedidos">("facturado");
+  const [medida, setMedida] = useState<Medida>("facturado");
   const [descargando, setDescargando] = useState(false);
   const [errorDescarga, setErrorDescarga] = useState<string | null>(null);
 
@@ -198,7 +201,7 @@ function AdminDashboardPageContenido() {
       {data && (
         <>
           {/* Cifras clave, comparadas con el periodo anterior de la misma duración. */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
             <Kpi titulo={t("kpis.billed")} valor={f.euros(data.kpis.facturado)}>
               <Variacion actual={data.kpis.facturado} anterior={data.periodoAnterior.facturado} />
             </Kpi>
@@ -211,6 +214,9 @@ function AdminDashboardPageContenido() {
                 anterior={data.periodoAnterior.pedidos > 0 ? data.periodoAnterior.facturado / data.periodoAnterior.pedidos : 0}
               />
             </Kpi>
+            <Kpi titulo={t("kpis.units")} valor={f.numero(data.kpis.unidades)}>
+              <Variacion actual={data.kpis.unidades} anterior={data.periodoAnterior.unidades} />
+            </Kpi>
             <Kpi titulo={t("kpis.pending")} valor={f.numero(data.kpis.sinEnviar)}>
               <span className="text-neutral-500">{t("kpis.cancelled", { n: data.kpis.cancelados })}</span>
             </Kpi>
@@ -220,7 +226,7 @@ function AdminDashboardPageContenido() {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-medium text-neutral-900">{t(`evolution.${data.periodo.granularidad}`)}</p>
               <div className="flex overflow-hidden rounded-md border border-neutral-200 text-xs" role="group">
-                {(["facturado", "pedidos"] as const).map((m) => (
+                {MEDIDAS.map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -302,7 +308,7 @@ function AdminDashboardPageContenido() {
                       key={m.marca}
                       etiqueta={<InsigniaMarca marca={m.marca} />}
                       valor={f.euros(m.facturado)}
-                      detalle={`${t("ordersN", { n: m.pedidos })} · ${f.porcentaje(data.kpis.facturado > 0 ? m.facturado / data.kpis.facturado : 0)}`}
+                      detalle={`${t("ordersN", { n: m.pedidos })} · ${t("unitsN", { n: m.unidades })} · ${f.porcentaje(data.kpis.facturado > 0 ? m.facturado / data.kpis.facturado : 0)}`}
                       fraccion={data.kpis.facturado > 0 ? m.facturado / data.kpis.facturado : 0}
                       claseBarra={MARCA_INFO[m.marca].acento}
                     />
@@ -322,7 +328,8 @@ function AdminDashboardPageContenido() {
                     <tr className="text-left text-xs text-neutral-500">
                       <th className="pb-2 font-normal">{t("cols.company")}</th>
                       <th className="pb-2 text-right font-normal">{t("cols.orders")}</th>
-                      <th className="pb-2 text-right font-normal">{t("cols.billed")}</th>
+                      <th className="pb-2 pl-3 text-right font-normal">{t("cols.units")}</th>
+                      <th className="pb-2 pl-3 text-right font-normal">{t("cols.billed")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -338,7 +345,8 @@ function AdminDashboardPageContenido() {
                           </div>
                         </td>
                         <td className="py-2 text-right tabular-nums text-neutral-600">{f.numero(e.pedidos)}</td>
-                        <td className="py-2 text-right font-medium tabular-nums text-neutral-900">{f.euros(e.facturado)}</td>
+                        <td className="py-2 pl-3 text-right tabular-nums text-neutral-600">{f.numero(e.unidades)}</td>
+                        <td className="py-2 pl-3 text-right font-medium tabular-nums text-neutral-900">{f.euros(e.facturado)}</td>
                       </tr>
                     ))}
                   </tbody>

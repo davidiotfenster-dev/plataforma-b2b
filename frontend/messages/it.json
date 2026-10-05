@@ -623,7 +623,8 @@
       "orders": "Ordini",
       "avgOrder": "Ordine medio",
       "pending": "Non spediti",
-      "cancelled": "{n, plural, =0 {Nessun annullato} one {# annullato (non conta)} other {# annullati (non contano)}}"
+      "cancelled": "{n, plural, =0 {Nessun annullato} one {# annullato (non conta)} other {# annullati (non contano)}}",
+      "units": "Pezzi venduti"
     },
     "vsPrevious": {
       "label": "vs periodo precedente",
@@ -636,7 +637,8 @@
     },
     "measure": {
       "facturado": "Fatturato",
-      "pedidos": "Ordini"
+      "pedidos": "Ordini",
+      "unidades": "Pezzi"
     },
     "byStatus": "Ordini per stato",
     "byBrand": "Fatturato per marca",
@@ -654,7 +656,8 @@
       "button": "Scarica Excel",
       "downloading": "Preparazione…",
       "hint": "Scarica in Excel le cifre con i filtri attuali, più l'elenco degli ordini del periodo"
-    }
+    },
+    "unitsN": "{n, plural, one {# pz.} other {# pz.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Corriere",

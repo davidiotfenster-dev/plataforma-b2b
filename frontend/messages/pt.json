@@ -623,7 +623,8 @@
       "orders": "Encomendas",
       "avgOrder": "Encomenda média",
       "pending": "Por enviar",
-      "cancelled": "{n, plural, =0 {Nenhuma cancelada} one {# cancelada (não conta)} other {# canceladas (não contam)}}"
+      "cancelled": "{n, plural, =0 {Nenhuma cancelada} one {# cancelada (não conta)} other {# canceladas (não contam)}}",
+      "units": "Unidades vendidas"
     },
     "vsPrevious": {
       "label": "vs período anterior",
@@ -636,7 +637,8 @@
     },
     "measure": {
       "facturado": "Faturação",
-      "pedidos": "Encomendas"
+      "pedidos": "Encomendas",
+      "unidades": "Unidades"
     },
     "byStatus": "Encomendas por estado",
     "byBrand": "Faturação por marca",
@@ -654,7 +656,8 @@
       "button": "Descarregar Excel",
       "downloading": "A preparar…",
       "hint": "Descarrega em Excel os valores com os filtros atuais, mais a lista de encomendas do período"
-    }
+    },
+    "unitsN": "{n, plural, one {# un.} other {# un.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Transportadora",

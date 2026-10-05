@@ -623,7 +623,8 @@
       "orders": "Pedidos",
       "avgOrder": "Pedido medio",
       "pending": "Sin enviar",
-      "cancelled": "{n, plural, =0 {Ningún cancelado} one {# cancelado (no cuenta)} other {# cancelados (no cuentan)}}"
+      "cancelled": "{n, plural, =0 {Ningún cancelado} one {# cancelado (no cuenta)} other {# cancelados (no cuentan)}}",
+      "units": "Unidades vendidas"
     },
     "vsPrevious": {
       "label": "vs periodo anterior",
@@ -636,7 +637,8 @@
     },
     "measure": {
       "facturado": "Facturación",
-      "pedidos": "Pedidos"
+      "pedidos": "Pedidos",
+      "unidades": "Unidades"
     },
     "byStatus": "Pedidos por estado",
     "byBrand": "Facturación por marca",
@@ -654,7 +656,8 @@
       "button": "Descargar Excel",
       "downloading": "Preparando…",
       "hint": "Descarga en Excel las cifras con los filtros actuales, más el listado de pedidos del periodo"
-    }
+    },
+    "unitsN": "{n, plural, one {# ud.} other {# uds.}}"
   },
   "avanzarEstado": {
     "carrierPlaceholder": "Transportista",

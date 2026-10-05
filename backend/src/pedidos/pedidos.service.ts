@@ -464,7 +464,7 @@ export class PedidosService {
           poNumber: true,
           totalNeto: true,
           partner: { select: { razonSocial: true, marcaCatalogo: true } },
-          _count: { select: { items: true } },
+          items: { select: { cantidad: true } },
         },
       }),
     ]);
@@ -501,7 +501,7 @@ export class PedidosService {
       ...(query.marca ? [Prisma.sql`p."marcaCatalogo" = ${query.marca}::"MarcaCatalogo"`] : []),
     ];
 
-    const [porEstado, porEmpresa, totales, anterior, serie, productos, empresas] = await Promise.all([
+    const [porEstado, porEmpresa, totales, anterior, unidadesAnterior, unidadesPorEmpresa, serie, productos, empresas] = await Promise.all([
       this.prisma.order.groupBy({
         by: ['estado'],
         where: enPeriodo,
@@ -520,12 +520,32 @@ export class PedidosService {
         _count: { _all: true },
         _sum: { totalNeto: true },
       }),
-      this.prisma.$queryRaw<{ tramo: Date; pedidos: bigint; facturado: Prisma.Decimal | null }[]>`
+      this.prisma.orderItem.aggregate({
+        where: {
+          order: {
+            is: { ...filtroEmpresa, estado: { not: EstadoPedido.CANCELADO }, createdAt: { gte: periodo.inicioAnterior, lt: periodo.inicio } },
+          },
+        },
+        _sum: { cantidad: true },
+      }),
+      this.prisma.$queryRaw<{ partnerId: string; unidades: bigint }[]>`
+        SELECT o."partnerId", SUM(i."cantidad")::bigint AS unidades
+        FROM "OrderItem" i
+        JOIN "Order" o ON o."id" = i."orderId"
+        JOIN "Partner" p ON p."id" = o."partnerId"
+        WHERE ${Prisma.join(condicionesSql, ' AND ')}
+        GROUP BY o."partnerId"
+      `,
+      this.prisma.$queryRaw<{ tramo: Date; pedidos: bigint; facturado: Prisma.Decimal | null; unidades: bigint | null }[]>`
         SELECT date_trunc(${periodo.granularidad}::text, o."createdAt") AS tramo,
                COUNT(*)::bigint AS pedidos,
-               SUM(o."totalNeto") AS facturado
+               SUM(o."totalNeto") AS facturado,
+               SUM(u."unidades")::bigint AS unidades
         FROM "Order" o
         JOIN "Partner" p ON p."id" = o."partnerId"
+        LEFT JOIN (
+          SELECT "orderId", SUM("cantidad") AS unidades FROM "OrderItem" GROUP BY "orderId"
+        ) u ON u."orderId" = o."id"
         WHERE ${Prisma.join(condicionesSql, ' AND ')}
         GROUP BY tramo
         ORDER BY tramo ASC
@@ -549,21 +569,24 @@ export class PedidosService {
     const facturadoDe = (v: Prisma.Decimal | null | undefined) => (v ? Number(v) : 0);
     const centimos = (n: number) => Math.round(n * 100) / 100;
 
+    const unidadesDe = new Map(unidadesPorEmpresa.map((u) => [u.partnerId, Number(u.unidades)]));
     const ranking = porEmpresa
       .map((e) => ({
         partnerId: e.partnerId,
         razonSocial: infoEmpresa.get(e.partnerId)?.razonSocial ?? 'Desconocido',
         marca: infoEmpresa.get(e.partnerId)?.marcaCatalogo ?? null,
         pedidos: e._count._all,
+        unidades: unidadesDe.get(e.partnerId) ?? 0,
         facturado: facturadoDe(e._sum.totalNeto),
       }))
       .sort((a, b) => b.facturado - a.facturado);
 
-    const porMarca = new Map<string, { marca: string; pedidos: number; facturado: number }>();
+    const porMarca = new Map<string, { marca: string; pedidos: number; unidades: number; facturado: number }>();
     for (const e of ranking) {
       if (!e.marca) continue;
-      const acc = porMarca.get(e.marca) ?? { marca: e.marca, pedidos: 0, facturado: 0 };
+      const acc = porMarca.get(e.marca) ?? { marca: e.marca, pedidos: 0, unidades: 0, facturado: 0 };
       acc.pedidos += e.pedidos;
+      acc.unidades += e.unidades;
       acc.facturado += e.facturado;
       porMarca.set(e.marca, acc);
     }
@@ -582,16 +605,19 @@ export class PedidosService {
         pedidos,
         facturado,
         ticketMedio: pedidos > 0 ? centimos(facturado / pedidos) : 0,
+        unidades: ranking.reduce((acc, e) => acc + e.unidades, 0),
         sinEnviar,
         cancelados,
       },
       periodoAnterior: {
         pedidos: anterior._count._all,
         facturado: facturadoDe(anterior._sum.totalNeto),
+        unidades: unidadesAnterior._sum.cantidad ?? 0,
       },
       serie: tramosDelPeriodo(periodo).map((tramo) => ({
         tramo,
         pedidos: Number(serieIndexada.get(tramo)?.pedidos ?? 0),
+        unidades: Number(serieIndexada.get(tramo)?.unidades ?? 0),
         facturado: facturadoDe(serieIndexada.get(tramo)?.facturado),
       })),
       porEstado: porEstado.map((e) => ({
