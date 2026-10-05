@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { Trash2 } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ResumenCarrito } from "@/lib/types";
 import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 import { usePrecio } from "@/lib/formato";
+import { CampoCantidad } from "@/components/campo-cantidad";
 
 export default function CarritoPage() {
   const queryClient = useQueryClient();
@@ -48,6 +49,8 @@ export default function CarritoPage() {
     );
   }
 
+  const hayNoDisponibles = carrito.items.some((item) => !item.disponible);
+
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold text-neutral-900">{t("title")}</h1>
@@ -69,24 +72,22 @@ export default function CarritoPage() {
           </thead>
           <tbody>
             {carrito.items.map((item) => (
-              <tr key={item.id} className="border-b border-neutral-100 last:border-0">
+              <tr key={item.id} className={`border-b border-neutral-100 last:border-0 ${item.disponible ? "" : "bg-amber-50"}`}>
                 <td className="px-4 py-3">
                   <p className="font-medium text-neutral-900">{item.nombreComercial}</p>
                   <p className="text-xs text-neutral-400">{item.skuComercial}</p>
+                  {!item.disponible && (
+                    <p className="mt-1 flex items-center gap-1 text-xs font-medium text-amber-800">
+                      <AlertTriangle className="size-3.5 shrink-0" aria-hidden /> {t("unavailable")}
+                    </p>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-neutral-700">{precio(item.precioNetoUnitario)}</td>
                 <td className="px-4 py-3">
-                  <input
-                    type="number"
-                    min={1}
-                    defaultValue={item.cantidad}
-                    onBlur={(e) => {
-                      const cantidad = Number(e.target.value);
-                      if (cantidad > 0 && cantidad !== item.cantidad) {
-                        actualizarCantidad.mutate({ id: item.id, cantidad });
-                      }
-                    }}
-                    className="w-20 rounded-md border border-neutral-300 px-2 py-1"
+                  <CampoCantidad
+                    valor={item.cantidad}
+                    etiqueta={t("quantityOf", { producto: item.nombreComercial })}
+                    onCambiar={(cantidad) => actualizarCantidad.mutateAsync({ id: item.id, cantidad })}
                   />
                 </td>
                 <td className="px-4 py-3 font-medium text-neutral-900">{precio(item.totalLinea)}</td>
@@ -107,13 +108,27 @@ export default function CarritoPage() {
 
       <div className="mt-6 flex items-center justify-between">
         <p className="text-lg font-semibold text-neutral-900">{t("totalLabel", { total: precio(carrito.totalPedido) })}</p>
-        <Link
-          href="/checkout"
-          className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"
-        >
-          {t("continueToCheckout")}
-        </Link>
+        {hayNoDisponibles ? (
+          <span
+            aria-disabled="true"
+            className="cursor-not-allowed rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white opacity-50"
+          >
+            {t("continueToCheckout")}
+          </span>
+        ) : (
+          <Link
+            href="/checkout"
+            className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            {t("continueToCheckout")}
+          </Link>
+        )}
       </div>
+      {hayNoDisponibles && (
+        <p role="alert" className="mt-3 text-right text-sm text-amber-800">
+          {t("unavailableBlock")}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { REPRESENTACION_VISIBLE } from '../catalogo-marca/catalogo-marca.service.js';
+import { REPRESENTACION_VISIBLE, representacionDisponible } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { calcularPrecioNeto } from '../common/precio-neto.js';
 import { CANTIDAD_MAXIMA_POR_LINEA } from './dto/agregar-item.dto.js';
@@ -20,6 +20,8 @@ export interface LineaCarrito {
   descuentoPorcentaje: string;
   precioNetoUnitario: string;
   totalLinea: string;
+  /// `false` si el producto se retiró de la venta después de meterlo en el carrito.
+  disponible: boolean;
 }
 
 export interface ResumenCarrito {
@@ -59,7 +61,7 @@ export class CarritoService {
     const [items, partner] = await Promise.all([
       this.prisma.cartItem.findMany({
         where: { cartId },
-        include: { representacionPartner: true },
+        include: { representacionPartner: { include: { productoBase: true, productoMarca: true } } },
         orderBy: { createdAt: 'asc' },
       }),
       this.prisma.partner.findUniqueOrThrow({ where: { id: partnerId } }),
@@ -86,6 +88,7 @@ export class CarritoService {
         descuentoPorcentaje: descuentoAplicado.toString(),
         precioNetoUnitario: precioNetoUnitario.toString(),
         totalLinea: totalLinea.toString(),
+        disponible: representacionDisponible(rep),
       };
     });
 

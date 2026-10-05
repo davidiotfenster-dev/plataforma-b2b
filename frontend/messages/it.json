@@ -201,7 +201,12 @@
     "total": "Totale",
     "removeLine": "Rimuovi riga",
     "totalLabel": "Totale: {total}",
-    "continueToCheckout": "Procedi al checkout"
+    "continueToCheckout": "Procedi al checkout",
+    "quantityInvalid": "Inserisci un numero intero tra 1 e {max}.",
+    "quantityError": "Non è stato possibile modificare la quantità.",
+    "quantityOf": "Quantità di {producto}",
+    "unavailable": "Questo prodotto non è più disponibile.",
+    "unavailableBlock": "Rimuovi dal carrello i prodotti non più disponibili per continuare."
   },
   "checkout": {
     "loading": "Caricamento…",

@@ -13,6 +13,7 @@ import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-quer
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
 import { calcularPrecioNeto } from '../common/precio-neto.js';
+import { representacionDisponible } from '../catalogo-marca/catalogo-marca.service.js';
 import { calcularPeriodo, tramosDelPeriodo, type PeriodoEstadisticas } from './estadisticas-periodo.js';
 import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
@@ -97,12 +98,7 @@ export class PedidosService {
       /// Un producto retirado de la venta después de meterlo en el carrito no
       /// se puede pedir: se avisa cuáles son para que el cliente los quite.
       const retirados = cart.items
-        .filter(
-          (item) =>
-            item.representacionPartner.activo === false ||
-            item.representacionPartner.productoBase?.activo === false ||
-            item.representacionPartner.productoMarca?.activo === false,
-        )
+        .filter((item) => !representacionDisponible(item.representacionPartner))
         .map((item) => item.representacionPartner.nombreComercial);
       if (retirados.length > 0) {
         throw new ConflictException(`Estos productos ya no están disponibles, quítalos del carrito: ${retirados.join(', ')}.`);

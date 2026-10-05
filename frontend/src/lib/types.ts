@@ -53,6 +53,8 @@ export interface LineaCarrito {
   descuentoPorcentaje: string;
   precioNetoUnitario: string;
   totalLinea: string;
+  /// `false` si el producto se retiró de la venta después de meterlo en el carrito.
+  disponible: boolean;
 }
 
 export interface ResumenCarrito {
