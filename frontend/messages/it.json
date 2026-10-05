@@ -159,7 +159,8 @@
     "disclaimer": "Alla conferma, l'ordine viene registrato con i prezzi congelati. Non viene effettuato alcun pagamento online: la gestione avviene a fronte dell'ordine di acquisto indicato.",
     "totalLabel": "Totale: {total} €",
     "confirmError": "Errore durante la conferma dell'ordine",
-    "pricesChanged": "I prezzi del tuo carrello sono cambiati. Abbiamo aggiornato il riepilogo: controlla il nuovo totale e conferma di nuovo."
+    "pricesChanged": "I prezzi del tuo carrello sono cambiati. Abbiamo aggiornato il riepilogo: controlla il nuovo totale e conferma di nuovo.",
+    "requiredFields": "Inserisci l'indirizzo di spedizione e il PO Number per confermare l'ordine."
   },
   "pedidos": {
     "title": "I miei ordini",

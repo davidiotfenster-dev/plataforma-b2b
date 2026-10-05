@@ -159,7 +159,8 @@
     "disclaimer": "Al confirmar, el pedido queda registrado con precios congelados. No se realiza pago online: se gestiona contra la orden de compra indicada.",
     "totalLabel": "Total: {total} €",
     "confirmError": "Error al confirmar el pedido",
-    "pricesChanged": "Los precios de tu carrito han cambiado. Hemos actualizado el resumen: revisa el nuevo total y vuelve a confirmar."
+    "pricesChanged": "Los precios de tu carrito han cambiado. Hemos actualizado el resumen: revisa el nuevo total y vuelve a confirmar.",
+    "requiredFields": "Escribe la dirección de envío y el PO Number para confirmar el pedido."
   },
   "pedidos": {
     "title": "Mis pedidos",

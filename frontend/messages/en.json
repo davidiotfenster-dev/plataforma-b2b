@@ -159,7 +159,8 @@
     "disclaimer": "On confirmation, the order is registered with prices frozen. No online payment is taken: it is settled against the purchase order provided.",
     "totalLabel": "Total: €{total}",
     "confirmError": "Error confirming the order",
-    "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again."
+    "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again.",
+    "requiredFields": "Enter the shipping address and the PO Number to confirm the order."
   },
   "pedidos": {
     "title": "My orders",

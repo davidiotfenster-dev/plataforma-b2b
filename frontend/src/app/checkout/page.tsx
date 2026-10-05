@@ -26,9 +26,9 @@ export default function CheckoutPage() {
   const confirmar = useMutation({
     mutationFn: () =>
       api.post<Order>("/pedidos/confirmar", {
-        direccionEnvio,
-        poNumber,
-        notas: notas || undefined,
+        direccionEnvio: direccionEnvio.trim(),
+        poNumber: poNumber.trim(),
+        notas: notas.trim() || undefined,
         // El total que el cliente está viendo: si cambió, el servidor no confirma en silencio.
         totalEsperado: carrito?.totalPedido,
       }),
@@ -51,6 +51,11 @@ export default function CheckoutPage() {
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    // `required` deja pasar un campo con solo espacios: sin dirección o sin PO no hay pedido.
+    if (!direccionEnvio.trim() || !poNumber.trim()) {
+      setError(t("requiredFields"));
+      return;
+    }
     confirmar.mutate();
   }
 

@@ -159,7 +159,8 @@
     "disclaimer": "Mit der Bestätigung wird die Bestellung mit eingefrorenen Preisen erfasst. Es erfolgt keine Online-Zahlung: die Abwicklung erfolgt gegen den angegebenen Bestellauftrag.",
     "totalLabel": "Gesamt: {total} €",
     "confirmError": "Fehler beim Bestätigen der Bestellung",
-    "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut."
+    "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut.",
+    "requiredFields": "Geben Sie die Lieferadresse und die PO-Nummer ein, um die Bestellung zu bestätigen."
   },
   "pedidos": {
     "title": "Meine Bestellungen",

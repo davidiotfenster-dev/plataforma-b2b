@@ -166,7 +166,8 @@ export class PedidosService {
           userId,
           direccionEnvio: dto.direccionEnvio,
           poNumber: dto.poNumber,
-          notas: dto.notas,
+          // Una nota vacía (o solo con espacios) no es una nota.
+          notas: dto.notas || null,
           totalNeto,
           items: { createMany: { data: lineas } },
           historial: { create: { estado: EstadoPedido.RECIBIDO } },
