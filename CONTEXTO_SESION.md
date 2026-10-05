@@ -246,6 +246,12 @@ probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en
   Código en `frontend/src/components/ayuda/`: `temas.ts` (qué preguntas salen en cada
   ruta), `ayuda-burbuja.tsx` y `ayuda-puntual.tsx`. Textos en `messages/*.json`, clave
   `ayuda` (`ayuda.q.<id>.p|r`, `ayuda.temas.<tema>`, `ayuda.puntual.*`).
+- **Buscador y "Otros temas"** (2026-10-05): el panel tiene un buscador (sin tildes ni
+  mayúsculas, busca en preguntas y respuestas) y abajo los demás temas para consultarlos
+  desde cualquier pantalla. Cada usuario solo ve los suyos: el personal de IoT FENSTER los
+  del panel (`TEMAS_PERSONAL`), los clientes los del portal (sin entrar/registro con
+  sesión). Con ayuda propia también: Nueva empresa, Catálogo de la empresa y Usuarios de
+  la empresa. La barra fija de guardar de la ficha deja sitio a la derecha para el botón.
 - **Iconos "?" puntuales** (pasas el ratón, los enfocas o los pulsas): estados en Mis
   pedidos, "Precio neto" en el carrito y en el detalle del pedido, y "Tipo de empresa"
   en la ficha de la empresa.

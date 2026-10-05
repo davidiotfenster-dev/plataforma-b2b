@@ -760,7 +760,10 @@
       "adminMarcas": "Marchi",
       "adminProductos": "Prodotti",
       "adminPedidos": "Ordini",
-      "adminDashboard": "Statistiche"
+      "adminDashboard": "Statistiche",
+      "adminAlta": "Nuova azienda",
+      "adminCatalogoEmpresa": "Catalogo dell'azienda",
+      "adminUsuarios": "Utenti dell'azienda"
     },
     "puntual": {
       "estados": "Ricevuto, Confermato, In preparazione, Preparato e Spedito sono le fasi di un ordine, in questo ordine. Annullato significa che è stato cancellato.",
@@ -904,7 +907,38 @@
       "miCuenta": {
         "p": "Con quale account ho effettuato l''accesso?",
         "r": "In alto a destra, sopra la barra, vedi «Accesso come» con l''email dell''account in uso."
+      },
+      "altaDirecta": {
+        "p": "In cosa si differenzia dalla registrazione?",
+        "r": "L'azienda è subito attiva con il suo primo utente: senza verifica dell'email né approvazione. Riceve il catalogo del suo marchio appena creata."
+      },
+      "contrasenaInicial": {
+        "p": "Come faccio avere la password all'utente?",
+        "r": "Scrivila o premi «Genera» per crearne una sicura. Il portale non la invia: comunicala tu all'utente tramite un canale sicuro."
+      },
+      "descuentoProducto": {
+        "p": "Posso applicare uno sconto diverso a un solo prodotto?",
+        "r": "Sì. Scrivi la percentuale nella casella dello sconto di quel prodotto e salva: userà quello al posto dello sconto generale. Lasciala vuota per tornare allo sconto generale."
+      },
+      "desactivarUsuario": {
+        "p": "Disattivare o forzare la disconnessione",
+        "r": "Disattivare impedisce all'utente di accedere finché non lo riattivi. Forzare la disconnessione chiude solo la sessione aperta: può accedere di nuovo."
+      },
+      "verAuditoria": {
+        "p": "Cosa mostra «Visualizza registro di audit»?",
+        "r": "Gli eventi registrati per quell'utente con la data, come i suoi accessi o gli ordini che ha confermato."
+      },
+      "anadirUsuario": {
+        "p": "Posso aggiungere un altro utente all'azienda?",
+        "r": "Non ancora dal portale: ogni azienda ha l'utente creato nella registrazione o al momento dell'inserimento. Qui puoi cambiarne il ruolo, disattivarlo o chiuderne la sessione."
       }
-    }
+    },
+    "buscar": "Cerca nella guida",
+    "buscarPlaceholder": "Cerca una domanda…",
+    "resultados": "{n, plural, =0 {Nessun risultato} one {# risultato} other {# risultati}}",
+    "sinResultados": "Nessuna domanda contiene queste parole. Prova con parole più brevi o consulta gli argomenti.",
+    "otrosTemas": "Altri argomenti",
+    "volverPantalla": "Torna a questa schermata",
+    "volver": "Indietro"
   }
 }

@@ -760,7 +760,10 @@
       "adminMarcas": "Marken",
       "adminProductos": "Produkte",
       "adminPedidos": "Bestellungen",
-      "adminDashboard": "Statistiken"
+      "adminDashboard": "Statistiken",
+      "adminAlta": "Neues Unternehmen",
+      "adminCatalogoEmpresa": "Katalog des Unternehmens",
+      "adminUsuarios": "Benutzer des Unternehmens"
     },
     "puntual": {
       "estados": "Eingegangen, Bestätigt, In Vorbereitung, Bereit und Versendet sind die Schritte einer Bestellung, in dieser Reihenfolge. Storniert bedeutet, dass sie annulliert wurde.",
@@ -904,7 +907,38 @@
       "miCuenta": {
         "p": "Mit welchem Konto bin ich angemeldet?",
         "r": "Oben rechts, über der Leiste, sehen Sie „Angemeldet als“ mit der E-Mail des verwendeten Kontos."
+      },
+      "altaDirecta": {
+        "p": "Was ist der Unterschied zur Registrierung?",
+        "r": "Das Unternehmen ist sofort mit seinem ersten Benutzer aktiv: ohne E-Mail-Bestätigung und ohne Freigabe. Es erhält den Katalog seiner Marke direkt beim Anlegen."
+      },
+      "contrasenaInicial": {
+        "p": "Wie erhält der Benutzer das Passwort?",
+        "r": "Geben Sie eines ein oder klicken Sie auf „Erzeugen“ für ein sicheres. Das Portal versendet es nicht: Geben Sie es dem Benutzer selbst über einen sicheren Kanal weiter."
+      },
+      "descuentoProducto": {
+        "p": "Kann ich einem einzelnen Produkt einen anderen Rabatt geben?",
+        "r": "Ja. Tragen Sie den Prozentsatz im Rabattfeld dieses Produkts ein und speichern Sie: Es gilt dann statt des allgemeinen Rabatts. Lassen Sie das Feld leer, um zum allgemeinen Rabatt zurückzukehren."
+      },
+      "desactivarUsuario": {
+        "p": "Deaktivieren oder Abmeldung erzwingen",
+        "r": "Deaktivieren verhindert die Anmeldung, bis Sie den Benutzer wieder aktivieren. Abmeldung erzwingen beendet nur die aktuelle Sitzung: Er kann sich wieder anmelden."
+      },
+      "verAuditoria": {
+        "p": "Was zeigt „Prüfprotokoll anzeigen“?",
+        "r": "Die für diesen Benutzer erfassten Ereignisse mit Datum, z. B. seine Anmeldungen oder die von ihm bestätigten Bestellungen."
+      },
+      "anadirUsuario": {
+        "p": "Kann ich dem Unternehmen einen weiteren Benutzer hinzufügen?",
+        "r": "Noch nicht über das Portal: Jedes Unternehmen hat den Benutzer aus der Registrierung oder der Anlage. Hier können Sie seine Rolle ändern, ihn deaktivieren oder seine Sitzung beenden."
       }
-    }
+    },
+    "buscar": "Hilfe durchsuchen",
+    "buscarPlaceholder": "Frage suchen…",
+    "resultados": "{n, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
+    "sinResultados": "Keine Frage enthält diese Wörter. Versuchen Sie kürzere oder sehen Sie sich die Themen an.",
+    "otrosTemas": "Weitere Themen",
+    "volverPantalla": "Zurück zu dieser Seite",
+    "volver": "Zurück"
   }
 }

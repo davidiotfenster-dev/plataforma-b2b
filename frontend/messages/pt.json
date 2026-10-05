@@ -760,7 +760,10 @@
       "adminMarcas": "Marcas",
       "adminProductos": "Produtos",
       "adminPedidos": "Encomendas",
-      "adminDashboard": "Estatísticas"
+      "adminDashboard": "Estatísticas",
+      "adminAlta": "Nova empresa",
+      "adminCatalogoEmpresa": "Catálogo da empresa",
+      "adminUsuarios": "Utilizadores da empresa"
     },
     "puntual": {
       "estados": "Recebida, Confirmada, Em preparação, Preparada e Enviada são os passos de uma encomenda, por essa ordem. Cancelada significa que foi anulada.",
@@ -904,7 +907,38 @@
       "miCuenta": {
         "p": "Com que conta entrei?",
         "r": "No canto superior direito, por cima da barra, vê «Sessão iniciada como» com o email da conta em uso."
+      },
+      "altaDirecta": {
+        "p": "Em que é diferente do registo?",
+        "r": "A empresa fica ativa de imediato com o seu primeiro utilizador: sem verificação de email nem aprovação. Recebe o catálogo da sua marca assim que é criada."
+      },
+      "contrasenaInicial": {
+        "p": "Como faço chegar a palavra-passe ao utilizador?",
+        "r": "Escreva-a ou carregue em «Gerar» para criar uma segura. O portal não a envia: transmita-a ao utilizador por um canal seguro."
+      },
+      "descuentoProducto": {
+        "p": "Posso dar outro desconto a um só produto?",
+        "r": "Sim. Escreva a percentagem na caixa de desconto desse produto e guarde: usará esse em vez do geral. Deixe-a vazia para voltar ao desconto geral."
+      },
+      "desactivarUsuario": {
+        "p": "Desativar ou forçar o fim de sessão",
+        "r": "Desativar impede o utilizador de entrar até o ativar de novo. Forçar o fim de sessão só fecha a sessão que tem aberta: pode voltar a entrar."
+      },
+      "verAuditoria": {
+        "p": "O que mostra «Ver registo de auditoria»?",
+        "r": "Os eventos registados desse utilizador com a data, como os seus inícios de sessão ou as encomendas que confirmou."
+      },
+      "anadirUsuario": {
+        "p": "Posso adicionar outro utilizador à empresa?",
+        "r": "Ainda não a partir do portal: cada empresa tem o utilizador criado no registo ou na criação. Aqui pode alterar o seu perfil, desativá-lo ou fechar a sessão."
       }
-    }
+    },
+    "buscar": "Pesquisar na ajuda",
+    "buscarPlaceholder": "Pesquise uma pergunta…",
+    "resultados": "{n, plural, =0 {Nenhum resultado} one {# resultado} other {# resultados}}",
+    "sinResultados": "Nenhuma pergunta contém essas palavras. Tente palavras mais curtas ou consulte os temas.",
+    "otrosTemas": "Outros temas",
+    "volverPantalla": "Voltar a este ecrã",
+    "volver": "Voltar"
   }
 }

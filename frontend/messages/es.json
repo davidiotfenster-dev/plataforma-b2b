@@ -760,7 +760,10 @@
       "adminMarcas": "Marcas",
       "adminProductos": "Productos",
       "adminPedidos": "Pedidos",
-      "adminDashboard": "Estadísticas"
+      "adminDashboard": "Estadísticas",
+      "adminAlta": "Nueva empresa",
+      "adminCatalogoEmpresa": "Catálogo de la empresa",
+      "adminUsuarios": "Usuarios de la empresa"
     },
     "puntual": {
       "estados": "Recibido, Confirmado, En preparación, Preparado y Enviado son los pasos de un pedido, en ese orden. Cancelado significa que se ha anulado.",
@@ -904,7 +907,38 @@
       "miCuenta": {
         "p": "¿Con qué cuenta he entrado?",
         "r": "Arriba a la derecha, sobre la barra, ves «Sesión iniciada como» con el correo de la cuenta en uso."
+      },
+      "altaDirecta": {
+        "p": "¿En qué se diferencia del registro?",
+        "r": "La empresa queda activa al momento con su primer usuario: no pasa por la verificación de correo ni por la aprobación. Recibe el catálogo de su marca nada más crearla."
+      },
+      "contrasenaInicial": {
+        "p": "¿Cómo le hago llegar la contraseña?",
+        "r": "Escríbela o pulsa «Generar» para crear una segura. El portal no se la envía: pásasela al usuario tú, por un canal seguro."
+      },
+      "descuentoProducto": {
+        "p": "¿Puedo poner otro descuento a un solo producto?",
+        "r": "Sí. Escribe el porcentaje en la casilla de descuento de ese producto y guarda: usará ese en lugar del general. Déjala vacía para volver al descuento general."
+      },
+      "desactivarUsuario": {
+        "p": "Desactivar o forzar el cierre de sesión",
+        "r": "Desactivar impide que el usuario entre hasta que lo actives de nuevo. Forzar el cierre de sesión solo cierra la sesión que tenga abierta: puede volver a entrar."
+      },
+      "verAuditoria": {
+        "p": "¿Qué muestra «Ver auditoría»?",
+        "r": "Los eventos registrados de ese usuario con su fecha, como sus inicios de sesión o los pedidos que ha confirmado."
+      },
+      "anadirUsuario": {
+        "p": "¿Puedo añadir otro usuario a la empresa?",
+        "r": "Todavía no desde el portal: cada empresa tiene el usuario creado en su registro o en su alta. Aquí sí puedes cambiar su rol, desactivarlo o cerrar su sesión."
       }
-    }
+    },
+    "buscar": "Buscar en la ayuda",
+    "buscarPlaceholder": "Busca una pregunta…",
+    "resultados": "{n, plural, =0 {Ningún resultado} one {# resultado} other {# resultados}}",
+    "sinResultados": "No hay ninguna pregunta con esas palabras. Prueba con otras más cortas o revisa los temas.",
+    "otrosTemas": "Otros temas",
+    "volverPantalla": "Volver a esta pantalla",
+    "volver": "Volver"
   }
 }

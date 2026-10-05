@@ -760,7 +760,10 @@
       "adminMarcas": "Brands",
       "adminProductos": "Products",
       "adminPedidos": "Orders",
-      "adminDashboard": "Statistics"
+      "adminDashboard": "Statistics",
+      "adminAlta": "New company",
+      "adminCatalogoEmpresa": "Company catalogue",
+      "adminUsuarios": "Company users"
     },
     "puntual": {
       "estados": "Received, Confirmed, In preparation, Prepared and Shipped are the steps of an order, in that order. Cancelled means it has been called off.",
@@ -904,7 +907,38 @@
       "miCuenta": {
         "p": "Which account am I signed in with?",
         "r": "At the top right, above the bar, you see “Signed in as” with the email of the account in use."
+      },
+      "altaDirecta": {
+        "p": "How is this different from sign-up?",
+        "r": "The company is active straight away with its first user: no email verification and no approval. It gets its brand's catalogue as soon as it is created."
+      },
+      "contrasenaInicial": {
+        "p": "How do I give them the password?",
+        "r": "Type one or press “Generate” to create a strong one. The portal does not send it: pass it on to the user yourself through a secure channel."
+      },
+      "descuentoProducto": {
+        "p": "Can I set a different discount on a single product?",
+        "r": "Yes. Type the percentage in that product's discount box and save: it will use that one instead of the general discount. Leave it empty to go back to the general discount."
+      },
+      "desactivarUsuario": {
+        "p": "Deactivate or force logout",
+        "r": "Deactivating stops the user from signing in until you activate them again. Forcing logout only ends their current session: they can sign in again."
+      },
+      "verAuditoria": {
+        "p": "What does “View audit log” show?",
+        "r": "The events recorded for that user with their date, such as their sign-ins or the orders they confirmed."
+      },
+      "anadirUsuario": {
+        "p": "Can I add another user to the company?",
+        "r": "Not from the portal yet: each company has the user created at sign-up or when it was added. Here you can change their role, deactivate them or end their session."
       }
-    }
+    },
+    "buscar": "Search help",
+    "buscarPlaceholder": "Search for a question…",
+    "resultados": "{n, plural, =0 {No results} one {# result} other {# results}}",
+    "sinResultados": "No question matches those words. Try shorter ones or browse the topics.",
+    "otrosTemas": "Other topics",
+    "volverPantalla": "Back to this screen",
+    "volver": "Back"
   }
 }
