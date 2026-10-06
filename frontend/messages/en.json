@@ -1068,11 +1068,80 @@
     "privacidad": "Privacy",
     "cookies": "Cookies",
     "condiciones": "Terms of use",
-    "soloEspanol": "The legal texts are available in Spanish, which is the version that prevails."
+    "soloEspanol": "The legal texts are available in Spanish, which is the version that prevails.",
+    "editarDatos": "Edit legal details"
   },
   "pasosCompra": {
     "label": "Order steps",
     "cart": "Cart",
     "confirm": "Delivery and confirmation"
+  },
+  "adminDatosLegales": {
+    "title": "Legal details",
+    "intro": "What you enter here appears in the portal's legal notice, privacy policy and terms of use. An empty field shows as “pending” on those pages.",
+    "loading": "Loading…",
+    "empresa": "Company",
+    "empresaDesc": "IoT FENSTER identification details required by Spanish law (LSSI).",
+    "condiciones": "Commercial terms and privacy",
+    "condicionesDesc": "Clauses shown in the terms of use and the privacy policy.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved. The legal pages already show the changes.",
+    "error": "The details could not be saved.",
+    "pendientes": "{n, plural, =0 {All complete} one {# item pending} other {# items pending}}",
+    "campos": {
+      "razonSocial": {
+        "label": "Company name",
+        "ayuda": "E.g. IoT Fenster, S.L."
+      },
+      "cif": {
+        "label": "Tax ID (CIF)",
+        "ayuda": ""
+      },
+      "domicilio": {
+        "label": "Registered address",
+        "ayuda": ""
+      },
+      "emailContacto": {
+        "label": "Contact email",
+        "ayuda": "For misuse reports and account closures."
+      },
+      "emailPrivacidad": {
+        "label": "Privacy email",
+        "ayuda": "Where data protection rights are exercised."
+      },
+      "telefono": {
+        "label": "Phone",
+        "ayuda": ""
+      },
+      "registroMercantil": {
+        "label": "Commercial Registry",
+        "ayuda": "E.g. Registro Mercantil de Murcia, volume X, folio Y, sheet MU-Z."
+      },
+      "alojamiento": {
+        "label": "Hosting",
+        "ayuda": "Provider and country of the website and database servers."
+      },
+      "ciudadTribunales": {
+        "label": "Competent courts",
+        "ayuda": "City whose courts settle disputes."
+      },
+      "portes": {
+        "label": "Shipping costs",
+        "ayuda": "Who pays shipping and whether there is a minimum order for free shipping."
+      },
+      "formaPago": {
+        "label": "Default payment terms",
+        "ayuda": "E.g. bank transfer 30 days from invoice date."
+      },
+      "devoluciones": {
+        "label": "Returns and transport incidents",
+        "ayuda": "Deadline to report transport damage and how non-warranty returns work."
+      },
+      "plazoRegistros": {
+        "label": "Security log retention",
+        "ayuda": "E.g. 12 months."
+      }
+    }
   }
 }

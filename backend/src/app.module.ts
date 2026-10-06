@@ -17,6 +17,7 @@ import { ProductosModule } from './productos/productos.module.js';
 import { CarritoModule } from './carrito/carrito.module.js';
 import { PedidosModule } from './pedidos/pedidos.module.js';
 import { AuditoriaModule } from './auditoria/auditoria.module.js';
+import { AjustesLegalesModule } from './ajustes-legales/ajustes-legales.module.js';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuditoriaModule } from './auditoria/auditoria.module.js';
     CarritoModule,
     PedidosModule,
     AuditoriaModule,
+    AjustesLegalesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

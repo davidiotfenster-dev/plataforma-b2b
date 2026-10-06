@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { LegalNav } from "./legal-nav";
-import { ULTIMA_ACTUALIZACION_LEGAL } from "./datos-empresa";
+import { ultimaActualizacionLegal } from "./datos";
 
 /// Los textos legales están redactados solo en español (es la versión que
 /// rige, ver condiciones de uso). En los demás idiomas se traduce el marco de
@@ -8,6 +8,7 @@ import { ULTIMA_ACTUALIZACION_LEGAL } from "./datos-empresa";
 export default async function LegalLayout({ children }: LayoutProps<"/legal">) {
   const locale = await getLocale();
   const t = await getTranslations("legal");
+  const actualizada = await ultimaActualizacionLegal();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -20,7 +21,7 @@ export default async function LegalLayout({ children }: LayoutProps<"/legal">) {
       <article lang="es" className="space-y-8 rounded-2xl border border-neutral-200 bg-white px-6 py-8 text-sm leading-relaxed text-neutral-700 sm:px-10">
         {children}
         <p className="border-t border-neutral-200 pt-4 text-xs text-neutral-500">
-          Última actualización: {ULTIMA_ACTUALIZACION_LEGAL}
+          Última actualización: {actualizada}
         </p>
       </article>
     </div>
