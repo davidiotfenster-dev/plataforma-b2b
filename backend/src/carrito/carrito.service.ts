@@ -82,7 +82,9 @@ export class CarritoService {
         representacionPartnerId: rep.id,
         skuComercial: rep.skuComercial,
         nombreComercial: rep.nombreComercial,
-        imagenUrl: rep.imagenUrl,
+        /// Igual que en el catálogo: la foto propia de la empresa si la tiene; si no,
+        /// la del aparato, que es donde el admin sube las fotos.
+        imagenUrl: rep.imagenUrl ?? rep.productoBase.imagenUrl,
         cantidad: item.cantidad,
         pvpBase: rep.pvpBase.toString(),
         descuentoPorcentaje: descuentoAplicado.toString(),
@@ -119,23 +121,20 @@ export class CarritoService {
 
     const cart = await this.obtenerOCrearCart(partnerId, userId);
 
-    const existente = await this.prisma.cartItem.findUnique({
-      where: { cartId_representacionPartnerId: { cartId: cart.id, representacionPartnerId } },
-    });
+    /// Una sola sentencia que crea la línea o suma a la existente: dos "añadir"
+    /// simultáneos (doble clic, dos pestañas) suman los dos, sin chocar ni perder
+    /// unidades. Si la suma pasaría del máximo, no se toca la fila y no vuelve nada.
+    const ahora = new Date();
+    const filas = await this.prisma.$queryRaw<{ id: string }[]>`
+      INSERT INTO "CartItem" ("id", "cartId", "representacionPartnerId", "cantidad", "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), ${cart.id}::uuid, ${representacionPartnerId}::uuid, ${cantidad}, ${ahora}, ${ahora})
+      ON CONFLICT ("cartId", "representacionPartnerId") DO UPDATE
+        SET "cantidad" = "CartItem"."cantidad" + EXCLUDED."cantidad", "updatedAt" = EXCLUDED."updatedAt"
+        WHERE "CartItem"."cantidad" + EXCLUDED."cantidad" <= ${CANTIDAD_MAXIMA_POR_LINEA}
+      RETURNING "id"`;
 
-    if (existente) {
-      const nuevaCantidad = existente.cantidad + cantidad;
-      if (nuevaCantidad > CANTIDAD_MAXIMA_POR_LINEA) {
-        throw new BadRequestException(`La cantidad máxima por producto es ${CANTIDAD_MAXIMA_POR_LINEA}.`);
-      }
-      await this.prisma.cartItem.update({
-        where: { id: existente.id },
-        data: { cantidad: nuevaCantidad },
-      });
-    } else {
-      await this.prisma.cartItem.create({
-        data: { cartId: cart.id, representacionPartnerId, cantidad },
-      });
+    if (filas.length === 0) {
+      throw new BadRequestException(`La cantidad máxima por producto es ${CANTIDAD_MAXIMA_POR_LINEA}.`);
     }
 
     return this.obtenerResumen(partnerId, userId);

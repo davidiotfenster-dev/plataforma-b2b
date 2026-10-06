@@ -24,6 +24,8 @@ function representacion(id: string, pvpBase: number) {
     skuComercial: `SKU-${id}`,
     nombreComercial: `Producto ${id}`,
     imagenUrl: null,
+    productoBase: { activo: true, imagenUrl: null },
+    productoMarca: null,
     pvpBase: new Prisma.Decimal(pvpBase),
     descuentoOverride: null,
   };

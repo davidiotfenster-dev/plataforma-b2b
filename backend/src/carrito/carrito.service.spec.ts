@@ -18,12 +18,16 @@ describe('CarritoService.obtenerResumen — cálculo de precio y descuento', () 
   const PARTNER_ID = 'partner-1';
   const USER_ID = 'user-1';
 
-  function representacion(overrides: Partial<{ id: string; pvpBase: number; descuentoOverride: number | null }> = {}) {
+  function representacion(
+    overrides: Partial<{ id: string; pvpBase: number; descuentoOverride: number | null; imagenUrl: string | null; imagenBase: string | null }> = {},
+  ) {
     return {
       id: overrides.id ?? 'rep-1',
       skuComercial: 'SKU-1',
       nombreComercial: 'Producto de prueba',
-      imagenUrl: null,
+      imagenUrl: overrides.imagenUrl ?? null,
+      productoBase: { activo: true, imagenUrl: overrides.imagenBase ?? null },
+      productoMarca: null,
       pvpBase: new Prisma.Decimal(overrides.pvpBase ?? 100),
       descuentoOverride:
         overrides.descuentoOverride === undefined || overrides.descuentoOverride === null
@@ -53,6 +57,18 @@ describe('CarritoService.obtenerResumen — cálculo de precio y descuento', () 
     expect(resumen.items[0].precioNetoUnitario).toBe('90');
     expect(resumen.items[0].totalLinea).toBe('180');
     expect(resumen.totalPedido).toBe('180');
+  });
+
+  it('enseña la foto del aparato si la empresa no tiene una propia', async () => {
+    prisma.cartItem.findMany.mockResolvedValue([
+      { id: 'item-1', cantidad: 1, representacionPartner: representacion({ imagenBase: '/imagenes/wave.png' }) },
+      { id: 'item-2', cantidad: 1, representacionPartner: representacion({ id: 'rep-2', imagenUrl: '/imagenes/propia.png', imagenBase: '/imagenes/wave.png' }) },
+    ]);
+    prisma.partner.findUniqueOrThrow.mockResolvedValue({ descuentoPorcentaje: new Prisma.Decimal(0) });
+
+    const resumen = await service.obtenerResumen(PARTNER_ID, USER_ID);
+
+    expect(resumen.items.map((linea) => linea.imagenUrl)).toEqual(['/imagenes/wave.png', '/imagenes/propia.png']);
   });
 
   it('aplica el descuento específico del producto en vez del general cuando existe', async () => {

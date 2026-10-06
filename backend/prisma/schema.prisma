@@ -260,6 +260,7 @@ model ProductoMarca {
 
   @@unique([marca, productoBaseId])
   @@unique([marca, skuComercial])
+  @@index([productoBaseId])
 }
 
 /// Mapeo Producto Base -> catálogo autorizado y comercializado por cada partner.
@@ -301,6 +302,7 @@ model RepresentacionPartner {
   @@unique([partnerId, productoMarcaId])
   @@index([productoBaseId])
   @@index([partnerId, activo])
+  @@index([productoMarcaId])
 }
 
 // ---------------------------------------------------------------------------
@@ -321,6 +323,7 @@ model Cart {
 
   /// Un carrito activo por usuario dentro de su partner.
   @@unique([partnerId, userId])
+  @@index([userId])
 }
 
 model CartItem {
@@ -417,6 +420,9 @@ model OrderItem {
   representacionPartner RepresentacionPartner? @relation(fields: [representacionPartnerId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
+  /// Al quitar un producto de un catálogo, la base busca sus líneas de pedido
+  /// (para dejarles el enlace a nulo): sin índice recorrería todas.
+  @@index([representacionPartnerId])
 }
 
 // ---------------------------------------------------------------------------
@@ -449,5 +455,5 @@ model AuditLog {
   @@index([eventType])
   @@index([timestamp])
   @@index([partnerId])
-  @@index([userId])
+  @@index([userId, timestamp])
 }
