@@ -10,8 +10,13 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  Max,
   ValidateNested,
+  MaxLength,
 } from 'class-validator';
+
+/// Tope de cordura para un PVP: un cero de más (82 → 820) llegaría a todas las empresas de la marca.
+export const PVP_MAXIMO = 100_000;
 
 export class ItemCatalogoMarcaDto {
   @IsUUID()
@@ -19,14 +24,17 @@ export class ItemCatalogoMarcaDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
   skuComercial!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreComercial!: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(PVP_MAXIMO)
   pvpBase!: number;
 }
 
@@ -43,16 +51,19 @@ export class ActualizarProductoMarcaDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
   skuComercial?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreComercial?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(PVP_MAXIMO)
   pvpBase?: number;
 
   @IsOptional()

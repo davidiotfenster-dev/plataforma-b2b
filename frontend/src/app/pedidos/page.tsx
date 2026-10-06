@@ -68,6 +68,8 @@ export default function PedidosPage() {
   const busquedaDiferida = useDebouncedValue(busqueda);
 
   const filtrosActivos = Boolean(busqueda || estado || desde || hasta);
+  // Con las fechas al revés no hay nada que buscar: se avisa en vez de enseñar una lista vacía.
+  const rangoInvertido = Boolean(desde && hasta && desde > hasta);
   const { orden, sentido } = ORDENES[clave];
 
   const { data, isLoading, isError } = useQuery<PedidosPagina>({
@@ -82,6 +84,7 @@ export default function PedidosPage() {
     },
     // Al cambiar de página o de filtro se sigue viendo la lista anterior en vez de parpadear.
     placeholderData: keepPreviousData,
+    enabled: !rangoInvertido,
   });
 
   if (isLoading) return <p className="text-neutral-500">{t("loading")}</p>;
@@ -180,6 +183,11 @@ export default function PedidosPage() {
               />
             </label>
           </div>
+          {rangoInvertido && (
+            <p role="alert" className="text-xs text-red-600 md:self-end">
+              {t("invertedRange")}
+            </p>
+          )}
           <label className="text-xs text-neutral-500">
             {t("sortLabel")}
             <select

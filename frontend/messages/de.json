@@ -69,7 +69,14 @@
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "noAccount": "Ihr Unternehmen hat noch keinen Zugang?",
-    "register": "Zugang anfragen"
+    "register": "Zugang anfragen",
+    "errors": {
+      "CUENTA_EMAIL_SIN_VERIFICAR": "Ihre E-Mail-Adresse ist noch nicht bestätigt. Öffnen Sie den Link aus der E-Mail bei der Registrierung; ist er abgelaufen, fordern Sie dort einen neuen an.",
+      "CUENTA_PENDIENTE_APROBACION": "Ihre Registrierung wartet auf Freigabe. IoT FENSTER benachrichtigt Sie per E-Mail, sobald Sie sich anmelden können.",
+      "CUENTA_RECHAZADA": "Ihre Registrierungsanfrage wurde nicht genehmigt. Wenn Sie einen Irrtum vermuten, wenden Sie sich an IoT FENSTER.",
+      "CUENTA_EMPRESA_SUSPENDIDA": "Der Zugang Ihres Unternehmens ist gesperrt. Wenden Sie sich an IoT FENSTER.",
+      "CUENTA_DESACTIVADA": "Ihr Benutzer ist deaktiviert. Wenden Sie sich an den Administrator Ihres Unternehmens oder an IoT FENSTER."
+    }
   },
   "roles": {
     "PARTNER_ADMIN": "Administrator",
@@ -95,7 +102,9 @@
     "doneTitle": "Passwort aktualisiert",
     "doneBody": "Ihr Passwort wurde erfolgreich aktualisiert. Sie können sich jetzt anmelden.",
     "backToLogin": "Zur Anmeldung",
-    "genericError": "Fehler beim Zurücksetzen des Passworts"
+    "genericError": "Fehler beim Zurücksetzen des Passworts",
+    "repeatPassword": "Neues Passwort wiederholen",
+    "passwordMismatch": "Die beiden Passwörter stimmen nicht überein."
   },
   "verificarEmail": {
     "verifying": "Ihre E-Mail-Adresse wird bestätigt…",
@@ -168,7 +177,9 @@
     "empty": "Ihr freigegebener Katalog enthält noch keine Produkte.",
     "addedToCart": "{producto} wurde in den Warenkorb gelegt",
     "addError": "Fehler beim Hinzufügen zum Warenkorb",
-    "addToCart": "In den Warenkorb"
+    "addToCart": "In den Warenkorb",
+    "yourPrice": "Ihr Preis",
+    "pvpDiscount": "UVP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "Produkt wird geladen…",
@@ -192,7 +203,13 @@
     "total": "Gesamt",
     "removeLine": "Position entfernen",
     "totalLabel": "Gesamt: {total}",
-    "continueToCheckout": "Weiter zur Kasse"
+    "continueToCheckout": "Weiter zur Kasse",
+    "quantityInvalid": "Geben Sie eine ganze Zahl zwischen 1 und {max} ein.",
+    "quantityError": "Die Menge konnte nicht geändert werden.",
+    "quantityOf": "Menge von {producto}",
+    "unavailable": "Dieses Produkt ist nicht mehr verfügbar.",
+    "unavailableBlock": "Entfernen Sie nicht mehr verfügbare Produkte aus dem Warenkorb, um fortzufahren.",
+    "quantityHugeConfirm": "Möchten Sie wirklich {cantidad} Stück dieses Produkts?"
   },
   "checkout": {
     "loading": "Wird geladen…",
@@ -242,7 +259,8 @@
     "noResults": "Keine Bestellung entspricht den Filtern.",
     "itemsCount": "{n, plural, one {# Artikel} other {# Artikel}}",
     "moreProducts": "+{n} weitere",
-    "trackShipment": "Sendung verfolgen"
+    "trackShipment": "Sendung verfolgen",
+    "invertedRange": "Das Datum „Von“ liegt nach „Bis“."
   },
   "pedidoDetalle": {
     "loading": "Bestellung wird geladen…",
@@ -374,9 +392,9 @@
     "confirmApproval": "Partner freigeben",
     "approveError": "Die Freigabe war nicht möglich. Bitte versuchen Sie es erneut.",
     "approveDoneTitle": "{partner} freigegeben",
-    "approveDoneBody": "Er kann sich jetzt anmelden. Es fehlt noch das Wichtigste: die Produkte zuzuweisen, die er bestellen darf.",
+    "approveDoneBody": "Er kann sich jetzt anmelden und sieht den Katalog seiner Marke. Bei anderem Bedarf können Sie ihn anpassen.",
     "later": "Später",
-    "assignCatalog": "Katalog zuweisen",
+    "assignCatalog": "Katalog ansehen",
     "cancel": "Abbrechen",
     "working": "Wird bearbeitet…",
     "backToList": "Alle Unternehmen",
@@ -496,7 +514,13 @@
     "orderCount": "{cantidad} Bestellung(en)",
     "cancelReason": "Stornierungsgrund: {motivo}",
     "searchPlaceholder": "Partner suchen…",
-    "noResults": "Kein Partner entspricht der Suche."
+    "noResults": "Kein Partner entspricht der Suche.",
+    "byCompany": "Nach Unternehmen",
+    "allOrders": "Alle Bestellungen",
+    "filterByStatus": "Nach Status filtern",
+    "allStatuses": "Alle Status",
+    "searchOrdersPlaceholder": "Nach PED, PO oder Unternehmen suchen…",
+    "noOrdersFound": "Keine Bestellung entspricht der Suche."
   },
   "cancelarPedido": {
     "cancel": "Bestellung stornieren",
@@ -718,7 +742,10 @@
     "trackingUrlPlaceholder": "Tracking-URL",
     "markAsShipped": "Als versendet markieren",
     "advanceError": "Fehler beim Aktualisieren des Status",
-    "advanceTo": "Weiter zu {estado}"
+    "advanceTo": "Weiter zu {estado}",
+    "confirmTitle": "Bestellung {codigo} weiterschalten",
+    "confirmText": "Die Bestellung wechselt von „{desde}“ zu „{hasta}“ und der Kunde erhält eine E-Mail. Bei einem Fehler lässt sich das nur über die manuelle Korrektur zurücknehmen.",
+    "confirmYes": "Ja, auf {estado} setzen"
   },
   "forzarEstado": {
     "title": "Manuelle Statuskorrektur",
@@ -787,7 +814,12 @@
     "canAddHelp": "Sie haben einen Namen in dieser Marke, sind aber nicht im Katalog. Name, SKU und Preis prüfen und hinzufügen.",
     "nothingToAdd": "Nichts fehlt.",
     "hideOthers": "Produkte anderer Marken ausblenden",
-    "showOthers": "Produkt einer anderen Marke hinzufügen ({n})"
+    "showOthers": "Produkt einer anderen Marke hinzufügen ({n})",
+    "pvpInvalid": "Der UVP muss größer als 0 sein und darf {max} nicht überschreiten.",
+    "pvpConfirmTitle": "UVP von „{name}“ ändern",
+    "pvpConfirmText": "Der UVP ändert sich von {antes} auf {despues}. Die Änderung gilt sofort für die {n} Unternehmen dieser Marke; bestehende Bestellungen behalten ihren Preis.",
+    "pvpConfirmSuspicious": "Der UVP ändert sich von {antes} auf {despues}, eine sehr große Änderung: Prüfen Sie, ob es ein Tippfehler ist. Sie gilt sofort für die {n} Unternehmen dieser Marke; bestehende Bestellungen behalten ihren Preis.",
+    "pvpConfirmYes": "Ja, für {n} Unternehmen ändern"
   },
   "ayuda": {
     "boton": "Hilfe",

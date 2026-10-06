@@ -23,6 +23,16 @@ export const REPRESENTACION_VISIBLE = {
   OR: [{ productoMarcaId: null }, { productoMarca: { activo: true } }],
 } satisfies Prisma.RepresentacionPartnerWhereInput;
 
+/// La misma regla que `REPRESENTACION_VISIBLE`, para una fila ya leída: sirve para
+/// avisar de lo que dejó de estar a la venta mientras estaba en un carrito.
+export function representacionDisponible(rep: {
+  activo: boolean;
+  productoBase?: { activo: boolean } | null;
+  productoMarca?: { activo: boolean } | null;
+}): boolean {
+  return rep.activo !== false && rep.productoBase?.activo !== false && rep.productoMarca?.activo !== false;
+}
+
 /// Catálogo de cada submarca (Wave, ICON, Connect). Es la fuente de verdad:
 /// cada empresa (partner o distribuidor) con esa `marcaCatalogo` tiene una
 /// `RepresentacionPartner` enlazada por producto, que se sincroniza aquí. La

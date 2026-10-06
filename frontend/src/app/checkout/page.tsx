@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { api, ApiError } from "@/lib/api";
 import type { Order, ResumenCarrito } from "@/lib/types";
 import { usePrecio } from "@/lib/formato";
+import { useMe } from "@/hooks/use-me";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -20,7 +21,10 @@ export default function CheckoutPage() {
     refetchInterval: 30_000,
   });
 
-  const [direccionEnvio, setDireccionEnvio] = useState("");
+  const { data: perfil } = useMe();
+  // La dirección de la ficha de la empresa se propone; lo que el usuario escriba la sustituye.
+  const [direccionEscrita, setDireccionEnvio] = useState<string | null>(null);
+  const direccionEnvio = direccionEscrita ?? perfil?.partner?.direccionEnvio ?? "";
   const [poNumber, setPoNumber] = useState("");
   const [notas, setNotas] = useState("");
   const [error, setError] = useState<string | null>(null);

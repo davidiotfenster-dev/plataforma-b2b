@@ -69,7 +69,14 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "noAccount": "¿Tu empresa aún no tiene acceso?",
-    "register": "Solicitar acceso"
+    "register": "Solicitar acceso",
+    "errors": {
+      "CUENTA_EMAIL_SIN_VERIFICAR": "Falta verificar tu correo. Abre el enlace que te enviamos al registrarte; si ha caducado, pide uno nuevo desde esa página.",
+      "CUENTA_PENDIENTE_APROBACION": "Tu alta está pendiente de aprobación. IoT FENSTER te avisará por correo cuando puedas entrar.",
+      "CUENTA_RECHAZADA": "Tu solicitud de alta no ha sido aprobada. Si crees que es un error, contacta con IoT FENSTER.",
+      "CUENTA_EMPRESA_SUSPENDIDA": "El acceso de tu empresa está suspendido. Contacta con IoT FENSTER.",
+      "CUENTA_DESACTIVADA": "Tu usuario está desactivado. Contacta con el administrador de tu empresa o con IoT FENSTER."
+    }
   },
   "roles": {
     "PARTNER_ADMIN": "Administrador",
@@ -95,7 +102,9 @@
     "doneTitle": "Contraseña actualizada",
     "doneBody": "Tu contraseña se ha actualizado correctamente. Ya puedes iniciar sesión.",
     "backToLogin": "Ir a iniciar sesión",
-    "genericError": "Error al restablecer la contraseña"
+    "genericError": "Error al restablecer la contraseña",
+    "repeatPassword": "Repite la nueva contraseña",
+    "passwordMismatch": "Las dos contraseñas no coinciden."
   },
   "verificarEmail": {
     "verifying": "Verificando tu correo…",
@@ -168,7 +177,9 @@
     "empty": "Tu catálogo autorizado todavía no tiene productos.",
     "addedToCart": "{producto} añadido al carrito",
     "addError": "Error al añadir al carrito",
-    "addToCart": "Añadir al carrito"
+    "addToCart": "Añadir al carrito",
+    "yourPrice": "Tu precio",
+    "pvpDiscount": "PVP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "Cargando producto…",
@@ -192,7 +203,13 @@
     "total": "Total",
     "removeLine": "Eliminar línea",
     "totalLabel": "Total: {total}",
-    "continueToCheckout": "Continuar al checkout"
+    "continueToCheckout": "Continuar al checkout",
+    "quantityInvalid": "Escribe un número entero entre 1 y {max}.",
+    "quantityError": "No se ha podido cambiar la cantidad.",
+    "quantityOf": "Cantidad de {producto}",
+    "unavailable": "Este producto ya no está disponible.",
+    "unavailableBlock": "Quita del carrito los productos que ya no están disponibles para poder continuar.",
+    "quantityHugeConfirm": "¿Seguro que quieres {cantidad} unidades de este producto?"
   },
   "checkout": {
     "loading": "Cargando…",
@@ -242,7 +259,8 @@
     "noResults": "Ningún pedido coincide con los filtros.",
     "itemsCount": "{n, plural, one {# artículo} other {# artículos}}",
     "moreProducts": "+{n} más",
-    "trackShipment": "Seguir envío"
+    "trackShipment": "Seguir envío",
+    "invertedRange": "La fecha «Desde» es posterior a «Hasta»."
   },
   "pedidoDetalle": {
     "loading": "Cargando pedido…",
@@ -374,9 +392,9 @@
     "confirmApproval": "Aprobar partner",
     "approveError": "No se pudo aprobar. Inténtalo de nuevo.",
     "approveDoneTitle": "{partner} aprobado",
-    "approveDoneBody": "Ya puede iniciar sesión. Falta lo más importante: asignarle los productos que podrá pedir.",
+    "approveDoneBody": "Ya puede iniciar sesión y ve el catálogo de su marca. Si necesita productos distintos, puedes ajustárselo.",
     "later": "Más tarde",
-    "assignCatalog": "Asignar catálogo",
+    "assignCatalog": "Ver catálogo",
     "cancel": "Cancelar",
     "working": "Trabajando…",
     "backToList": "Todas las empresas",
@@ -490,13 +508,19 @@
     "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?"
   },
   "adminPedidos": {
-    "title": "Fulfillment de pedidos",
+    "title": "Gestión de pedidos",
     "loading": "Cargando pedidos…",
     "empty": "No hay pedidos todavía.",
     "orderCount": "{cantidad} pedido(s)",
     "cancelReason": "Motivo de cancelación: {motivo}",
     "searchPlaceholder": "Buscar partner…",
-    "noResults": "Ningún partner coincide con la búsqueda."
+    "noResults": "Ningún partner coincide con la búsqueda.",
+    "byCompany": "Por empresa",
+    "allOrders": "Todos los pedidos",
+    "filterByStatus": "Filtrar por estado",
+    "allStatuses": "Todos los estados",
+    "searchOrdersPlaceholder": "Buscar por PED, PO o empresa…",
+    "noOrdersFound": "Ningún pedido coincide con la búsqueda."
   },
   "cancelarPedido": {
     "cancel": "Cancelar pedido",
@@ -718,7 +742,10 @@
     "trackingUrlPlaceholder": "URL de tracking",
     "markAsShipped": "Marcar como enviado",
     "advanceError": "Error al actualizar el estado",
-    "advanceTo": "Avanzar a {estado}"
+    "advanceTo": "Avanzar a {estado}",
+    "confirmTitle": "Avanzar el pedido {codigo}",
+    "confirmText": "El pedido pasará de «{desde}» a «{hasta}» y el cliente recibirá un correo avisándole. Si te equivocas, solo se podrá volver atrás con la corrección manual.",
+    "confirmYes": "Sí, pasar a {estado}"
   },
   "forzarEstado": {
     "title": "Corrección manual de estado",
@@ -787,7 +814,12 @@
     "canAddHelp": "Tienen nombre en esta marca pero no están en su catálogo. Revisa nombre, SKU y precio y añádelos.",
     "nothingToAdd": "No falta ninguno.",
     "hideOthers": "Ocultar productos de otras marcas",
-    "showOthers": "Añadir un producto de otra marca ({n})"
+    "showOthers": "Añadir un producto de otra marca ({n})",
+    "pvpInvalid": "El PVP debe ser mayor que 0 y no pasar de {max}.",
+    "pvpConfirmTitle": "Cambiar el PVP de «{name}»",
+    "pvpConfirmText": "El PVP pasa de {antes} a {despues}. El cambio llega al momento a las {n} empresas de esta marca; los pedidos ya hechos conservan su precio.",
+    "pvpConfirmSuspicious": "El PVP pasa de {antes} a {despues}, un cambio muy grande: revisa que no sea un error de tecleo. Llegará al momento a las {n} empresas de esta marca; los pedidos ya hechos conservan su precio.",
+    "pvpConfirmYes": "Sí, cambiar para {n} empresas"
   },
   "ayuda": {
     "boton": "Ayuda",

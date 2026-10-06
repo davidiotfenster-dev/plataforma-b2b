@@ -1,9 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ActualizarProductoBaseDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreTecnico?: string;
 
   @IsOptional()

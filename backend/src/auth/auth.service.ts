@@ -35,6 +35,17 @@ import type { JwtPayload } from './strategies/jwt.strategy.js';
 import type { UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
 
 const SALT_ROUNDS = 12;
+/// Códigos de negocio del login (cuerpo `codigo` de la respuesta 401), para que el
+/// frontend muestre el motivo en el idioma del usuario.
+export const CODIGOS_LOGIN = {
+  DESACTIVADA: 'CUENTA_DESACTIVADA',
+  EMAIL_SIN_VERIFICAR: 'CUENTA_EMAIL_SIN_VERIFICAR',
+  PENDIENTE_APROBACION: 'CUENTA_PENDIENTE_APROBACION',
+  RECHAZADA: 'CUENTA_RECHAZADA',
+  EMPRESA_SUSPENDIDA: 'CUENTA_EMPRESA_SUSPENDIDA',
+} as const;
+/// Tiempo mínimo entre dos correos de «olvidé mi contraseña» para la misma cuenta.
+const ESPERA_ENTRE_REENVIOS_RESET_MS = 2 * 60 * 1000;
 /// Validez del enlace de invitación de un usuario nuevo (`invitarUsuario`).
 const PLAZO_INVITACION = '7d';
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002';
@@ -43,6 +54,21 @@ export interface UsuarioValidado {
   id: string;
   partnerId: string | null;
   rol: RolUsuario;
+}
+
+/// Dirección de envío de la ficha de la empresa en líneas (calle / CP y localidad /
+/// provincia y país), o `null` si no tiene calle guardada.
+export function direccionEnvioPorDefecto(f: {
+  direccionEnvioDefecto: string | null;
+  codigoPostalEnvio: string | null;
+  localidadEnvio: string | null;
+  provinciaEnvio: string | null;
+  paisEnvio: string | null;
+}): string | null {
+  const calle = f.direccionEnvioDefecto?.trim();
+  if (!calle) return null;
+  const unir = (...partes: (string | null)[]) => partes.map((p) => p?.trim()).filter(Boolean).join(' ');
+  return [calle, unir(f.codigoPostalEnvio, f.localidadEnvio), unir(f.provinciaEnvio, f.paisEnvio)].filter(Boolean).join('\n');
 }
 
 function dominioDeEmail(email: string): string {
@@ -62,7 +88,10 @@ export class AuthService {
   ) {}
 
   async registrarPartner(dto: RegistroPartnerDto): Promise<{ partnerId: string; userId: string }> {
-    if (dominioDeEmail(dto.emailAdmin) !== dto.dominioWeb.toLowerCase()) {
+    // El correo puede ser del dominio de la empresa o de un subdominio suyo (ana@mail.empresa.com).
+    const dominioEmail = dominioDeEmail(dto.emailAdmin);
+    const dominioEmpresa = dto.dominioWeb.toLowerCase();
+    if (dominioEmail !== dominioEmpresa && !dominioEmail.endsWith(`.${dominioEmpresa}`)) {
       throw new BadRequestException(
         'El email del administrador debe pertenecer al dominio corporativo indicado (dominioWeb)',
       );
@@ -333,7 +362,7 @@ export class AuthService {
     });
 
     const credencialesInvalidas = () =>
-      new UnauthorizedException('Credenciales inválidas');
+      new UnauthorizedException({ message: 'Credenciales inválidas', codigo: 'CREDENCIALES_INVALIDAS' });
 
     if (!user) {
       /// Se ejecuta un hash igualmente para no filtrar por timing si el
@@ -347,9 +376,11 @@ export class AuthService {
       throw credencialesInvalidas();
     }
 
-    if (!user.activo) {
-      throw credencialesInvalidas();
-    }
+    /// Con la contraseña ya acertada, el motivo concreto solo se lo enseña a quien
+    /// conoce la contraseña: el resto (cuenta inexistente, contraseña mala) sigue
+    /// viendo el mismo «Credenciales inválidas». El `codigo` deja a la pantalla
+    /// mostrarlo traducido.
+    const cuentaNoDisponible = (codigo: string, mensaje: string) => new UnauthorizedException({ message: mensaje, codigo });
 
     /// Rol COMERCIAL apagado por ahora (`COMERCIAL_ACTIVO`): se avisa con un mensaje
     /// claro, y solo tras acertar la contraseña, para no revelar qué emails son de comerciales.
@@ -362,9 +393,27 @@ export class AuthService {
     /// email verificado.
     const esPersonalInterno = user.rol === RolUsuario.ADMIN_FENSTER || user.rol === RolUsuario.COMERCIAL;
     if (!esPersonalInterno) {
-      if (!user.emailVerificadoEn || !user.partner || user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
+      if (!user.partner) {
         throw credencialesInvalidas();
       }
+      if (!user.emailVerificadoEn || user.partner.estado === EstadoPartner.PENDIENTE_VERIFICACION_EMAIL) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.EMAIL_SIN_VERIFICAR, 'Verifica tu correo con el enlace que te enviamos al registrarte.');
+      }
+      if (user.partner.estado === EstadoPartner.PENDIENTE_APROBACION) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.PENDIENTE_APROBACION, 'Tu alta está pendiente de aprobación por IoT FENSTER.');
+      }
+      if (user.partner.estado === EstadoPartner.RECHAZADO) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.RECHAZADA, 'Tu solicitud de alta no ha sido aprobada. Contacta con IoT FENSTER.');
+      }
+      if (user.partner.estado !== EstadoPartner.ACTIVO || user.partner.archivadoEn) {
+        throw cuentaNoDisponible(CODIGOS_LOGIN.EMPRESA_SUSPENDIDA, 'El acceso de tu empresa está suspendido. Contacta con IoT FENSTER.');
+      }
+    }
+
+    /// Va al final: el administrador de una empresa recién registrada está inactivo hasta
+    /// que se aprueba, y debe ver «pendiente de aprobación» (o «verifica tu correo»), no «desactivado».
+    if (!user.activo) {
+      throw cuentaNoDisponible(CODIGOS_LOGIN.DESACTIVADA, 'Tu usuario está desactivado. Contacta con IoT FENSTER.');
     }
 
     return { id: user.id, partnerId: user.partnerId, rol: user.rol };
@@ -380,10 +429,28 @@ export class AuthService {
         rol: true,
         idioma: true,
         partnerId: true,
-        partner: { select: { razonSocial: true, marcaComercial: true, estado: true } },
+        partner: {
+          select: {
+            razonSocial: true,
+            marcaComercial: true,
+            estado: true,
+            direccionEnvioDefecto: true,
+            codigoPostalEnvio: true,
+            localidadEnvio: true,
+            provinciaEnvio: true,
+            paisEnvio: true,
+          },
+        },
       },
     });
-    return user;
+    const { partner, ...resto } = user;
+    if (!partner) return { ...resto, partner: null };
+    const { direccionEnvioDefecto, codigoPostalEnvio, localidadEnvio, provinciaEnvio, paisEnvio, ...datosEmpresa } = partner;
+    return {
+      ...resto,
+      // La dirección de envío de la ficha, ya escrita en líneas, para precargar el checkout.
+      partner: { ...datosEmpresa, direccionEnvio: direccionEnvioPorDefecto({ direccionEnvioDefecto, codigoPostalEnvio, localidadEnvio, provinciaEnvio, paisEnvio }) },
+    };
   }
 
   async actualizarIdioma(userId: string, idioma: Idioma): Promise<void> {
@@ -453,6 +520,16 @@ export class AuthService {
     if (!usuario || !usuario.activo) {
       return;
     }
+    /// Un correo cada pocos minutos por cuenta: sin esto, repetir la petición
+    /// llenaría el buzón de un cliente. Se mira cuándo se firmó el último enlace
+    /// (su `iat`), así no hace falta guardar nada más. Se responde igual que si
+    /// se hubiera enviado, para no dar pistas.
+    if (usuario.tokenResetPassword) {
+      const { iat } = this.jwtService.decode<{ iat?: number } | null>(usuario.tokenResetPassword) ?? {};
+      if (iat && Date.now() - iat * 1000 < ESPERA_ENTRE_REENVIOS_RESET_MS) {
+        return;
+      }
+    }
     await this.generarYEnviarTokenReset(usuario);
   }
 
@@ -501,6 +578,30 @@ export class AuthService {
   /// el enlace para crear su contraseña.
   async invitarUsuario(usuario: { id: string; email: string; idioma: Idioma }, razonSocial: string): Promise<void> {
     await this.generarYEnviarTokenReset(usuario, { razonSocial });
+  }
+
+  /// «Salir»: además de borrar la cookie del navegador (lo hace el controller), el
+  /// token deja de valer en el servidor, así que una copia suya (otro equipo, un
+  /// portátil compartido) ya no entra. Usa el mismo mecanismo que `forzarLogout`,
+  /// por lo que también cierra las demás sesiones abiertas de ese usuario. Un token
+  /// ausente, caducado o falso se ignora: salir nunca debe fallar.
+  async cerrarSesion(token: string | undefined): Promise<void> {
+    if (!token) return;
+    let sub: string | undefined;
+    try {
+      ({ sub } = await this.jwtService.verifyAsync<{ sub?: string }>(token, {
+        secret: this.configService.get<string>('jwtSecret'),
+      }));
+    } catch {
+      return;
+    }
+    if (!sub) return;
+    try {
+      await this.prisma.user.updateMany({ where: { id: sub }, data: { sesionInvalidadaEn: new Date() } });
+    } catch (error) {
+      // Salir nunca debe fallar: la cookie se borra igual y el fallo queda en el log.
+      this.logger.error(`No se pudo invalidar la sesión de ${sub}: ${(error as Error).message}`);
+    }
   }
 
   /// Invalida cualquier JWT de sesión emitido antes de este momento para el

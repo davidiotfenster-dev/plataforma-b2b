@@ -9,9 +9,11 @@ import { EstadoPedido, Idioma, RolUsuario } from '../generated/prisma/enums.js';
 import { siguienteCodigoPedido } from './codigo-pedido.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
-import type { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
+import type { ListarPedidosAdminQueryDto, ListarTodosPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import type { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import type { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
+import { calcularPrecioNeto } from '../common/precio-neto.js';
+import { representacionDisponible } from '../catalogo-marca/catalogo-marca.service.js';
 import { calcularPeriodo, tramosDelPeriodo, type PeriodoEstadisticas } from './estadisticas-periodo.js';
 import { generarExcelEstadisticas } from './estadisticas-excel.js';
 import {
@@ -74,11 +76,6 @@ export class PedidosService {
     private readonly configService: ConfigService,
   ) {}
 
-  private calcularPrecioNeto(pvpBase: Prisma.Decimal, descuentoPorcentaje: Prisma.Decimal): Prisma.Decimal {
-    const factor = new Prisma.Decimal(1).minus(descuentoPorcentaje.dividedBy(100));
-    return pvpBase.times(factor).toDecimalPlaces(2);
-  }
-
   async confirmar(partnerId: string, userId: string, dto: ConfirmarPedidoDto) {
     const orden = await this.prisma.$transaction(async (tx) => {
       const cart = await tx.cart.findUnique({
@@ -101,12 +98,7 @@ export class PedidosService {
       /// Un producto retirado de la venta después de meterlo en el carrito no
       /// se puede pedir: se avisa cuáles son para que el cliente los quite.
       const retirados = cart.items
-        .filter(
-          (item) =>
-            item.representacionPartner.activo === false ||
-            item.representacionPartner.productoBase?.activo === false ||
-            item.representacionPartner.productoMarca?.activo === false,
-        )
+        .filter((item) => !representacionDisponible(item.representacionPartner))
         .map((item) => item.representacionPartner.nombreComercial);
       if (retirados.length > 0) {
         throw new ConflictException(`Estos productos ya no están disponibles, quítalos del carrito: ${retirados.join(', ')}.`);
@@ -120,7 +112,7 @@ export class PedidosService {
         /// El descuento específico del producto (si existe) prevalece sobre
         /// el descuento general del partner.
         const descuentoAplicado = rep.descuentoOverride ?? partner.descuentoPorcentaje;
-        const precioNetoUnitario = this.calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
+        const precioNetoUnitario = calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
         const totalLinea = precioNetoUnitario.times(item.cantidad);
         totalNeto = totalNeto.plus(totalLinea);
 
@@ -296,6 +288,9 @@ export class PedidosService {
       where.estado = query.estado;
     }
 
+    if (query.desde && query.hasta && query.desde > query.hasta) {
+      throw new BadRequestException({ message: 'La fecha «desde» no puede ser posterior a «hasta».', codigo: 'RANGO_FECHAS_INVERTIDO' });
+    }
     if (query.desde || query.hasta) {
       where.createdAt = {
         ...(query.desde ? { gte: inicioDelDia(query.desde) } : {}),
@@ -490,6 +485,37 @@ export class PedidosService {
       page,
       limit,
     };
+  }
+
+  /// Lista plana y paginada de todos los pedidos (los más recientes primero). La
+  /// búsqueda cubre el código PED, el PO Number y la razón social. Un COMERCIAL solo
+  /// ve los de las empresas que él dio de alta.
+  async listarTodosAdmin(query: ListarTodosPedidosAdminQueryDto, restringirCreadoPorId?: string) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const busqueda = query.busqueda?.trim();
+    const where: Prisma.OrderWhereInput = {
+      ...(query.estado && { estado: query.estado }),
+      ...(restringirCreadoPorId !== undefined && { partner: { creadoPorUsuarioId: restringirCreadoPorId } }),
+      ...(busqueda && {
+        OR: [
+          { codigoPed: { contains: busqueda, mode: 'insensitive' } },
+          { poNumber: { contains: busqueda, mode: 'insensitive' } },
+          { partner: { razonSocial: { contains: busqueda, mode: 'insensitive' } } },
+        ],
+      }),
+    };
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { partner: { select: { razonSocial: true } } },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+    return { data, total, page, limit };
   }
 
   /// Pedidos de un único partner, vista admin (todos los estados, sin
@@ -751,7 +777,7 @@ export class PedidosService {
     }
 
     if (dto.estado === order.estado) {
-      throw new BadRequestException('El pedido ya está en ese estado.');
+      throw new BadRequestException({ message: 'El pedido ya está en ese estado.', codigo: 'PEDIDO_YA_EN_ESTADO' });
     }
 
     const esCancelacion = dto.estado === EstadoPedido.CANCELADO;
@@ -772,9 +798,10 @@ export class PedidosService {
       /// estrictamente lineal. Reactivar un pedido cancelado siempre requiere
       /// `forzar`, ya que no forma parte de la secuencia lineal.
       if (!dto.forzar && (veniaCancelado || indiceNuevo !== indiceActual + 1)) {
-        throw new ConflictException(
-          `Transición de estado inválida: ${order.estado} -> ${dto.estado}. Solo se permite avanzar un paso en la secuencia.`,
-        );
+        throw new ConflictException({
+          message: `Transición de estado inválida: ${order.estado} -> ${dto.estado}. Solo se permite avanzar un paso en la secuencia.`,
+          codigo: 'TRANSICION_INVALIDA',
+        });
       }
     }
 
@@ -827,7 +854,10 @@ export class PedidosService {
       ]);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new ConflictException('El pedido ha cambiado de estado mientras lo editabas. Recarga y vuelve a intentarlo.');
+        throw new ConflictException({
+          message: 'El pedido ha cambiado de estado mientras lo editabas. Recarga y vuelve a intentarlo.',
+          codigo: 'PEDIDO_CAMBIADO',
+        });
       }
       throw error;
     }

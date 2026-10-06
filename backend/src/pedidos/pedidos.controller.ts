@@ -22,7 +22,7 @@ import { exigirPuedeComprar } from '../common/permisos-partner.js';
 import { PedidosService } from './pedidos.service.js';
 import { ConfirmarPedidoDto } from './dto/confirmar-pedido.dto.js';
 import { ActualizarEstadoDto } from './dto/actualizar-estado.dto.js';
-import { ListarPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
+import { ListarPedidosAdminQueryDto, ListarTodosPedidosAdminQueryDto } from './dto/listar-pedidos-admin-query.dto.js';
 import { ListarPedidosQueryDto } from './dto/listar-pedidos-query.dto.js';
 import { DescargarPdfQueryDto } from './dto/descargar-pdf-query.dto.js';
 import { EstadisticasQueryDto } from './dto/estadisticas-query.dto.js';
@@ -90,6 +90,15 @@ export class PedidosController {
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   async resumenPorPartner(@CurrentUser() usuario: UsuarioAutenticado, @Query() query: ListarPedidosAdminQueryDto) {
     return this.pedidosService.resumenPorPartner(query, this.restriccion(usuario));
+  }
+
+  /// Todos los pedidos en una sola lista (paginada), para buscar uno por su código o
+  /// su PO sin saber de qué empresa es, o ver todo lo que está en un estado.
+  @Get('admin/lista')
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async listaAdmin(@CurrentUser() usuario: UsuarioAutenticado, @Query() query: ListarTodosPedidosAdminQueryDto) {
+    return this.pedidosService.listarTodosAdmin(query, this.restriccion(usuario));
   }
 
   @Get('admin/por-partner/:partnerId')

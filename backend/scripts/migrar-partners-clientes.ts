@@ -36,14 +36,23 @@ async function main() {
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
   try {
     const vbh = await prisma.partner.updateMany({
-      where: { razonSocial: 'VBH' },
+      where: { razonSocial: { equals: 'VBH', mode: 'insensitive' } },
       data: { tipo: TipoEmpresa.PARTNER, marcaCatalogo: MarcaCatalogo.VBH },
     });
     const procomsa = await prisma.partner.updateMany({
-      where: { marcaComercial: 'PROCOMSA' },
+      // Por marca comercial o, en una base donde aún no se haya fijado, por razón social.
+      where: {
+        OR: [
+          { marcaComercial: { equals: 'PROCOMSA', mode: 'insensitive' } },
+          { razonSocial: { equals: 'PROCOMSA', mode: 'insensitive' } },
+        ],
+      },
       data: { tipo: TipoEmpresa.PARTNER, marcaCatalogo: MarcaCatalogo.PROCOMSA },
     });
     console.log(`VBH: ${vbh.count} · Procomsa: ${procomsa.count} marcados como partner`);
+    if (vbh.count === 0 || procomsa.count === 0) {
+      console.warn('AVISO: no se ha encontrado VBH o Procomsa; quedarán como distribuidores. Revisa su razón social o marca comercial.');
+    }
 
     const msw = await prisma.partner.upsert({
       where: { cif: 'PENDIENTE-MYSMARTWINDOW' },

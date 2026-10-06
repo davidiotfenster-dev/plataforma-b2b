@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -156,9 +156,22 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
   const [error, setError] = useState<string | null>(null);
   const [guardado, setGuardado] = useState(false);
   const [copiada, setCopiada] = useState(false);
+  // Versión de la ficha con la que se abrió el formulario (bloqueo optimista). Solo se renueva
+  // al guardar uno mismo: si siguiera a cada relectura, los cambios de otra persona que llegan
+  // mientras se edita pasarían por propios y se pisarían sin aviso.
+  const versionFicha = useRef(partner?.updatedAt);
 
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
+
+  // Cerrar o recargar la pestaña con datos sin guardar pide confirmación (el navegador pone el texto).
+  const sinGuardar = cambiado && !guardado;
+  useEffect(() => {
+    if (!sinGuardar) return;
+    const avisar = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", avisar);
+    return () => window.removeEventListener("beforeunload", avisar);
+  }, [sinGuardar]);
 
   function cambiar(nombre: string, valor: string) {
     setGuardado(false);
@@ -199,13 +212,17 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
       const carga: Record<string, unknown> = {
         marcaCatalogo: valores.marcaCatalogo,
         razonSocial: texto("razonSocial"),
-        cif: texto("cif"),
         direccionFiscal: texto("direccionFiscal"),
         pais: texto("pais"),
-        dominioWeb: texto("dominioWeb"),
         descuentoPorcentaje: Number(valores.descuentoPorcentaje || 0),
         iva: numero("iva"),
+        // La versión de la ficha que se está editando: si otra persona la guarda antes, no se pisa.
+        actualizadoEn: versionFicha.current,
       };
+      // CIF y dominio se validan al cambiarlos: una ficha antigua con un dato que hoy
+      // no pasaría la validación sigue pudiéndose editar sin tocar esos campos.
+      if (texto("cif") !== partner!.cif) carga.cif = texto("cif");
+      if (texto("dominioWeb") !== partner!.dominioWeb) carga.dominioWeb = texto("dominioWeb");
       // Vaciar un campo opcional lo borra (null), salvo marca y tarifa, que no admiten borrarse.
       for (const campo of CAMPOS_OPCIONALES_TEXTO) {
         carga[campo] = texto(campo) === "" ? (campo === "marcaComercial" || campo === "tarifa" ? undefined : null) : texto(campo);
@@ -221,6 +238,7 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         queryClient.invalidateQueries({ queryKey: ["admin-partner", partner!.id] });
         // Se muestra lo que el servidor ha guardado (ya recortado y normalizado), sin dejar el botón activo.
         setValores(valoresIniciales(resultado));
+        versionFicha.current = resultado.updatedAt;
         setGuardado(true);
       }
     },

@@ -5,7 +5,7 @@ import { RegistroPartnerDto } from './registro-partner.dto.js';
 
 const base = {
   razonSocial: 'Nueva S.L.',
-  cif: 'B1',
+  cif: 'B12345678',
   direccionFiscal: 'Calle 1',
   pais: 'España',
   dominioWeb: 'nueva.com',

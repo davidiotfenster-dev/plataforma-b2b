@@ -1,5 +1,13 @@
 import type { RolUsuario } from "@/lib/types";
 
+/// Quién puede comprar: el usuario de solo consulta ve catálogo y pedidos, pero
+/// no tiene carrito ni checkout (el servidor también se lo niega).
+const PUEDEN_COMPRAR: RolUsuario[] = ["PARTNER_ADMIN", "PARTNER_COMPRADOR"];
+
+export function puedeComprar(rol: RolUsuario): boolean {
+  return PUEDEN_COMPRAR.includes(rol);
+}
+
 /// Zonas del portal que exigen sesión, y quién puede entrar en cada una. Todo lo
 /// demás (portada, login, registro, verificación, páginas legales…) es público.
 /// El backend sigue siendo quien decide de verdad (401/403/404); esto solo evita
@@ -7,10 +15,8 @@ import type { RolUsuario } from "@/lib/types";
 const ZONAS: { prefijos: string[]; roles: RolUsuario[] }[] = [
   { prefijos: ["/admin"], roles: ["ADMIN_FENSTER", "COMERCIAL"] },
   { prefijos: ["/equipo"], roles: ["PARTNER_ADMIN"] },
-  {
-    prefijos: ["/catalogo", "/carrito", "/checkout", "/pedidos"],
-    roles: ["PARTNER_ADMIN", "PARTNER_COMPRADOR", "PARTNER_CONSULTA"],
-  },
+  { prefijos: ["/carrito", "/checkout"], roles: PUEDEN_COMPRAR },
+  { prefijos: ["/catalogo", "/pedidos"], roles: ["PARTNER_ADMIN", "PARTNER_COMPRADOR", "PARTNER_CONSULTA"] },
 ];
 
 function zonaDe(pathname: string) {

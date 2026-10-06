@@ -10,6 +10,13 @@ import { candidatosParaPartner } from "@/lib/catalogo-admin";
 import { FAMILIA_DE_MARCA, MARCA_INFO, MARCAS_CATALOGO } from "@/lib/marcas";
 import type { CatalogoMarcaAdmin, MarcaCatalogo, ProductoBaseAdmin, ProductoMarcaAdmin } from "@/lib/types";
 import { SoloAdmin } from "@/components/solo-admin";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { usePrecio } from "@/lib/formato";
+
+/// Igual que el tope del servidor (`PVP_MAXIMO`).
+const PVP_MAXIMO = 100_000;
+/// Un PVP que se multiplica o divide por más de esto probablemente es un error de tecleo.
+const CAMBIO_SOSPECHOSO = 2;
 
 const ENTRADA = "h-8 w-full min-w-0 rounded-md border border-neutral-300 bg-white px-2 text-sm focus:border-neutral-500 focus:outline-none";
 
@@ -44,11 +51,16 @@ function FilaProductoMarca({ producto, empresas }: { producto: ProductoMarcaAdmi
   const [nombre, setNombre] = useState(producto.nombreComercial);
   const [pvp, setPvp] = useState(producto.pvpBase);
   const [error, setError] = useState<string | null>(null);
+  const [confirmando, setConfirmando] = useState(false);
+  const precio = usePrecio();
   const fallo = (err: unknown) => setError(err instanceof ApiError ? err.message : t("genericError"));
 
   const guardar = useMutation({
     mutationFn: (cambios: Record<string, unknown>) => api.patch(`/catalogos-marca/productos/${producto.id}`, cambios),
-    onSuccess: refrescar,
+    onSuccess: () => {
+      setConfirmando(false);
+      refrescar();
+    },
     onError: fallo,
   });
   const quitar = useMutation({
@@ -58,6 +70,12 @@ function FilaProductoMarca({ producto, empresas }: { producto: ProductoMarcaAdmi
   });
 
   const cambiado = sku !== producto.skuComercial || nombre !== producto.nombreComercial || Number(pvp) !== Number(producto.pvpBase);
+  const pvpAntes = Number(producto.pvpBase);
+  const pvpNuevo = Number(pvp);
+  const cambiaPvp = pvpNuevo !== pvpAntes;
+  const sospechoso = cambiaPvp && pvpAntes > 0 && (pvpNuevo / pvpAntes > CAMBIO_SOSPECHOSO || pvpNuevo / pvpAntes < 1 / CAMBIO_SOSPECHOSO);
+  const pvpValido = pvpNuevo > 0 && pvpNuevo <= PVP_MAXIMO;
+  const guardarCambios = () => guardar.mutate({ skuComercial: sku.trim(), nombreComercial: nombre.trim(), pvpBase: pvpNuevo });
   const ocupado = guardar.isPending || quitar.isPending;
 
   return (
@@ -79,9 +97,11 @@ function FilaProductoMarca({ producto, empresas }: { producto: ProductoMarcaAdmi
           <button
             onClick={() => {
               setError(null);
-              guardar.mutate({ skuComercial: sku.trim(), nombreComercial: nombre.trim(), pvpBase: Number(pvp) });
+              // Un cambio de precio llega al momento a todas las empresas de la marca: se confirma antes.
+              if (cambiaPvp) setConfirmando(true);
+              else guardarCambios();
             }}
-            disabled={ocupado || !cambiado || !sku.trim() || !nombre.trim() || !(Number(pvp) > 0)}
+            disabled={ocupado || !cambiado || !sku.trim() || !nombre.trim() || !pvpValido}
             className="h-8 rounded-md bg-neutral-900 px-3 text-xs font-medium text-white hover:bg-neutral-700 disabled:bg-neutral-200 disabled:text-neutral-400"
           >
             {t("save")}
@@ -115,7 +135,31 @@ function FilaProductoMarca({ producto, empresas }: { producto: ProductoMarcaAdmi
         {producto.productoBase.nombreTecnico} · {producto.productoBase.skuIndustrial}
         {!producto.activo && <span className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-neutral-600">{t("hidden")}</span>}
       </p>
+      {pvp !== "" && !pvpValido && (
+        <p role="alert" className="mt-1 pl-12 text-xs text-red-600">
+          {t("pvpInvalid", { max: precio(PVP_MAXIMO) })}
+        </p>
+      )}
       {error && <p className="mt-1 pl-12 text-xs text-red-600">{error}</p>}
+      {confirmando && (
+        <ConfirmDialog
+          titulo={t("pvpConfirmTitle", { name: producto.nombreComercial })}
+          descripcion={t(sospechoso ? "pvpConfirmSuspicious" : "pvpConfirmText", {
+            antes: precio(pvpAntes),
+            despues: precio(pvpNuevo),
+            n: empresas,
+          })}
+          confirmar={t("pvpConfirmYes", { n: empresas })}
+          peligro={sospechoso}
+          cargando={guardar.isPending}
+          error={error}
+          onConfirmar={() => {
+            setError(null);
+            guardarCambios();
+          }}
+          onCancelar={() => setConfirmando(false)}
+        />
+      )}
     </li>
   );
 }
@@ -166,7 +210,7 @@ function FilaAnadir({ producto, marca }: { producto: ProductoBaseAdmin; marca: M
               setError(null);
               anadir.mutate();
             }}
-            disabled={anadir.isPending || !sku.trim() || !nombre.trim() || !(Number(pvp) > 0)}
+            disabled={anadir.isPending || !sku.trim() || !nombre.trim() || !(Number(pvp) > 0 && Number(pvp) <= PVP_MAXIMO)}
             className="inline-flex h-8 items-center gap-1 rounded-md border border-neutral-300 px-3 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
           >
             <Plus size={12} /> {t("add")}

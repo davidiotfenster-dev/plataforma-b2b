@@ -7,24 +7,32 @@ import {
   IsString,
   Matches,
   MinLength,
+  MaxLength,
 } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
+import { CIF_MENSAJE, CIF_REGEX, NormalizarCif, DOMINIO_REGEX, DominioCorporativo } from '../../partners/dto/validadores-ficha-cliente.js';
 import { Idioma } from '../../generated/prisma/enums.js';
 
 export class RegistroPartnerDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   razonSocial!: string;
 
+  @NormalizarCif()
   @IsString()
   @IsNotEmpty()
+  @Matches(CIF_REGEX, { message: CIF_MENSAJE })
   cif!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   direccionFiscal!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   pais!: string;
 
   /// Dominio corporativo de la empresa (p. ej. "empresa.com"). El email del
@@ -32,9 +40,8 @@ export class RegistroPartnerDto {
   /// correo corporativo" que exige CLAUDE.md.
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i, {
-    message: 'dominioWeb debe ser un dominio válido (p. ej. empresa.com)',
-  })
+  @Matches(DOMINIO_REGEX, { message: 'dominioWeb debe ser un dominio válido (p. ej. empresa.com)' })
+  @DominioCorporativo()
   dominioWeb!: string;
 
   @IsEmail()

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoPartner } from '../generated/prisma/enums.js';
 import { especificacionesParaPartner, varianteParaPartner } from './especificaciones-partner.js';
+import { calcularPrecioNeto } from '../common/precio-neto.js';
 import { REPRESENTACION_VISIBLE } from '../catalogo-marca/catalogo-marca.service.js';
 import type { CrearProductoBaseDto } from './dto/crear-producto-base.dto.js';
 import type { ActualizarProductoBaseDto } from './dto/actualizar-producto-base.dto.js';
@@ -117,10 +118,36 @@ export class ProductosService {
     imagenUrl: true,
     documentacionUrl: true,
     pvpBase: true,
+    /// Para calcular el precio neto del cliente; no se devuelve tal cual.
+    descuentoOverride: true,
     activo: true,
   } as const;
 
+  /// Añade al producto el descuento y el precio neto de ESTE cliente (el del
+  /// producto si lo tiene, si no el general de su empresa), calculados con la
+  /// misma fórmula que luego usan el carrito y el pedido.
+  private conPrecioNeto<T extends { pvpBase: Prisma.Decimal; descuentoOverride: Prisma.Decimal | null }>(
+    { descuentoOverride, ...producto }: T,
+    descuentoGeneral: Prisma.Decimal,
+  ) {
+    const descuentoAplicado = descuentoOverride ?? descuentoGeneral;
+    return {
+      ...producto,
+      descuentoPorcentaje: descuentoAplicado.toString(),
+      precioNeto: calcularPrecioNeto(producto.pvpBase, descuentoAplicado).toString(),
+    };
+  }
+
+  private async descuentoGeneral(partnerId: string): Promise<Prisma.Decimal> {
+    const { descuentoPorcentaje } = await this.prisma.partner.findUniqueOrThrow({
+      where: { id: partnerId },
+      select: { descuentoPorcentaje: true },
+    });
+    return descuentoPorcentaje;
+  }
+
   async listarCatalogo(partnerId: string) {
+    const descuentoGeneral = await this.descuentoGeneral(partnerId);
     const filas = await this.prisma.representacionPartner.findMany({
       where: { partnerId, ...REPRESENTACION_VISIBLE },
       select: {
@@ -131,7 +158,7 @@ export class ProductosService {
     });
     // Color y modelo (opaco) para agrupar las variantes de color en una sola tarjeta.
     return filas.map(({ productoBase, ...producto }) => ({
-      ...producto,
+      ...this.conPrecioNeto(producto, descuentoGeneral),
       imagenUrl: producto.imagenUrl ?? productoBase.imagenUrl,
       ...varianteParaPartner(productoBase.especificacionesJson, productoBase.nombreTecnico, partnerId),
     }));
@@ -140,6 +167,7 @@ export class ProductosService {
   async obtenerRepresentacion(partnerId: string, id: string) {
     /// El filtro por `partnerId` va en la propia consulta: un producto de otro
     /// partner y uno inexistente son indistinguibles (mismo 404).
+    const descuentoGeneral = await this.descuentoGeneral(partnerId);
     const representacion = await this.prisma.representacionPartner.findFirst({
       where: { id, partnerId, ...REPRESENTACION_VISIBLE },
       select: {
@@ -154,7 +182,7 @@ export class ProductosService {
 
     const { productoBase, ...producto } = representacion;
     return {
-      ...producto,
+      ...this.conPrecioNeto(producto, descuentoGeneral),
       imagenUrl: producto.imagenUrl ?? productoBase.imagenUrl,
       productoBase: { especificacionesJson: especificacionesParaPartner(productoBase.especificacionesJson) },
     };

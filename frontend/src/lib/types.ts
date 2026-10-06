@@ -17,7 +17,7 @@ export interface Perfil {
   rol: RolUsuario;
   idioma: Idioma;
   partnerId: string | null;
-  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner } | null;
+  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner; direccionEnvio: string | null } | null;
 }
 
 export interface Producto {
@@ -27,6 +27,9 @@ export interface Producto {
   imagenUrl: string | null;
   documentacionUrl: string | null;
   pvpBase: string;
+  /// Descuento (%) y precio neto unitario de la empresa del usuario, calculados en el servidor.
+  descuentoPorcentaje: string;
+  precioNeto: string;
   activo: boolean;
   /// Color y modelo (identificador opaco) para agrupar las variantes de color; solo en el listado.
   color?: string | null;
@@ -50,6 +53,8 @@ export interface LineaCarrito {
   descuentoPorcentaje: string;
   precioNetoUnitario: string;
   totalLinea: string;
+  /// `false` si el producto se retiró de la venta después de meterlo en el carrito.
+  disponible: boolean;
 }
 
 export interface ResumenCarrito {
@@ -255,6 +260,7 @@ export interface CatalogoMarcaAdmin {
 
 export interface Partner {
   id: string;
+  updatedAt?: string;
   razonSocial: string;
   cif: string;
   direccionFiscal: string;

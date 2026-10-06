@@ -69,7 +69,14 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "noAccount": "Your company doesn't have access yet?",
-    "register": "Request access"
+    "register": "Request access",
+    "errors": {
+      "CUENTA_EMAIL_SIN_VERIFICAR": "Your email is not verified yet. Open the link we sent you when you registered; if it has expired, request a new one from that page.",
+      "CUENTA_PENDIENTE_APROBACION": "Your registration is pending approval. IoT FENSTER will email you when you can log in.",
+      "CUENTA_RECHAZADA": "Your registration request was not approved. If you think this is a mistake, contact IoT FENSTER.",
+      "CUENTA_EMPRESA_SUSPENDIDA": "Your company's access is suspended. Contact IoT FENSTER.",
+      "CUENTA_DESACTIVADA": "Your user is deactivated. Contact your company administrator or IoT FENSTER."
+    }
   },
   "roles": {
     "PARTNER_ADMIN": "Administrator",
@@ -95,7 +102,9 @@
     "doneTitle": "Password updated",
     "doneBody": "Your password has been updated successfully. You can now log in.",
     "backToLogin": "Go to log in",
-    "genericError": "Error resetting the password"
+    "genericError": "Error resetting the password",
+    "repeatPassword": "Repeat the new password",
+    "passwordMismatch": "The two passwords do not match."
   },
   "verificarEmail": {
     "verifying": "Verifying your email…",
@@ -168,7 +177,9 @@
     "empty": "Your authorized catalog doesn't have any products yet.",
     "addedToCart": "{producto} added to cart",
     "addError": "Error adding to cart",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "yourPrice": "Your price",
+    "pvpDiscount": "RRP {pvp} · −{descuento} %"
   },
   "catalogoDetalle": {
     "loading": "Loading product…",
@@ -192,7 +203,13 @@
     "total": "Total",
     "removeLine": "Remove line",
     "totalLabel": "Total: {total}",
-    "continueToCheckout": "Continue to checkout"
+    "continueToCheckout": "Continue to checkout",
+    "quantityInvalid": "Enter a whole number between 1 and {max}.",
+    "quantityError": "The quantity could not be changed.",
+    "quantityOf": "Quantity of {producto}",
+    "unavailable": "This product is no longer available.",
+    "unavailableBlock": "Remove the products that are no longer available from your cart to continue.",
+    "quantityHugeConfirm": "Are you sure you want {cantidad} units of this product?"
   },
   "checkout": {
     "loading": "Loading…",
@@ -242,7 +259,8 @@
     "noResults": "No orders match the filters.",
     "itemsCount": "{n, plural, one {# item} other {# items}}",
     "moreProducts": "+{n} more",
-    "trackShipment": "Track shipment"
+    "trackShipment": "Track shipment",
+    "invertedRange": "The “From” date is after the “To” date."
   },
   "pedidoDetalle": {
     "loading": "Loading order…",
@@ -374,9 +392,9 @@
     "confirmApproval": "Approve partner",
     "approveError": "Could not approve. Please try again.",
     "approveDoneTitle": "{partner} approved",
-    "approveDoneBody": "They can sign in now. The most important step is left: assigning the products they can order.",
+    "approveDoneBody": "They can sign in now and see their brand's catalog. If they need different products, you can adjust it.",
     "later": "Later",
-    "assignCatalog": "Assign catalog",
+    "assignCatalog": "View catalog",
     "cancel": "Cancel",
     "working": "Working…",
     "backToList": "All companies",
@@ -496,7 +514,13 @@
     "orderCount": "{cantidad} order(s)",
     "cancelReason": "Cancellation reason: {motivo}",
     "searchPlaceholder": "Search partner…",
-    "noResults": "No partners match your search."
+    "noResults": "No partners match your search.",
+    "byCompany": "By company",
+    "allOrders": "All orders",
+    "filterByStatus": "Filter by status",
+    "allStatuses": "All statuses",
+    "searchOrdersPlaceholder": "Search by PED, PO or company…",
+    "noOrdersFound": "No order matches the search."
   },
   "cancelarPedido": {
     "cancel": "Cancel order",
@@ -718,7 +742,10 @@
     "trackingUrlPlaceholder": "Tracking URL",
     "markAsShipped": "Mark as shipped",
     "advanceError": "Error updating the status",
-    "advanceTo": "Advance to {estado}"
+    "advanceTo": "Advance to {estado}",
+    "confirmTitle": "Advance order {codigo}",
+    "confirmText": "The order will move from “{desde}” to “{hasta}” and the customer will be emailed. If you get it wrong, it can only be undone with the manual correction.",
+    "confirmYes": "Yes, move to {estado}"
   },
   "forzarEstado": {
     "title": "Manual status correction",
@@ -787,7 +814,12 @@
     "canAddHelp": "They have a name in this brand but are not in its catalogue. Check name, SKU and price and add them.",
     "nothingToAdd": "Nothing missing.",
     "hideOthers": "Hide products from other brands",
-    "showOthers": "Add a product from another brand ({n})"
+    "showOthers": "Add a product from another brand ({n})",
+    "pvpInvalid": "The RRP must be above 0 and no more than {max}.",
+    "pvpConfirmTitle": "Change the RRP of “{name}”",
+    "pvpConfirmText": "The RRP goes from {antes} to {despues}. The change reaches the {n} companies of this brand straight away; existing orders keep their price.",
+    "pvpConfirmSuspicious": "The RRP goes from {antes} to {despues}, a very large change: check it is not a typo. It reaches the {n} companies of this brand straight away; existing orders keep their price.",
+    "pvpConfirmYes": "Yes, change for {n} companies"
   },
   "ayuda": {
     "boton": "Help",

@@ -206,6 +206,54 @@ describe('AuthService — correos del alta de empresas', () => {
     });
   });
 
+  describe('olvidé mi contraseña', () => {
+    const cuenta = (tokenResetPassword: string | null) => ({
+      id: 'user-1',
+      email: 'ana@nueva.com',
+      idioma: Idioma.ES,
+      activo: true,
+      tokenResetPassword,
+    });
+
+    it('manda el correo la primera vez', async () => {
+      prisma.user.findUnique.mockResolvedValue(cuenta(null));
+      await service.olvidePassword('ana@nueva.com');
+      expect(email.enviar).toHaveBeenCalledTimes(1);
+    });
+
+    it('no repite el correo si el último enlace se firmó hace menos de 2 minutos, pero sí pasado ese tiempo', async () => {
+      prisma.user.findUnique.mockResolvedValue(cuenta('tok-previo'));
+
+      jwt.decode.mockReturnValueOnce({ iat: Math.floor(Date.now() / 1000) - 30 });
+      await service.olvidePassword('ana@nueva.com');
+      expect(email.enviar).not.toHaveBeenCalled();
+
+      jwt.decode.mockReturnValueOnce({ iat: Math.floor(Date.now() / 1000) - 180 });
+      await service.olvidePassword('ana@nueva.com');
+      expect(email.enviar).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('cerrar sesión', () => {
+    it('invalida en el servidor los tokens ya emitidos de quien sale', async () => {
+      jwt.verifyAsync.mockResolvedValue({ sub: 'user-7' });
+
+      await service.cerrarSesion('cookie-copiada');
+
+      expect(jwt.verifyAsync).toHaveBeenCalledWith('cookie-copiada', { secret: 's' });
+      const { where, data } = prisma.user.updateMany.mock.calls[0][0];
+      expect(where).toEqual({ id: 'user-7' });
+      expect(data.sesionInvalidadaEn).toBeInstanceOf(Date);
+    });
+
+    it('sin cookie o con un token falso o caducado no falla ni toca a nadie', async () => {
+      await service.cerrarSesion(undefined);
+      jwt.verifyAsync.mockRejectedValue(new Error('jwt expired'));
+      await expect(service.cerrarSesion('basura')).resolves.toBeUndefined();
+      expect(prisma.user.updateMany).not.toHaveBeenCalled();
+    });
+  });
+
   describe('aprobar y rechazar', () => {
     beforeEach(() => {
       prisma.partner.findUnique.mockResolvedValue({ id: 'partner-1', estado: 'PENDIENTE_APROBACION' });

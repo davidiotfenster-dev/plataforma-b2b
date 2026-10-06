@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { REPRESENTACION_VISIBLE } from '../catalogo-marca/catalogo-marca.service.js';
+import { REPRESENTACION_VISIBLE, representacionDisponible } from '../catalogo-marca/catalogo-marca.service.js';
 import { Prisma } from '../generated/prisma/client.js';
+import { calcularPrecioNeto } from '../common/precio-neto.js';
 import { CANTIDAD_MAXIMA_POR_LINEA } from './dto/agregar-item.dto.js';
 
 /// Mensaje opaco: idéntico exista o no el recurso, o pertenezca a otro
@@ -19,6 +20,8 @@ export interface LineaCarrito {
   descuentoPorcentaje: string;
   precioNetoUnitario: string;
   totalLinea: string;
+  /// `false` si el producto se retiró de la venta después de meterlo en el carrito.
+  disponible: boolean;
 }
 
 export interface ResumenCarrito {
@@ -46,13 +49,6 @@ export class CarritoService {
   /// solo podía enseñar un total y cobrar otro.
   constructor(private readonly prisma: PrismaService) {}
 
-  /// Calcula el precio neto en servidor: nunca se confía en un precio
-  /// enviado por el cliente. Redondeo a 2 decimales (moneda).
-  private calcularPrecioNeto(pvpBase: Prisma.Decimal, descuentoPorcentaje: Prisma.Decimal): Prisma.Decimal {
-    const factor = new Prisma.Decimal(1).minus(descuentoPorcentaje.dividedBy(100));
-    return pvpBase.times(factor).toDecimalPlaces(2);
-  }
-
   private async obtenerOCrearCart(partnerId: string, userId: string) {
     return this.prisma.cart.upsert({
       where: { partnerId_userId: { partnerId, userId } },
@@ -65,7 +61,7 @@ export class CarritoService {
     const [items, partner] = await Promise.all([
       this.prisma.cartItem.findMany({
         where: { cartId },
-        include: { representacionPartner: true },
+        include: { representacionPartner: { include: { productoBase: true, productoMarca: true } } },
         orderBy: { createdAt: 'asc' },
       }),
       this.prisma.partner.findUniqueOrThrow({ where: { id: partnerId } }),
@@ -77,7 +73,7 @@ export class CarritoService {
       /// El descuento específico del producto (si existe) prevalece sobre el
       /// descuento general del partner.
       const descuentoAplicado = rep.descuentoOverride ?? partner.descuentoPorcentaje;
-      const precioNetoUnitario = this.calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
+      const precioNetoUnitario = calcularPrecioNeto(rep.pvpBase, descuentoAplicado);
       const totalLinea = precioNetoUnitario.times(item.cantidad);
       totalPedido = totalPedido.plus(totalLinea);
 
@@ -92,6 +88,7 @@ export class CarritoService {
         descuentoPorcentaje: descuentoAplicado.toString(),
         precioNetoUnitario: precioNetoUnitario.toString(),
         totalLinea: totalLinea.toString(),
+        disponible: representacionDisponible(rep),
       };
     });
 

@@ -38,6 +38,20 @@ describe('JwtStrategy.validate', () => {
     expect(usuario).toEqual({ userId: 'user-1', partnerId: 'partner-real', rol: RolUsuario.PARTNER_CONSULTA });
   });
 
+  it('un token de un solo uso (verificar correo, restablecer contraseña) no vale como sesión', async () => {
+    findUnique.mockResolvedValue({
+      activo: true,
+      sesionInvalidadaEn: null,
+      rol: RolUsuario.ADMIN_FENSTER,
+      partnerId: null,
+      partner: null,
+    });
+
+    await expect(strategy.validate(payload({ tipo: 'verificacion-email' }))).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(strategy.validate(payload({ tipo: 'reset-password' }))).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(findUnique).not.toHaveBeenCalled();
+  });
+
   it('rechaza a un usuario cuyo partner está suspendido, aunque su cookie siga viva', async () => {
     findUnique.mockResolvedValue({
       activo: true,

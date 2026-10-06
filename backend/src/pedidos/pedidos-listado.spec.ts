@@ -64,6 +64,35 @@ describe('PedidosService — Mis pedidos del cliente', () => {
     );
   });
 
+  describe('listarTodosAdmin', () => {
+    it('sin restricción ni filtros no acota nada y pagina', async () => {
+      await service.listarTodosAdmin({ page: 2, limit: 10 });
+
+      const args = prisma.order.findMany.mock.calls[0][0];
+      expect(args.where).toEqual({});
+      expect(args).toMatchObject({ skip: 10, take: 10, orderBy: { createdAt: 'desc' } });
+    });
+
+    it('un comercial solo ve los pedidos de las empresas que dio de alta', async () => {
+      await service.listarTodosAdmin({ estado: 'ENVIADO' as never }, 'comercial-1');
+
+      const where = prisma.order.findMany.mock.calls[0][0].where;
+      expect(where).toMatchObject({ estado: 'ENVIADO', partner: { creadoPorUsuarioId: 'comercial-1' } });
+      expect(prisma.order.count.mock.calls[0][0].where).toEqual(where);
+    });
+
+    it('la búsqueda cubre código PED, PO y empresa sin distinguir mayúsculas', async () => {
+      await service.listarTodosAdmin({ busqueda: '  ped-12 ' });
+
+      const { OR } = prisma.order.findMany.mock.calls[0][0].where;
+      expect(OR).toEqual([
+        { codigoPed: { contains: 'ped-12', mode: 'insensitive' } },
+        { poNumber: { contains: 'ped-12', mode: 'insensitive' } },
+        { partner: { razonSocial: { contains: 'ped-12', mode: 'insensitive' } } },
+      ]);
+    });
+  });
+
   describe('listar', () => {
     it('siempre acota por el partner del usuario', async () => {
       await service.listar(PARTNER_ID, {});

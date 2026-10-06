@@ -146,7 +146,8 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    await this.authService.cerrarSesion(req.cookies?.[JWT_COOKIE_NAME]);
     /// Mismos atributos que al crearla: con `SameSite=None` (demo por túnel) el
     /// navegador puede ignorar un borrado que no los repita.
     res.clearCookie(JWT_COOKIE_NAME, { httpOnly: true, secure: true, sameSite: cookieSameSite() });
