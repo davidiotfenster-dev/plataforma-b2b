@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { UsuarioAutenticado } from '../common/decorators/current-user.decorator.js';
+import { AuditoriaRemotaService } from '../partners-api/auditoria-remota.service.js';
 
 type PeticionAuditable = Omit<Request, 'user'> & { user?: UsuarioAutenticado; auditada?: boolean };
 
@@ -13,7 +14,10 @@ type PeticionAuditable = Omit<Request, 'user'> & { user?: UsuarioAutenticado; au
 export class AuditoriaService {
   private readonly logger = new Logger('Auditoria');
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly remota: AuditoriaRemotaService,
+  ) {}
 
   registrar(peticion: Request, statusCode: number, extra: Record<string, unknown> = {}, persistir = true): void {
     const request = peticion as unknown as PeticionAuditable;
@@ -39,6 +43,7 @@ export class AuditoriaService {
 
     this.logger.log(JSON.stringify(entrada));
     if (!persistir) return;
+    this.remota.encolar(entrada);
 
     /// Fire-and-forget: un fallo al escribir auditoría nunca debe afectar
     /// la respuesta HTTP ya resuelta.

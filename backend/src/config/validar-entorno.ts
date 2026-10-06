@@ -26,6 +26,17 @@ export function validarEntorno(env: NodeJS.ProcessEnv = process.env): { errores:
     avisos.push('EMAIL_LOGO_URL debe empezar por https:// para que el logo se vea en los correos.');
   }
 
+  const partnersApiUrl = env.PARTNERS_API_URL?.trim();
+  if (partnersApiUrl && !/^https:\/\/[^/]+/i.test(partnersApiUrl)) {
+    errores.push('PARTNERS_API_URL debe ser la URL https de API Gateway con el stage (p. ej. https://xxxx.execute-api.eu-west-1.amazonaws.com/v1).');
+  }
+  for (const variable of ['PARTNERS_API_TIMEOUT_MS', 'PARTNERS_API_REINTENTOS'] as const) {
+    if (env[variable] !== undefined && !/^\d+$/.test(env[variable])) errores.push(`${variable} debe ser un número entero.`);
+  }
+  if (env.PARTNERS_API_AUDITORIA === 'true' && !partnersApiUrl) {
+    avisos.push('PARTNERS_API_AUDITORIA=true pero falta PARTNERS_API_URL: la auditoría solo se guarda en la base de datos.');
+  }
+
   if (!env.REDIS_URL) avisos.push('REDIS_URL no está definida: se usará redis://localhost:6379 (sin caché si no responde).');
   if (!env.FRONTEND_URL) avisos.push('FRONTEND_URL no está definida: los enlaces de los correos apuntarán a http://localhost:3000.');
   if (!env.RESEND_API_KEY && proveedorCorreo !== 'ses') avisos.push('Sin proveedor de correo: los emails solo se escriben en el log.');

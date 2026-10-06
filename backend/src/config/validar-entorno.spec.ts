@@ -43,4 +43,14 @@ describe('validarEntorno', () => {
     expect(validarEntorno({ ...BASE, EMAIL_LOGO_URL: 'http://x/logo.png' }).avisos).toHaveLength(1);
     expect(validarEntorno({ ...BASE, EMAIL_LOGO_URL: 'https://x/logo.png' }).avisos).toEqual([]);
   });
+
+  it('PARTNERS_API_URL tiene que ser https y los números de la API, enteros', () => {
+    expect(validarEntorno({ ...BASE, PARTNERS_API_URL: 'http://api/v1' }).errores).toHaveLength(1);
+    expect(validarEntorno({ ...BASE, PARTNERS_API_URL: 'https://abc.execute-api.eu-west-1.amazonaws.com/v1' }).errores).toHaveLength(0);
+    expect(validarEntorno({ ...BASE, PARTNERS_API_TIMEOUT_MS: '10s' }).errores).toHaveLength(1);
+  });
+
+  it('avisa si se pide copiar la auditoría a la API sin PARTNERS_API_URL', () => {
+    expect(validarEntorno({ ...BASE, PARTNERS_API_AUDITORIA: 'true' }).avisos).toHaveLength(1);
+  });
 });
