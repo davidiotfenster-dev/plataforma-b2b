@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { api, ApiError } from "@/lib/api";
 import { Campo, CampoTexto, Seccion } from "@/components/campo";
 import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
 import { useMe } from "@/hooks/use-me";
+import { useAvisoSinGuardar } from "@/hooks/use-aviso-sin-guardar";
 import { MARCA_INFO, MARCAS_CATALOGO, TIPOS_EMPRESA } from "@/lib/marcas";
 import type { CrearPartnerInput, MarcaCatalogo, Partner, TipoEmpresa } from "@/lib/types";
 
@@ -164,14 +165,9 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
 
-  // Cerrar o recargar la pestaña con datos sin guardar pide confirmación (el navegador pone el texto).
+  // Salir de la ficha con datos sin guardar (cerrar la pestaña o pulsar un enlace) pide confirmación.
   const sinGuardar = cambiado && !guardado;
-  useEffect(() => {
-    if (!sinGuardar) return;
-    const avisar = (e: BeforeUnloadEvent) => e.preventDefault();
-    window.addEventListener("beforeunload", avisar);
-    return () => window.removeEventListener("beforeunload", avisar);
-  }, [sinGuardar]);
+  useAvisoSinGuardar(sinGuardar, t("unsavedLeave"));
 
   function cambiar(nombre: string, valor: string) {
     setGuardado(false);

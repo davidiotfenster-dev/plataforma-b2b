@@ -43,7 +43,8 @@
     "marcas": "Marcas",
     "signedInAs": "Sesión iniciada como",
     "roleAdmin": "Administrador FENSTER",
-    "roleComercial": "Comercial FENSTER"
+    "roleComercial": "Comercial FENSTER",
+    "menu": "Menú principal"
   },
   "home": {
     "title": "Portal Partner IoT FENSTER",
@@ -179,7 +180,19 @@
     "addError": "Error al añadir al carrito",
     "addToCart": "Añadir al carrito",
     "yourPrice": "Tu precio",
-    "pvpDiscount": "PVP {pvp} · −{descuento} %"
+    "pvpDiscount": "PVP {pvp} · −{descuento} %",
+    "inCart": "{cantidad} en el carrito",
+    "unitsOf": "Unidades de {producto}",
+    "add": "Añadir",
+    "addedToCartQty": "{cantidad, plural, one {} other {# × }}{producto} añadido al carrito",
+    "less": "Una menos",
+    "more": "Una más",
+    "searchPlaceholder": "Buscar por nombre, SKU o color",
+    "clearSearch": "Borrar búsqueda",
+    "showingOf": "{visibles} de {total} modelos",
+    "modelCount": "{total, plural, one {# modelo} other {# modelos}}",
+    "noResults": "Ningún producto coincide con «{busqueda}».",
+    "quantityHugeConfirm": "¿Seguro que quieres {cantidad} unidades de este producto?"
   },
   "catalogoDetalle": {
     "loading": "Cargando producto…",
@@ -190,7 +203,8 @@
     "addError": "Error al añadir al carrito",
     "addToCart": "Añadir al carrito",
     "documentation": "Documentación técnica",
-    "specifications": "Especificaciones técnicas"
+    "specifications": "Especificaciones técnicas",
+    "goToCart": "Ver carrito"
   },
   "carrito": {
     "title": "Tu carrito",
@@ -209,7 +223,14 @@
     "quantityOf": "Cantidad de {producto}",
     "unavailable": "Este producto ya no está disponible.",
     "unavailableBlock": "Quita del carrito los productos que ya no están disponibles para poder continuar.",
-    "quantityHugeConfirm": "¿Seguro que quieres {cantidad} unidades de este producto?"
+    "quantityHugeConfirm": "¿Seguro que quieres {cantidad} unidades de este producto?",
+    "less": "Una unidad menos de {producto}",
+    "more": "Una unidad más de {producto}",
+    "summaryCount": "{lineas, plural, one {# producto} other {# productos}} · {articulos, plural, one {# unidad} other {# unidades}}",
+    "emptyHint": "Añade productos desde el catálogo y aparecerán aquí.",
+    "unit": "ud.",
+    "totalHint": "Precios netos con tu descuento. Sin pago online: se factura contra tu orden de compra.",
+    "keepShopping": "Seguir comprando"
   },
   "checkout": {
     "loading": "Cargando…",
@@ -226,7 +247,10 @@
     "totalLabel": "Total: {total}",
     "confirmError": "Error al confirmar el pedido",
     "pricesChanged": "Los precios de tu carrito han cambiado. Hemos actualizado el resumen: revisa el nuevo total y vuelve a confirmar.",
-    "requiredFields": "Escribe la dirección de envío y el PO Number para confirmar el pedido."
+    "requiredFields": "Escribe la dirección de envío y el PO Number para confirmar el pedido.",
+    "backToCart": "Volver al carrito",
+    "totalNet": "Total neto",
+    "confirmWithTotal": "Confirmar pedido · {total}"
   },
   "pedidos": {
     "title": "Mis pedidos",
@@ -505,7 +529,8 @@
     "promote": "Promocionar a Partner",
     "demote": "Pasar a Distribuidor",
     "volumeLine": "{unidades, plural, one {# unidad} other {# unidades}} en {pedidos, plural, one {# pedido} other {# pedidos}}",
-    "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?"
+    "promoteHint": "Este distribuidor ya ha comprado {unidades} unidades (umbral: {umbral}). ¿Es momento de promocionarlo a Partner?",
+    "unsavedLeave": "Hay cambios sin guardar en la ficha. ¿Salir sin guardarlos?"
   },
   "adminPedidos": {
     "title": "Gestión de pedidos",
@@ -1044,5 +1069,10 @@
     "cookies": "Cookies",
     "condiciones": "Condiciones de uso",
     "soloEspanol": "Los textos legales están disponibles en español, que es la versión que prevalece."
+  },
+  "pasosCompra": {
+    "label": "Pasos del pedido",
+    "cart": "Carrito",
+    "confirm": "Entrega y confirmación"
   }
 }

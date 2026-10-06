@@ -13,13 +13,13 @@ export function PrecioProducto({ producto }: { producto: Pick<Producto, "pvpBase
   const descuento = Number(producto.descuentoPorcentaje);
 
   if (!(descuento > 0)) {
-    return <p className="text-2xl font-semibold text-neutral-900">{precio(producto.pvpBase)}</p>;
+    return <p className="text-xl font-semibold text-neutral-900 sm:text-2xl">{precio(producto.pvpBase)}</p>;
   }
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-teal-700">{t("yourPrice")}</p>
-      <p className="text-2xl font-semibold text-neutral-900">{precio(producto.precioNeto)}</p>
-      <p className="text-sm text-neutral-500">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-teal-700 sm:text-xs">{t("yourPrice")}</p>
+      <p className="text-xl font-semibold text-neutral-900 sm:text-2xl">{precio(producto.precioNeto)}</p>
+      <p className="text-xs text-neutral-500 sm:text-sm">
         {t("pvpDiscount", {
           pvp: precio(producto.pvpBase),
           descuento: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(descuento),
