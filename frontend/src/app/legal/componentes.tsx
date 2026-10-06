@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import { DATOS_EMPRESA } from "./datos-empresa";
+import type { CampoLegal } from "./campos";
+import { obtenerAjustesLegales } from "./datos";
 
-const ETIQUETAS: Record<keyof typeof DATOS_EMPRESA, string> = {
+export const ETIQUETAS_LEGALES: Record<CampoLegal, string> = {
   razonSocial: "razón social",
   cif: "CIF",
   domicilio: "domicilio social",
@@ -11,14 +12,18 @@ const ETIQUETAS: Record<keyof typeof DATOS_EMPRESA, string> = {
   registroMercantil: "datos del Registro Mercantil",
   alojamiento: "proveedor de alojamiento y país",
   ciudadTribunales: "ciudad de los tribunales",
+  portes: "portes y pedido mínimo",
+  formaPago: "forma de pago por defecto",
+  devoluciones: "devoluciones e incidencias de transporte",
+  plazoRegistros: "plazo de conservación de los registros",
 };
 
-/// Pinta un dato de la empresa o, si aún no está rellenado en
-/// `datos-empresa.ts`, un marcador ámbar bien visible.
-export function Dato({ campo }: { campo: keyof typeof DATOS_EMPRESA }) {
-  const valor = DATOS_EMPRESA[campo];
+/// Pinta un dato de los ajustes legales o, si aún no está rellenado en el
+/// panel (Admin › Datos legales), un marcador ámbar bien visible.
+export async function Dato({ campo }: { campo: CampoLegal }) {
+  const valor = (await obtenerAjustesLegales())[campo];
   if (valor) return <>{valor}</>;
-  return <Pendiente>{ETIQUETAS[campo]}</Pendiente>;
+  return <Pendiente>{ETIQUETAS_LEGALES[campo]}</Pendiente>;
 }
 
 /// Marcador ámbar para cualquier dato o cláusula que falte por decidir.

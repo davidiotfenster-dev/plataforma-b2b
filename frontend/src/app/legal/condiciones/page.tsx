@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Dato, Lista, Pendiente, Seccion } from "../componentes";
+import { Dato, Lista, Seccion } from "../componentes";
 
 export const metadata: Metadata = { title: "Condiciones de uso — IoT FENSTER" };
 
@@ -56,7 +56,9 @@ export default function CondicionesPage() {
           </li>
           <li>
             Los precios no incluyen IVA ni otros impuestos, que se añadirán en la factura según corresponda.
-            <Pendiente>portes y condiciones de envío</Pendiente>
+          </li>
+          <li>
+            Portes: <Dato campo="portes" />
           </li>
           <li>
             IoT FENSTER puede modificar productos, tarifas y descuentos en cualquier momento. Los cambios no afectan
@@ -84,7 +86,8 @@ export default function CondicionesPage() {
             precio o incumplimientos de pago, informando al partner del motivo.
           </li>
           <li>
-            El pago se realizará en la forma y plazos acordados con cada partner. <Pendiente>forma de pago por defecto</Pendiente>
+            El pago se realizará en la forma y plazos acordados con cada partner. Salvo acuerdo distinto:{" "}
+            <Dato campo="formaPago" />
           </li>
           <li>
             Los plazos de preparación y entrega son orientativos. Cuando el pedido se envía, el portal muestra el
@@ -104,8 +107,7 @@ export default function CondicionesPage() {
             soporte@iotfenster.com indicando modelo, número de serie y factura de compra.
           </li>
           <li>
-            Las incidencias de transporte y las devoluciones que no sean por garantía se rigen por{" "}
-            <Pendiente>política de devoluciones e incidencias de transporte</Pendiente>.
+            Incidencias de transporte y devoluciones que no sean por garantía: <Dato campo="devoluciones" />
           </li>
         </Lista>
       </Seccion>

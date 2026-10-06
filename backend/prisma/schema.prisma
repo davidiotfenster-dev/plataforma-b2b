@@ -426,6 +426,40 @@ model OrderItem {
 }
 
 // ---------------------------------------------------------------------------
+// TEXTOS LEGALES
+// ---------------------------------------------------------------------------
+
+/// Datos de IoT FENSTER que aparecen en los textos legales públicos (aviso
+/// legal, privacidad, condiciones de uso). Una sola fila (`unica` = true),
+/// editable por ADMIN_FENSTER desde el panel. Un campo nulo se muestra en las
+/// páginas como "pendiente" para que no se publique sin completar.
+model AjustesLegales {
+  id    String  @id @default(uuid()) @db.Uuid
+  unica Boolean @unique @default(true)
+
+  razonSocial       String?
+  cif               String?
+  domicilio         String?
+  emailContacto     String?
+  emailPrivacidad   String?
+  telefono          String?
+  registroMercantil String?
+  /// Proveedor y país donde se alojan la web y la base de datos.
+  alojamiento       String?
+  /// Ciudad cuyos juzgados resuelven los conflictos.
+  ciudadTribunales  String?
+
+  /// Cláusulas comerciales de las condiciones de uso, en texto libre.
+  portes         String?
+  formaPago      String?
+  devoluciones   String?
+  /// Cuánto se guardan los registros de seguridad (p. ej. "12 meses").
+  plazoRegistros String?
+
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
 // AUDITORÍA
 // ---------------------------------------------------------------------------
 

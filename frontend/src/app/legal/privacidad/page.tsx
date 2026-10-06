@@ -81,7 +81,7 @@ export default function PrivacidadPage() {
           activa. Después se bloquean durante los plazos de prescripción de las obligaciones legales (con carácter
           general, seis años para la documentación mercantil según el artículo 30 del Código de Comercio) y,
           transcurridos, se eliminan. Los registros de auditoría y seguridad se conservan el tiempo necesario para
-          investigar incidentes, y como máximo 12 meses.
+          investigar incidentes, y como máximo <Dato campo="plazoRegistros" />.
         </p>
       </Seccion>
 
