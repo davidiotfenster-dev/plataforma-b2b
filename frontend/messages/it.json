@@ -1068,11 +1068,80 @@
     "privacidad": "Privacy",
     "cookies": "Cookie",
     "condiciones": "Condizioni d'uso",
-    "soloEspanol": "I testi legali sono disponibili in spagnolo, che è la versione che prevale."
+    "soloEspanol": "I testi legali sono disponibili in spagnolo, che è la versione che prevale.",
+    "editarDatos": "Modifica dati legali"
   },
   "pasosCompra": {
     "label": "Passaggi dell’ordine",
     "cart": "Carrello",
     "confirm": "Consegna e conferma"
+  },
+  "adminDatosLegales": {
+    "title": "Dati legali",
+    "intro": "Ciò che inserisci qui compare nelle note legali, nell'informativa sulla privacy e nelle condizioni d'uso del portale. Un campo vuoto viene mostrato come «in sospeso».",
+    "loading": "Caricamento…",
+    "empresa": "Azienda",
+    "empresaDesc": "Dati identificativi di IoT FENSTER richiesti dalla legge spagnola (LSSI).",
+    "condiciones": "Condizioni commerciali e privacy",
+    "condicionesDesc": "Clausole riportate nelle condizioni d'uso e nell'informativa sulla privacy.",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "saved": "Salvato. Le pagine legali mostrano già le modifiche.",
+    "error": "Impossibile salvare i dati.",
+    "pendientes": "{n, plural, =0 {Tutto completo} one {# dato in sospeso} other {# dati in sospeso}}",
+    "campos": {
+      "razonSocial": {
+        "label": "Ragione sociale",
+        "ayuda": "Es.: IoT Fenster, S.L."
+      },
+      "cif": {
+        "label": "Codice fiscale (CIF)",
+        "ayuda": ""
+      },
+      "domicilio": {
+        "label": "Sede legale",
+        "ayuda": ""
+      },
+      "emailContacto": {
+        "label": "Email di contatto",
+        "ayuda": "Per segnalazioni di uso improprio e cancellazioni."
+      },
+      "emailPrivacidad": {
+        "label": "Email privacy",
+        "ayuda": "Dove si esercitano i diritti sulla protezione dei dati."
+      },
+      "telefono": {
+        "label": "Telefono",
+        "ayuda": ""
+      },
+      "registroMercantil": {
+        "label": "Registro delle imprese",
+        "ayuda": "Es.: Registro Mercantil de Murcia, tomo X, foglio Y, pagina MU-Z."
+      },
+      "alojamiento": {
+        "label": "Hosting",
+        "ayuda": "Fornitore e paese dei server del sito e del database."
+      },
+      "ciudadTribunales": {
+        "label": "Foro competente",
+        "ayuda": "Città i cui tribunali risolvono le controversie."
+      },
+      "portes": {
+        "label": "Spese di spedizione",
+        "ayuda": "Chi paga la spedizione e se esiste un ordine minimo per la spedizione gratuita."
+      },
+      "formaPago": {
+        "label": "Pagamento predefinito",
+        "ayuda": "Es.: bonifico a 30 giorni dalla data fattura."
+      },
+      "devoluciones": {
+        "label": "Resi e incidenti di trasporto",
+        "ayuda": "Termine per segnalare danni da trasporto e come funzionano i resi fuori garanzia."
+      },
+      "plazoRegistros": {
+        "label": "Conservazione dei registri di sicurezza",
+        "ayuda": "Es.: 12 mesi."
+      }
+    }
   }
 }

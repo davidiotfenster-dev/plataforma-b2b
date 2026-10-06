@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Pencil } from "lucide-react";
+import { useMe } from "@/hooks/use-me";
 import { PAGINAS_LEGALES } from "./paginas";
 
 export function LegalNav() {
   const t = useTranslations("legal");
   const pathname = usePathname();
+  const { data: perfil } = useMe();
 
   return (
     <nav aria-label={t("navLabel")} className="flex flex-wrap gap-2">
@@ -28,6 +31,15 @@ export function LegalNav() {
           </Link>
         );
       })}
+      {perfil?.rol === "ADMIN_FENSTER" && (
+        <Link
+          href="/admin/datos-legales"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-sm text-amber-900 hover:border-amber-400"
+        >
+          <Pencil className="size-3.5" />
+          {t("editarDatos")}
+        </Link>
+      )}
     </nav>
   );
 }

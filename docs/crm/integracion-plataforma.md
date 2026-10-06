@@ -119,7 +119,8 @@ Permisos (scopes) del Self Client, solo los necesarios: módulos (lectura y escr
 
 ## Límites
 
-- Bigin de pago: unos 50.000 créditos de API al día más 250 por usuario. La sincronización gastará unos cientos al día.
+- Créditos de API en ventana móvil de 24 h ([documentación de Bigin](https://www.bigin.com/developer/docs/apis/v2/api-limits.html)): Gratuito 5.000; Express, Premier y Zoho One 50.000 + 250 por usuario, con máximo de 100.000. Cada llamada cuesta 1 crédito; insertar o actualizar cuesta 1 por cada 10 registros (máximo 100 por llamada); leer registros con `cvid` cuesta 3; la escritura masiva cuesta 500 al iniciarse. La sincronización gastará unos cientos al día, así que sobra margen incluso en el plan gratuito.
+- Concurrencia: 5 llamadas simultáneas por usuario en Gratuito y 10 en Express, Premier y Zoho One. El worker del outbox debe procesar en serie o con pocas llamadas en paralelo.
 - Webhooks salientes: en planes de pago (Express y superiores).
 - Centro de datos: la cuenta debe estar en `.eu`; las URLs de arriba cambian si no.
 

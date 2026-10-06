@@ -8,6 +8,7 @@ Estado a 2026-10-05: **análisis y diseño cerrados, nada implantado todavía**.
 | Archivo | Contenido |
 |---|---|
 | [`funcionalidades.md`](funcionalidades.md) | Las 22 funcionalidades del CRM, cómo se monta cada una y la lista de implantación para marcar |
+| [`guia-montaje-bigin.md`](guia-montaje-bigin.md) | Guía paso a paso para montar el CRM en Bigin, con plantillas CSV de importación en [`plantillas-importacion/`](plantillas-importacion/) |
 | [`integracion-plataforma.md`](integracion-plataforma.md) | Diseño técnico de la conexión Zoho ↔ plataforma: datos, flujos, cambios en el backend, seguridad |
 | [`correos.md`](correos.md) | Qué correos envía Zoho y cuáles la plataforma (Amazon SES), y qué tocar en el DNS |
 | [`maqueta/index.html`](maqueta/index.html) | Maqueta navegable del CRM con datos de ejemplo. Se abre con doble clic en el navegador |
