@@ -59,6 +59,7 @@ CREATE DATABASE fenster;
 
 -- Dueño del esquema: con él se ejecutan las migraciones.
 CREATE ROLE fenster_migraciones LOGIN PASSWORD '<contraseña larga aleatoria>';
+GRANT fenster_migraciones TO CURRENT_USER;  -- en RDS hace falta para poder cederle la base
 GRANT ALL ON SCHEMA public TO fenster_migraciones;
 ALTER DATABASE fenster OWNER TO fenster_migraciones;
 
