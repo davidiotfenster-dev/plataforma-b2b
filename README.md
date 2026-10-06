@@ -191,3 +191,4 @@ Para enseñar la aplicación a alguien fuera de la red se usan túneles de Cloud
 - Crear el partner MySmartWindow y guardar la marca en la ficha de cada partner.
 - Asignación automática del catálogo al aprobar un partner nuevo.
 - Antes de producción: `SameSite=Strict`, dominio único para front y back, claves reales de correo y contraseñas nuevas para las cuentas de prueba.
+- Producción en AWS (RDS, ElastiCache, variables y copias de seguridad): ver [`DESPLIEGUE_AWS.md`](DESPLIEGUE_AWS.md).

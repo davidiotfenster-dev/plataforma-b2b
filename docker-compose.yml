@@ -1,3 +1,6 @@
+# SOLO PARA DESARROLLO LOCAL. En producción la base de datos es Amazon RDS y Redis
+# ElastiCache (ver DESPLIEGUE_AWS.md): no se usa este fichero.
+# Los puertos se publican solo en 127.0.0.1 para que no queden abiertos a la red.
 services:
   postgres:
     image: postgres:16
@@ -8,7 +11,7 @@ services:
       POSTGRES_PASSWORD: fenster_dev
       POSTGRES_DB: fenster
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - fenster_pgdata:/var/lib/postgresql/data
 
@@ -17,7 +20,7 @@ services:
     container_name: fenster-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - fenster_redisdata:/data
 
