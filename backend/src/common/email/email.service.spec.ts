@@ -75,6 +75,18 @@ describe('EmailService', () => {
   });
 });
 
+describe('logo de la cabecera', () => {
+  it('con EMAIL_LOGO_URL (https) la cabecera lleva el logo; sin ella, el nombre en texto', async () => {
+    resendSend.mockClear();
+    await servicio({ resendApiKey: 're_x', emailLogoUrl: 'https://b2b.iotfenster.com/logo-email.png' }).enviar('a@b.com', 'A', '<p>x</p>');
+    expect(resendSend.mock.calls[0][0].html).toContain('<img src="https://b2b.iotfenster.com/logo-email.png"');
+
+    await servicio({ resendApiKey: 're_x', emailLogoUrl: 'javascript:alert(1)' }).enviar('a@b.com', 'A', '<p>x</p>');
+    expect(resendSend.mock.calls[1][0].html).not.toContain('<img');
+    expect(resendSend.mock.calls[1][0].html).toContain('FENSTER</span>');
+  });
+});
+
 describe('botón', () => {
   it('sale como botón en el HTML y como "texto: enlace" en la versión de texto plano', async () => {
     const { boton } = await import('./plantillas-email.js');

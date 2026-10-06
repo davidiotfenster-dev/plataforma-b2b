@@ -29,4 +29,18 @@ describe('validarEntorno', () => {
     expect(r.errores).toHaveLength(0);
     expect(r.avisos).toHaveLength(2);
   });
+
+  it('con SES basta EMAIL_PROVEEDOR=ses: no avisa de falta de proveedor, y pide EMAIL_FROM', () => {
+    const r = validarEntorno({ ...BASE, RESEND_API_KEY: undefined, EMAIL_PROVEEDOR: 'SES' });
+    expect(r.errores).toHaveLength(0);
+    expect(r.avisos).toHaveLength(1);
+    expect(r.avisos[0]).toMatch(/EMAIL_FROM/);
+    expect(validarEntorno({ ...BASE, RESEND_API_KEY: undefined, EMAIL_PROVEEDOR: 'ses', EMAIL_FROM: 'a@b.com' }).avisos).toEqual([]);
+  });
+
+  it('un EMAIL_PROVEEDOR mal escrito para el arranque, y un logo sin https avisa', () => {
+    expect(validarEntorno({ ...BASE, EMAIL_PROVEEDOR: 'sess' }).errores).toHaveLength(1);
+    expect(validarEntorno({ ...BASE, EMAIL_LOGO_URL: 'http://x/logo.png' }).avisos).toHaveLength(1);
+    expect(validarEntorno({ ...BASE, EMAIL_LOGO_URL: 'https://x/logo.png' }).avisos).toEqual([]);
+  });
 });

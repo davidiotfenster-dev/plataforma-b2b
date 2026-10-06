@@ -44,10 +44,12 @@ export class EmailService {
   private readonly enviador: Enviador | null;
   private readonly emailFrom: string;
   private readonly emailReplyTo: string | undefined;
+  private readonly emailLogoUrl: string | undefined;
 
   constructor(private readonly configService: ConfigService) {
     this.emailFrom = this.configService.get<string>('emailFrom')!;
     this.emailReplyTo = this.configService.get<string>('emailReplyTo') || undefined;
+    this.emailLogoUrl = this.configService.get<string>('emailLogoUrl') || undefined;
     this.enviador = this.crearEnviador();
   }
 
@@ -56,7 +58,7 @@ export class EmailService {
   /// rol del servidor). Si no, Resend cuando hay `RESEND_API_KEY`. Sin ninguno,
   /// no se envía nada (modo desarrollo).
   private crearEnviador(): Enviador | null {
-    const proveedor = this.configService.get<string>('emailProveedor');
+    const proveedor = this.configService.get<string>('emailProveedor')?.trim().toLowerCase();
 
     if (proveedor === 'ses') {
       const ses = new SESv2Client({ region: this.configService.get<string>('awsSesRegion') });
@@ -127,7 +129,7 @@ export class EmailService {
     }
 
     try {
-      await this.enviador({ destinatario, asunto, html: envolverCorreo(cuerpoHtml), texto: htmlATexto(cuerpoHtml), adjuntos });
+      await this.enviador({ destinatario, asunto, html: envolverCorreo(cuerpoHtml, this.emailLogoUrl), texto: htmlATexto(cuerpoHtml), adjuntos });
     } catch (error) {
       /// Un fallo de envío de email nunca debe romper el flujo de negocio
       /// que lo disparó (confirmación de pedido, cambio de estado): se
