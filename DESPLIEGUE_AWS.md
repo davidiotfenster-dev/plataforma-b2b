@@ -5,6 +5,33 @@ Este documento dice cómo montar PostgreSQL y Redis en producción, qué variabl
 necesita el backend y cómo se hacen las copias de seguridad. El `docker-compose.yml`
 de la raíz es solo para desarrollo local.
 
+## 0. Qué hace falta (resumen)
+
+| Pieza | Tecnología | Servicio de AWS recomendado |
+|---|---|---|
+| Servidor de la web (frontend) | Next.js 16 + React 19 sobre **Node.js 22 LTS** (`npm run build` y `npm run start`) | EC2 (misma máquina que el backend) |
+| Servidor del API (backend) | NestJS 12 sobre **Node.js 22 LTS** (`npm run build` y `node dist/main`) | EC2 `t4g.small` con Nginx y PM2 |
+| Base de datos | **PostgreSQL 16** | Amazon RDS (apartado 1) |
+| Caché | Redis 7 (opcional) | ElastiCache, o ninguno (apartado 2) |
+| Fotos de productos | Ficheros en disco (`UPLOADS_DIR`) | Disco EBS del EC2, con instantáneas diarias de AWS Backup |
+| Correo (altas, pedidos, contraseñas) | Amazon SES, ya integrado (`EMAIL_PROVEEDOR=ses`) | SES con el dominio verificado (SPF, DKIM y DMARC) y fuera del modo sandbox |
+| PDF y Excel | PDFKit y ExcelJS dentro del backend | Nada aparte |
+| Dominio y HTTPS | Dos subdominios del mismo dominio, p. ej. `portal.iotfenster.com` (web) y `api.iotfenster.com` (API). **Tienen que ser del mismo dominio**: la cookie de sesión es `SameSite=Strict`. | Route 53 (o el DNS actual) + certificado de ACM en un balanceador, o Let's Encrypt en Nginx |
+| Secretos | `JWT_SECRET`, contraseñas de la base de datos y de Redis | Secrets Manager o Parameter Store |
+| Logs | El backend escribe la auditoría en JSON por la salida estándar | CloudWatch Logs |
+
+**Por qué un EC2 y no contenedores:** las fotos que sube el admin se guardan en el disco
+del servidor. En un EC2 con disco EBS se conservan entre reinicios. Si más adelante se
+pasa a contenedores (ECS Fargate), habrá que montar EFS en `UPLOADS_DIR` o mover las
+fotos a S3.
+
+**Al compilar el frontend**, `NEXT_PUBLIC_API_URL` tiene que valer la URL pública del API
+(p. ej. `https://api.iotfenster.com`): se fija en el `npm run build`, no al arrancar.
+
+**Nginx delante** de los dos servidores: HTTPS, redirección de http a https y proxy a los
+puertos de Node. Por eso en el backend va `TRUST_PROXY=1`, o `2` si además hay un
+balanceador delante.
+
 ## 1. PostgreSQL: Amazon RDS
 
 | Ajuste | Valor |
@@ -91,7 +118,8 @@ límite de intentos de login (ahora va en memoria de cada instancia).
 | `AWS_SES_REGION` | La región donde se verificó el dominio en SES |
 | `EMAIL_FROM` / `EMAIL_REPLY_TO` | Direcciones del dominio verificado |
 | `COOKIE_SAME_SITE` | Sin definir (Strict). `none` es solo para demos por túnel. |
-| `PORT` | El que espere el balanceador |
+| `PORT` | El puerto interno al que apunta Nginx |
+| `UPLOADS_DIR` | Carpeta persistente de las fotos (p. ej. `/srv/fenster/uploads/productos`). Copiar ahí las `default-*.png` de `backend/uploads/productos`. |
 
 El backend no arranca si falta `DATABASE_URL` o si `JWT_SECRET` tiene menos de 32
 caracteres, y avisa en el log si faltan Redis, `FRONTEND_URL` o el correo.
