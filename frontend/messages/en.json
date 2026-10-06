@@ -43,7 +43,8 @@
     "marcas": "Brands",
     "signedInAs": "Signed in as",
     "roleAdmin": "FENSTER administrator",
-    "roleComercial": "FENSTER sales"
+    "roleComercial": "FENSTER sales",
+    "menu": "Main menu"
   },
   "home": {
     "title": "IoT FENSTER Partner Portal",
@@ -179,7 +180,19 @@
     "addError": "Error adding to cart",
     "addToCart": "Add to cart",
     "yourPrice": "Your price",
-    "pvpDiscount": "RRP {pvp} · −{descuento} %"
+    "pvpDiscount": "RRP {pvp} · −{descuento} %",
+    "inCart": "{cantidad} in cart",
+    "unitsOf": "Units of {producto}",
+    "add": "Add",
+    "addedToCartQty": "{cantidad, plural, one {} other {# × }}{producto} added to cart",
+    "less": "One less",
+    "more": "One more",
+    "searchPlaceholder": "Search by name, SKU or colour",
+    "clearSearch": "Clear search",
+    "showingOf": "{visibles} of {total} models",
+    "modelCount": "{total, plural, one {# model} other {# models}}",
+    "noResults": "No product matches “{busqueda}”.",
+    "quantityHugeConfirm": "Are you sure you want {cantidad} units of this product?"
   },
   "catalogoDetalle": {
     "loading": "Loading product…",
@@ -190,7 +203,8 @@
     "addError": "Error adding to cart",
     "addToCart": "Add to cart",
     "documentation": "Technical documentation",
-    "specifications": "Technical specifications"
+    "specifications": "Technical specifications",
+    "goToCart": "View cart"
   },
   "carrito": {
     "title": "Your cart",
@@ -209,7 +223,14 @@
     "quantityOf": "Quantity of {producto}",
     "unavailable": "This product is no longer available.",
     "unavailableBlock": "Remove the products that are no longer available from your cart to continue.",
-    "quantityHugeConfirm": "Are you sure you want {cantidad} units of this product?"
+    "quantityHugeConfirm": "Are you sure you want {cantidad} units of this product?",
+    "less": "One unit less of {producto}",
+    "more": "One unit more of {producto}",
+    "summaryCount": "{lineas, plural, one {# product} other {# products}} · {articulos, plural, one {# unit} other {# units}}",
+    "emptyHint": "Add products from the catalogue and they will show up here.",
+    "unit": "unit",
+    "totalHint": "Net prices with your discount. No online payment: invoiced against your purchase order.",
+    "keepShopping": "Keep shopping"
   },
   "checkout": {
     "loading": "Loading…",
@@ -226,7 +247,10 @@
     "totalLabel": "Total: {total}",
     "confirmError": "Error confirming the order",
     "pricesChanged": "The prices in your cart have changed. We have updated the summary: check the new total and confirm again.",
-    "requiredFields": "Enter the shipping address and the PO Number to confirm the order."
+    "requiredFields": "Enter the shipping address and the PO Number to confirm the order.",
+    "backToCart": "Back to cart",
+    "totalNet": "Net total",
+    "confirmWithTotal": "Confirm order · {total}"
   },
   "pedidos": {
     "title": "My orders",
@@ -505,7 +529,8 @@
     "promote": "Promote to Partner",
     "demote": "Make Distributor",
     "volumeLine": "{unidades, plural, one {# unit} other {# units}} in {pedidos, plural, one {# order} other {# orders}}",
-    "promoteHint": "This distributor has already bought {unidades} units (threshold: {umbral}). Time to promote them to Partner?"
+    "promoteHint": "This distributor has already bought {unidades} units (threshold: {umbral}). Time to promote them to Partner?",
+    "unsavedLeave": "This record has unsaved changes. Leave without saving them?"
   },
   "adminPedidos": {
     "title": "Order fulfillment",
@@ -1044,5 +1069,10 @@
     "cookies": "Cookies",
     "condiciones": "Terms of use",
     "soloEspanol": "The legal texts are available in Spanish, which is the version that prevails."
+  },
+  "pasosCompra": {
+    "label": "Order steps",
+    "cart": "Cart",
+    "confirm": "Delivery and confirmation"
   }
 }

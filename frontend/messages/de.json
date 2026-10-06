@@ -43,7 +43,8 @@
     "marcas": "Marken",
     "signedInAs": "Angemeldet als",
     "roleAdmin": "FENSTER-Administrator",
-    "roleComercial": "FENSTER-Vertrieb"
+    "roleComercial": "FENSTER-Vertrieb",
+    "menu": "Hauptmenü"
   },
   "home": {
     "title": "IoT FENSTER Partnerportal",
@@ -179,7 +180,19 @@
     "addError": "Fehler beim Hinzufügen zum Warenkorb",
     "addToCart": "In den Warenkorb",
     "yourPrice": "Ihr Preis",
-    "pvpDiscount": "UVP {pvp} · −{descuento} %"
+    "pvpDiscount": "UVP {pvp} · −{descuento} %",
+    "inCart": "{cantidad} im Warenkorb",
+    "unitsOf": "Stückzahl von {producto}",
+    "add": "Hinzufügen",
+    "addedToCartQty": "{cantidad, plural, one {} other {# × }}{producto} zum Warenkorb hinzugefügt",
+    "less": "Eins weniger",
+    "more": "Eins mehr",
+    "searchPlaceholder": "Nach Name, SKU oder Farbe suchen",
+    "clearSearch": "Suche löschen",
+    "showingOf": "{visibles} von {total} Modellen",
+    "modelCount": "{total, plural, one {# Modell} other {# Modelle}}",
+    "noResults": "Kein Produkt passt zu „{busqueda}“.",
+    "quantityHugeConfirm": "Möchten Sie wirklich {cantidad} Stück dieses Produkts?"
   },
   "catalogoDetalle": {
     "loading": "Produkt wird geladen…",
@@ -190,7 +203,8 @@
     "addError": "Fehler beim Hinzufügen zum Warenkorb",
     "addToCart": "In den Warenkorb",
     "documentation": "Technische Dokumentation",
-    "specifications": "Technische Spezifikationen"
+    "specifications": "Technische Spezifikationen",
+    "goToCart": "Zum Warenkorb"
   },
   "carrito": {
     "title": "Ihr Warenkorb",
@@ -209,7 +223,14 @@
     "quantityOf": "Menge von {producto}",
     "unavailable": "Dieses Produkt ist nicht mehr verfügbar.",
     "unavailableBlock": "Entfernen Sie nicht mehr verfügbare Produkte aus dem Warenkorb, um fortzufahren.",
-    "quantityHugeConfirm": "Möchten Sie wirklich {cantidad} Stück dieses Produkts?"
+    "quantityHugeConfirm": "Möchten Sie wirklich {cantidad} Stück dieses Produkts?",
+    "less": "Ein Stück weniger von {producto}",
+    "more": "Ein Stück mehr von {producto}",
+    "summaryCount": "{lineas, plural, one {# Produkt} other {# Produkte}} · {articulos, plural, one {# Stück} other {# Stück}}",
+    "emptyHint": "Fügen Sie Produkte aus dem Katalog hinzu, sie erscheinen dann hier.",
+    "unit": "Stk.",
+    "totalHint": "Nettopreise mit Ihrem Rabatt. Keine Online-Zahlung: Abrechnung über Ihre Bestellnummer.",
+    "keepShopping": "Weiter einkaufen"
   },
   "checkout": {
     "loading": "Wird geladen…",
@@ -226,7 +247,10 @@
     "totalLabel": "Gesamt: {total}",
     "confirmError": "Fehler beim Bestätigen der Bestellung",
     "pricesChanged": "Die Preise in Ihrem Warenkorb haben sich geändert. Wir haben die Übersicht aktualisiert: Prüfen Sie den neuen Gesamtbetrag und bestätigen Sie erneut.",
-    "requiredFields": "Geben Sie die Lieferadresse und die PO-Nummer ein, um die Bestellung zu bestätigen."
+    "requiredFields": "Geben Sie die Lieferadresse und die PO-Nummer ein, um die Bestellung zu bestätigen.",
+    "backToCart": "Zurück zum Warenkorb",
+    "totalNet": "Gesamt netto",
+    "confirmWithTotal": "Bestellung bestätigen · {total}"
   },
   "pedidos": {
     "title": "Meine Bestellungen",
@@ -505,7 +529,8 @@
     "promote": "Zum Partner befördern",
     "demote": "Zum Händler machen",
     "volumeLine": "{unidades, plural, one {# Einheit} other {# Einheiten}} in {pedidos, plural, one {# Bestellung} other {# Bestellungen}}",
-    "promoteHint": "Dieser Händler hat bereits {unidades} Einheiten gekauft (Schwellenwert: {umbral}). Ist es Zeit, ihn zum Partner zu befördern?"
+    "promoteHint": "Dieser Händler hat bereits {unidades} Einheiten gekauft (Schwellenwert: {umbral}). Ist es Zeit, ihn zum Partner zu befördern?",
+    "unsavedLeave": "Das Datenblatt hat ungespeicherte Änderungen. Ohne Speichern verlassen?"
   },
   "adminPedidos": {
     "title": "Auftragsabwicklung",
@@ -1044,5 +1069,10 @@
     "cookies": "Cookies",
     "condiciones": "Nutzungsbedingungen",
     "soloEspanol": "Die Rechtstexte sind auf Spanisch verfügbar; die spanische Fassung ist maßgeblich."
+  },
+  "pasosCompra": {
+    "label": "Bestellschritte",
+    "cart": "Warenkorb",
+    "confirm": "Lieferung und Bestätigung"
   }
 }

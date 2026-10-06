@@ -43,7 +43,8 @@
     "marcas": "Marcas",
     "signedInAs": "Sessão iniciada como",
     "roleAdmin": "Administrador FENSTER",
-    "roleComercial": "Comercial FENSTER"
+    "roleComercial": "Comercial FENSTER",
+    "menu": "Menu principal"
   },
   "home": {
     "title": "Portal do Parceiro IoT FENSTER",
@@ -179,7 +180,19 @@
     "addError": "Erro ao adicionar ao carrinho",
     "addToCart": "Adicionar ao carrinho",
     "yourPrice": "O seu preço",
-    "pvpDiscount": "PVP {pvp} · −{descuento} %"
+    "pvpDiscount": "PVP {pvp} · −{descuento} %",
+    "inCart": "{cantidad} no carrinho",
+    "unitsOf": "Unidades de {producto}",
+    "add": "Adicionar",
+    "addedToCartQty": "{cantidad, plural, one {} other {# × }}{producto} adicionado ao carrinho",
+    "less": "Menos uma",
+    "more": "Mais uma",
+    "searchPlaceholder": "Pesquisar por nome, SKU ou cor",
+    "clearSearch": "Limpar pesquisa",
+    "showingOf": "{visibles} de {total} modelos",
+    "modelCount": "{total, plural, one {# modelo} other {# modelos}}",
+    "noResults": "Nenhum produto corresponde a «{busqueda}».",
+    "quantityHugeConfirm": "Tem a certeza de que quer {cantidad} unidades deste produto?"
   },
   "catalogoDetalle": {
     "loading": "A carregar produto…",
@@ -190,7 +203,8 @@
     "addError": "Erro ao adicionar ao carrinho",
     "addToCart": "Adicionar ao carrinho",
     "documentation": "Documentação técnica",
-    "specifications": "Especificações técnicas"
+    "specifications": "Especificações técnicas",
+    "goToCart": "Ver carrinho"
   },
   "carrito": {
     "title": "O seu carrinho",
@@ -209,7 +223,14 @@
     "quantityOf": "Quantidade de {producto}",
     "unavailable": "Este produto já não está disponível.",
     "unavailableBlock": "Remova do carrinho os produtos que já não estão disponíveis para continuar.",
-    "quantityHugeConfirm": "Tem a certeza de que quer {cantidad} unidades deste produto?"
+    "quantityHugeConfirm": "Tem a certeza de que quer {cantidad} unidades deste produto?",
+    "less": "Menos uma unidade de {producto}",
+    "more": "Mais uma unidade de {producto}",
+    "summaryCount": "{lineas, plural, one {# produto} other {# produtos}} · {articulos, plural, one {# unidade} other {# unidades}}",
+    "emptyHint": "Adicione produtos a partir do catálogo e aparecerão aqui.",
+    "unit": "un.",
+    "totalHint": "Preços líquidos com o seu desconto. Sem pagamento online: faturado contra a sua ordem de compra.",
+    "keepShopping": "Continuar a comprar"
   },
   "checkout": {
     "loading": "A carregar…",
@@ -226,7 +247,10 @@
     "totalLabel": "Total: {total}",
     "confirmError": "Erro ao confirmar a encomenda",
     "pricesChanged": "Os preços do seu carrinho mudaram. Atualizámos o resumo: verifique o novo total e confirme novamente.",
-    "requiredFields": "Indique a morada de envio e o PO Number para confirmar a encomenda."
+    "requiredFields": "Indique a morada de envio e o PO Number para confirmar a encomenda.",
+    "backToCart": "Voltar ao carrinho",
+    "totalNet": "Total líquido",
+    "confirmWithTotal": "Confirmar encomenda · {total}"
   },
   "pedidos": {
     "title": "As minhas encomendas",
@@ -505,7 +529,8 @@
     "promote": "Promover a Parceiro",
     "demote": "Passar a Distribuidor",
     "volumeLine": "{unidades, plural, one {# unidade} other {# unidades}} em {pedidos, plural, one {# encomenda} other {# encomendas}}",
-    "promoteHint": "Este distribuidor já comprou {unidades} unidades (limite: {umbral}). É altura de o promover a Parceiro?"
+    "promoteHint": "Este distribuidor já comprou {unidades} unidades (limite: {umbral}). É altura de o promover a Parceiro?",
+    "unsavedLeave": "A ficha tem alterações por guardar. Sair sem as guardar?"
   },
   "adminPedidos": {
     "title": "Processamento de encomendas",
@@ -1044,5 +1069,10 @@
     "cookies": "Cookies",
     "condiciones": "Condições de utilização",
     "soloEspanol": "Os textos legais estão disponíveis em espanhol, que é a versão que prevalece."
+  },
+  "pasosCompra": {
+    "label": "Passos da encomenda",
+    "cart": "Carrinho",
+    "confirm": "Entrega e confirmação"
   }
 }

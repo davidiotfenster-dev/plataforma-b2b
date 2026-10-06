@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
-import { Navbar } from "@/components/navbar";
+import { NavegacionMovil, Navbar } from "@/components/navbar";
 import { ControlAcceso } from "@/components/control-acceso";
 import { Marca } from "@/components/marca";
 import { AyudaBurbuja } from "@/components/ayuda/ayuda-burbuja";
@@ -56,6 +56,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <span>© {new Date().getFullYear()} IoT FENSTER</span>
               </div>
             </footer>
+            <NavegacionMovil />
             <AyudaBurbuja />
           </Providers>
         </NextIntlClientProvider>

@@ -43,7 +43,8 @@
     "marcas": "Marchi",
     "signedInAs": "Accesso come",
     "roleAdmin": "Amministratore FENSTER",
-    "roleComercial": "Commerciale FENSTER"
+    "roleComercial": "Commerciale FENSTER",
+    "menu": "Menu principale"
   },
   "home": {
     "title": "Portale Partner IoT FENSTER",
@@ -179,7 +180,19 @@
     "addError": "Errore durante l'aggiunta al carrello",
     "addToCart": "Aggiungi al carrello",
     "yourPrice": "Il tuo prezzo",
-    "pvpDiscount": "Prezzo di listino {pvp} · −{descuento} %"
+    "pvpDiscount": "Prezzo di listino {pvp} · −{descuento} %",
+    "inCart": "{cantidad} nel carrello",
+    "unitsOf": "Unità di {producto}",
+    "add": "Aggiungi",
+    "addedToCartQty": "{cantidad, plural, one {} other {# × }}{producto} aggiunto al carrello",
+    "less": "Una in meno",
+    "more": "Una in più",
+    "searchPlaceholder": "Cerca per nome, SKU o colore",
+    "clearSearch": "Cancella ricerca",
+    "showingOf": "{visibles} di {total} modelli",
+    "modelCount": "{total, plural, one {# modello} other {# modelli}}",
+    "noResults": "Nessun prodotto corrisponde a «{busqueda}».",
+    "quantityHugeConfirm": "Sei sicuro di volere {cantidad} unità di questo prodotto?"
   },
   "catalogoDetalle": {
     "loading": "Caricamento prodotto…",
@@ -190,7 +203,8 @@
     "addError": "Errore durante l'aggiunta al carrello",
     "addToCart": "Aggiungi al carrello",
     "documentation": "Documentazione tecnica",
-    "specifications": "Specifiche tecniche"
+    "specifications": "Specifiche tecniche",
+    "goToCart": "Vai al carrello"
   },
   "carrito": {
     "title": "Il tuo carrello",
@@ -209,7 +223,14 @@
     "quantityOf": "Quantità di {producto}",
     "unavailable": "Questo prodotto non è più disponibile.",
     "unavailableBlock": "Rimuovi dal carrello i prodotti non più disponibili per continuare.",
-    "quantityHugeConfirm": "Sei sicuro di volere {cantidad} unità di questo prodotto?"
+    "quantityHugeConfirm": "Sei sicuro di volere {cantidad} unità di questo prodotto?",
+    "less": "Una unità in meno di {producto}",
+    "more": "Una unità in più di {producto}",
+    "summaryCount": "{lineas, plural, one {# prodotto} other {# prodotti}} · {articulos, plural, one {# unità} other {# unità}}",
+    "emptyHint": "Aggiungi prodotti dal catalogo e appariranno qui.",
+    "unit": "pz.",
+    "totalHint": "Prezzi netti con il tuo sconto. Nessun pagamento online: si fattura contro il tuo ordine di acquisto.",
+    "keepShopping": "Continua gli acquisti"
   },
   "checkout": {
     "loading": "Caricamento…",
@@ -226,7 +247,10 @@
     "totalLabel": "Totale: {total}",
     "confirmError": "Errore durante la conferma dell'ordine",
     "pricesChanged": "I prezzi del tuo carrello sono cambiati. Abbiamo aggiornato il riepilogo: controlla il nuovo totale e conferma di nuovo.",
-    "requiredFields": "Inserisci l'indirizzo di spedizione e il PO Number per confermare l'ordine."
+    "requiredFields": "Inserisci l'indirizzo di spedizione e il PO Number per confermare l'ordine.",
+    "backToCart": "Torna al carrello",
+    "totalNet": "Totale netto",
+    "confirmWithTotal": "Conferma ordine · {total}"
   },
   "pedidos": {
     "title": "I miei ordini",
@@ -505,7 +529,8 @@
     "promote": "Promuovi a Partner",
     "demote": "Rendi Distributore",
     "volumeLine": "{unidades, plural, one {# unità} other {# unità}} in {pedidos, plural, one {# ordine} other {# ordini}}",
-    "promoteHint": "Questo distributore ha già acquistato {unidades} unità (soglia: {umbral}). È il momento di promuoverlo a Partner?"
+    "promoteHint": "Questo distributore ha già acquistato {unidades} unità (soglia: {umbral}). È il momento di promuoverlo a Partner?",
+    "unsavedLeave": "La scheda ha modifiche non salvate. Uscire senza salvarle?"
   },
   "adminPedidos": {
     "title": "Evasione ordini",
@@ -1044,5 +1069,10 @@
     "cookies": "Cookie",
     "condiciones": "Condizioni d'uso",
     "soloEspanol": "I testi legali sono disponibili in spagnolo, che è la versione che prevale."
+  },
+  "pasosCompra": {
+    "label": "Passaggi dell’ordine",
+    "cart": "Carrello",
+    "confirm": "Consegna e conferma"
   }
 }
