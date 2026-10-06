@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,7 +8,11 @@ import { useTranslations } from "next-intl";
 import { Check, Copy, Wand2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { Campo, CampoTexto, Seccion } from "@/components/campo";
-import type { CrearPartnerInput, Partner } from "@/lib/types";
+import { AyudaPuntual } from "@/components/ayuda/ayuda-puntual";
+import { useMe } from "@/hooks/use-me";
+import { useAvisoSinGuardar } from "@/hooks/use-aviso-sin-guardar";
+import { MARCA_INFO, MARCAS_CATALOGO, TIPOS_EMPRESA } from "@/lib/marcas";
+import type { CrearPartnerInput, MarcaCatalogo, Partner, TipoEmpresa } from "@/lib/types";
 
 type Valores = Record<string, string>;
 
@@ -95,6 +99,8 @@ const CAMPOS_OPCIONALES_TEXTO = [
 function valoresIniciales(partner?: Partner): Valores {
   const texto = (v: string | null | undefined) => v ?? "";
   return {
+    tipo: partner?.tipo ?? "DISTRIBUIDOR",
+    marcaCatalogo: partner?.marcaCatalogo ?? "MYSMARTWINDOW",
     razonSocial: partner?.razonSocial ?? "",
     cif: partner?.cif ?? "",
     direccionFiscal: partner?.direccionFiscal ?? "",
@@ -138,17 +144,30 @@ function generarPassword(): string {
 /// campos, con su etiqueta, agrupados por temas.
 export function PartnerForm({ partner }: { partner?: Partner }) {
   const t = useTranslations("adminPartners");
+  const tAyuda = useTranslations("ayuda");
   const router = useRouter();
   const queryClient = useQueryClient();
   const modoAlta = !partner;
+  // Solo un admin elige el tipo, y solo al dar de alta. Después, distribuidor <-> partner se cambia
+  // con "Promocionar" / "Pasar a Distribuidor" en la ficha (queda auditado); un comercial siempre da de alta distribuidores.
+  const { data: perfil } = useMe();
+  const puedeElegirTipo = modoAlta && perfil?.rol === "ADMIN_FENSTER";
   const inicial = useMemo(() => valoresIniciales(partner), [partner]);
   const [valores, setValores] = useState<Valores>(inicial);
   const [error, setError] = useState<string | null>(null);
   const [guardado, setGuardado] = useState(false);
   const [copiada, setCopiada] = useState(false);
+  // Versión de la ficha con la que se abrió el formulario (bloqueo optimista). Solo se renueva
+  // al guardar uno mismo: si siguiera a cada relectura, los cambios de otra persona que llegan
+  // mientras se edita pasarían por propios y se pisarían sin aviso.
+  const versionFicha = useRef(partner?.updatedAt);
 
   const cambiado = JSON.stringify(valores) !== JSON.stringify(inicial);
   const secciones = SECCIONES.filter((s) => modoAlta || !s.soloAlta);
+
+  // Salir de la ficha con datos sin guardar (cerrar la pestaña o pulsar un enlace) pide confirmación.
+  const sinGuardar = cambiado && !guardado;
+  useAvisoSinGuardar(sinGuardar, t("unsavedLeave"));
 
   function cambiar(nombre: string, valor: string) {
     setGuardado(false);
@@ -167,6 +186,8 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
 
       if (modoAlta) {
         const carga: CrearPartnerInput = {
+          ...(puedeElegirTipo && { tipo: valores.tipo as TipoEmpresa }),
+          marcaCatalogo: valores.marcaCatalogo as MarcaCatalogo,
           razonSocial: texto("razonSocial"),
           cif: texto("cif"),
           direccionFiscal: texto("direccionFiscal"),
@@ -185,14 +206,19 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
       }
 
       const carga: Record<string, unknown> = {
+        marcaCatalogo: valores.marcaCatalogo,
         razonSocial: texto("razonSocial"),
-        cif: texto("cif"),
         direccionFiscal: texto("direccionFiscal"),
         pais: texto("pais"),
-        dominioWeb: texto("dominioWeb"),
         descuentoPorcentaje: Number(valores.descuentoPorcentaje || 0),
         iva: numero("iva"),
+        // La versión de la ficha que se está editando: si otra persona la guarda antes, no se pisa.
+        actualizadoEn: versionFicha.current,
       };
+      // CIF y dominio se validan al cambiarlos: una ficha antigua con un dato que hoy
+      // no pasaría la validación sigue pudiéndose editar sin tocar esos campos.
+      if (texto("cif") !== partner!.cif) carga.cif = texto("cif");
+      if (texto("dominioWeb") !== partner!.dominioWeb) carga.dominioWeb = texto("dominioWeb");
       // Vaciar un campo opcional lo borra (null), salvo marca y tarifa, que no admiten borrarse.
       for (const campo of CAMPOS_OPCIONALES_TEXTO) {
         carga[campo] = texto(campo) === "" ? (campo === "marcaComercial" || campo === "tarifa" ? undefined : null) : texto(campo);
@@ -208,6 +234,7 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         queryClient.invalidateQueries({ queryKey: ["admin-partner", partner!.id] });
         // Se muestra lo que el servidor ha guardado (ya recortado y normalizado), sin dejar el botón activo.
         setValores(valoresIniciales(resultado));
+        versionFicha.current = resultado.updatedAt;
         setGuardado(true);
       }
     },
@@ -242,6 +269,49 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
               onChange={(e) => cambiar(campo.nombre, e.target.value)}
             />
           ))}
+
+          {seccion.clave === "comercial" && (
+            <>
+              {puedeElegirTipo && (
+                <div className="sm:col-span-3">
+                  <label htmlFor="tipo-empresa" className="mb-1 flex items-center gap-1 text-sm font-medium text-neutral-700">
+                    {t("fields.tipo")}
+                    <AyudaPuntual texto={tAyuda("puntual.tipoEmpresa")} />
+                  </label>
+                  <select
+                    id="tipo-empresa"
+                    value={valores.tipo}
+                    onChange={(e) => cambiar("tipo", e.target.value)}
+                    className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+                  >
+                    {TIPOS_EMPRESA.map((tipo) => (
+                      <option key={tipo} value={tipo}>
+                        {t(tipo === "PARTNER" ? "typePartnerLong" : "typeDistribuidorLong")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="sm:col-span-3">
+                <label htmlFor="marca-catalogo" className="mb-1 block text-sm font-medium text-neutral-700">
+                  {t("fields.marcaCatalogo")}
+                </label>
+                <select
+                  id="marca-catalogo"
+                  value={valores.marcaCatalogo}
+                  onChange={(e) => cambiar("marcaCatalogo", e.target.value)}
+                  className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+                >
+                  {MARCAS_CATALOGO.map((m) => (
+                    <option key={m} value={m}>
+                      {MARCA_INFO[m].etiqueta} · {MARCA_INFO[m].submarca}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-neutral-500">{t("hints.marcaCatalogo")}</p>
+              </div>
+            </>
+          )}
 
           {seccion.clave === "primerUsuario" && (
             <div className="sm:col-span-6">
@@ -291,7 +361,8 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         />
       </Seccion>
 
-      <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
+      {/* A la derecha se reserva sitio para el botón de ayuda flotante, que si no tapa los botones. */}
+      <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white/95 py-3 pl-4 pr-16 shadow-sm backdrop-blur xl:pr-4">
         <div className="min-h-5 text-sm" aria-live="polite">
           {error && <span role="alert" className="text-red-600">{error}</span>}
           {!error && guardado && (

@@ -1,11 +1,18 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MinLength, MaxLength } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
 import {
   CODIGO_POSTAL_MENSAJE,
   CODIGO_POSTAL_REGEX,
+  CIF_MENSAJE,
+  CIF_REGEX,
+  NormalizarCif,
+  DominioCorporativo,
   DOMINIO_MENSAJE,
   DOMINIO_REGEX,
   TELEFONO_MENSAJE,
   TELEFONO_REGEX,
+  MARCAS_CATALOGO,
+  TIPOS_EMPRESA,
 } from './validadores-ficha-cliente.js';
 
 /// Alta directa de un partner por el Admin o un Comercial (no pasa por
@@ -14,23 +21,29 @@ import {
 export class CrearPartnerDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   razonSocial!: string;
 
+  @NormalizarCif()
   @IsString()
   @IsNotEmpty()
+  @Matches(CIF_REGEX, { message: CIF_MENSAJE })
   cif!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   direccionFiscal!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   pais!: string;
 
   @IsString()
   @IsNotEmpty()
   @Matches(DOMINIO_REGEX, { message: DOMINIO_MENSAJE })
+  @DominioCorporativo()
   dominioWeb!: string;
 
   @IsOptional()
@@ -42,6 +55,16 @@ export class CrearPartnerDto {
   @IsString()
   @IsNotEmpty()
   marcaComercial?: string;
+
+  /// Partner (submarca propia) o distribuidor.
+  @IsOptional()
+  @IsIn(TIPOS_EMPRESA)
+  tipo?: (typeof TIPOS_EMPRESA)[number];
+
+  /// Marca cuyos dispositivos ve la empresa.
+  @IsOptional()
+  @IsIn(MARCAS_CATALOGO)
+  marcaCatalogo?: (typeof MARCAS_CATALOGO)[number];
 
   @IsOptional()
   @IsString()

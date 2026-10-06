@@ -11,6 +11,8 @@ import { ActualizarPartnerDto } from './dto/actualizar-partner.dto.js';
 import { AsignarProductosDto } from './dto/asignar-productos.dto.js';
 import { ActualizarRepresentacionDto } from './dto/actualizar-representacion.dto.js';
 import { ListarPartnersQueryDto } from './dto/listar-partners-query.dto.js';
+import { EliminarPartnerDto } from './dto/eliminar-partner.dto.js';
+import { CrearUsuarioDto } from './dto/crear-usuario.dto.js';
 
 @Controller('partners')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,7 +34,7 @@ export class PartnersController {
   @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
   @HttpCode(HttpStatus.CREATED)
   async crear(@CurrentUser() usuario: UsuarioAutenticado, @Body() dto: CrearPartnerDto) {
-    return this.partnersService.crear(dto, usuario.userId);
+    return this.partnersService.crear(dto, usuario.userId, usuario.rol);
   }
 
   @Get()
@@ -78,12 +80,57 @@ export class PartnersController {
     return this.partnersService.reactivar(id, this.restriccion(usuario));
   }
 
+  /// Distribuidor -> Partner y vuelta atrás: solo ADMIN_FENSTER (el rol por defecto del
+  /// controlador). Un comercial da de alta distribuidores, pero ser partner lo decide la empresa.
+  @Post(':id/promocionar')
+  @HttpCode(HttpStatus.OK)
+  async promocionar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.promocionar(id, usuario.userId);
+  }
+
+  @Post(':id/degradar')
+  @HttpCode(HttpStatus.OK)
+  async degradar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.degradar(id, usuario.userId);
+  }
+
+  @Post(':id/archivar')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  @HttpCode(HttpStatus.OK)
+  async archivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.archivar(id, usuario.userId, this.restriccion(usuario));
+  }
+
+  @Post(':id/desarchivar')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  @HttpCode(HttpStatus.OK)
+  async desarchivar(@CurrentUser() usuario: UsuarioAutenticado, @Param('id', ParseUUIDPipe) id: string) {
+    return this.partnersService.desarchivar(id, usuario.userId, this.restriccion(usuario));
+  }
+
+  /// Borrado definitivo: solo ADMIN_FENSTER (el rol por defecto del controlador) y solo sin pedidos.
+  @Delete(':id')
+  async eliminar(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: EliminarPartnerDto,
+  ) {
+    return this.partnersService.eliminar(id, dto, usuario.userId);
+  }
+
   /// Gestión de usuarios (activar/desactivar, forzar logout, reset de
   /// contraseña, auditoría) queda solo para ADMIN_FENSTER: son acciones
   /// sensibles de cuenta, fuera del alcance pedido para COMERCIAL.
   @Get(':id/usuarios')
   async usuarios(@Param('id', ParseUUIDPipe) id: string) {
     return this.usuariosService.listarPorPartner(id);
+  }
+
+  /// Alta de un usuario más en la empresa; recibe un correo para crear su contraseña.
+  @Post(':id/usuarios')
+  @HttpCode(HttpStatus.CREATED)
+  async crearUsuario(@Param('id', ParseUUIDPipe) id: string, @Body() dto: CrearUsuarioDto) {
+    return this.usuariosService.crear(id, dto);
   }
 
   @Get(':id/catalogo')
@@ -100,6 +147,15 @@ export class PartnersController {
     @Body() dto: AsignarProductosDto,
   ) {
     return this.partnersService.asignarProductos(id, dto, this.restriccion(usuario));
+  }
+
+  @Delete(':id/catalogo')
+  @Roles(RolUsuario.ADMIN_FENSTER, RolUsuario.COMERCIAL)
+  async eliminarTodasLasRepresentaciones(
+    @CurrentUser() usuario: UsuarioAutenticado,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.partnersService.eliminarTodasLasRepresentaciones(id, this.restriccion(usuario));
   }
 
   @Patch(':id/catalogo/:repId')

@@ -11,25 +11,30 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Modal } from "@/components/modal";
 import type { Partner } from "@/lib/types";
 
-type TipoAccion = "rechazar" | "suspender" | "reactivar";
+type TipoAccion = "rechazar" | "suspender" | "reactivar" | "archivar" | "desarchivar" | "promocionar" | "degradar";
 
 const RUTA_ACCION: Record<TipoAccion, (id: string) => string> = {
+  promocionar: (id) => `/partners/${id}/promocionar`,
+  degradar: (id) => `/partners/${id}/degradar`,
   rechazar: (id) => `/auth/partners/${id}/rechazar`,
   suspender: (id) => `/partners/${id}/suspender`,
   reactivar: (id) => `/partners/${id}/reactivar`,
+  archivar: (id) => `/partners/${id}/archivar`,
+  desarchivar: (id) => `/partners/${id}/desarchivar`,
 };
 
 /// Todo lo que se puede hacer con el estado de un partner (aprobar, rechazar,
-/// suspender, reactivar), con sus ventanas de confirmación. Lo usan a la vez el
+/// suspender, reactivar, archivar, eliminar), con sus ventanas de confirmación. Lo usan a la vez el
 /// listado y la ficha, así que se comportan igual en los dos sitios.
 ///
 /// Devuelve funciones para abrir cada acción y `dialogos`, que hay que pintar
 /// una vez en la pantalla.
-export function usePartnerAcciones(onHecho?: (mensaje: string) => void) {
+export function usePartnerAcciones(onHecho?: (mensaje: string) => void, onEliminada?: () => void) {
   const t = useTranslations("adminPartners");
   const queryClient = useQueryClient();
   const [aprobando, setAprobando] = useState<Partner | null>(null);
   const [confirmando, setConfirmando] = useState<{ tipo: TipoAccion; partner: Partner } | null>(null);
+  const [eliminando, setEliminando] = useState<Partner | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   function refrescar(partnerId: string) {
@@ -67,11 +72,26 @@ export function usePartnerAcciones(onHecho?: (mensaje: string) => void) {
           titulo={t(`confirm.${confirmando.tipo}.title`, { partner: confirmando.partner.razonSocial })}
           descripcion={t(`confirm.${confirmando.tipo}.body`)}
           confirmar={t(`confirm.${confirmando.tipo}.button`)}
-          peligro={confirmando.tipo !== "reactivar"}
+          peligro={confirmando.tipo === "rechazar" || confirmando.tipo === "suspender"}
           cargando={accion.isPending}
           error={error}
           onConfirmar={() => accion.mutate(confirmando)}
           onCancelar={() => setConfirmando(null)}
+        />
+      )}
+      {eliminando && (
+        <EliminarDialog
+          partner={eliminando}
+          onCerrar={() => setEliminando(null)}
+          onEliminada={() => {
+            const eliminada = eliminando;
+            setEliminando(null);
+            queryClient.invalidateQueries({ queryKey: ["admin-partners"] });
+            queryClient.invalidateQueries({ queryKey: ["admin-partners-resumen"] });
+            queryClient.removeQueries({ queryKey: ["admin-partner", eliminada.id] });
+            onHecho?.(t("done.eliminar", { partner: eliminada.razonSocial }));
+            onEliminada?.();
+          }}
         />
       )}
     </>
@@ -82,8 +102,67 @@ export function usePartnerAcciones(onHecho?: (mensaje: string) => void) {
     pedirRechazar: (partner: Partner) => pedirConfirmacion("rechazar", partner),
     pedirSuspender: (partner: Partner) => pedirConfirmacion("suspender", partner),
     pedirReactivar: (partner: Partner) => pedirConfirmacion("reactivar", partner),
+    pedirArchivar: (partner: Partner) => pedirConfirmacion("archivar", partner),
+    pedirDesarchivar: (partner: Partner) => pedirConfirmacion("desarchivar", partner),
+    pedirPromocionar: (partner: Partner) => pedirConfirmacion("promocionar", partner),
+    pedirDegradar: (partner: Partner) => pedirConfirmacion("degradar", partner),
+    pedirEliminar: (partner: Partner) => setEliminando(partner),
     dialogos,
   };
+}
+
+/// Borrado definitivo: hay que escribir la razón social tal cual. El servidor lo
+/// vuelve a comprobar y solo lo permite si la empresa no tiene pedidos.
+function EliminarDialog({ partner, onCerrar, onEliminada }: { partner: Partner; onCerrar: () => void; onEliminada: () => void }) {
+  const t = useTranslations("adminPartners");
+  const [escrito, setEscrito] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const eliminar = useMutation({
+    mutationFn: () => api.delete(`/partners/${partner.id}`, { confirmarRazonSocial: escrito.trim() }),
+    onSuccess: onEliminada,
+    onError: (err) => setError(err instanceof ApiError ? err.message : t("genericError")),
+  });
+
+  const coincide = escrito.trim() === partner.razonSocial;
+
+  return (
+    <Modal titulo={t("deleteTitle", { partner: partner.razonSocial })} onCerrar={onCerrar} bloqueada={eliminar.isPending}>
+      <p className="text-sm text-neutral-600">{t("deleteBody", { usuarios: partner._count?.usuarios ?? 0 })}</p>
+      <div className="mt-4">
+        <Campo
+          etiqueta={t("deleteConfirmLabel", { partner: partner.razonSocial })}
+          value={escrito}
+          onChange={(e) => setEscrito(e.target.value)}
+          autoComplete="off"
+        />
+      </div>
+      {error && (
+        <p role="alert" className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      <div className="mt-5 flex justify-end gap-2">
+        <button
+          onClick={onCerrar}
+          disabled={eliminar.isPending}
+          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+        >
+          {t("cancel")}
+        </button>
+        <button
+          onClick={() => {
+            setError(null);
+            eliminar.mutate();
+          }}
+          disabled={!coincide || eliminar.isPending}
+          className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+        >
+          {eliminar.isPending ? t("working") : t("deleteButton")}
+        </button>
+      </div>
+    </Modal>
+  );
 }
 
 /// Aprobar un partner = fijar sus condiciones comerciales. Al terminar propone

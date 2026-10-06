@@ -1,19 +1,20 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Info, Loader2, Lock, Mail } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { Perfil } from "@/lib/types";
+import { destinoTrasLogin } from "@/lib/acceso";
 import { localeCookieName } from "@/i18n/locales";
 
 const CAMPO =
   "h-11 w-full rounded-lg border border-neutral-300 bg-white pl-10 pr-3 text-sm text-neutral-900 placeholder:text-neutral-400 transition focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-600/15";
 
-export default function LoginPage() {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verPassword, setVerPassword] = useState(false);
@@ -23,6 +24,11 @@ export default function LoginPage() {
   const queryClient = useQueryClient();
   const t = useTranslations("login");
   const tCommon = useTranslations("common");
+  /// Llegada desde una página protegida: `next` es la página a la que volver y
+  /// `motivo=caducada` indica que la sesión terminó mientras se usaba el portal.
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+  const aviso = searchParams.get("motivo") === "caducada" ? t("sessionExpired") : next ? t("loginToContinue") : null;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -38,12 +44,16 @@ export default function LoginPage() {
       /// usuario (útil si inicia sesión desde un navegador/dispositivo nuevo
       /// sin la cookie de idioma ya puesta).
       document.cookie = `${localeCookieName}=${perfil.idioma.toLowerCase()}; path=/; max-age=31536000; SameSite=Lax`;
-      const destino =
-        perfil.rol === "ADMIN_FENSTER" ? "/admin/pedidos" : perfil.rol === "COMERCIAL" ? "/admin/partners" : "/catalogo";
-      router.push(destino);
+      router.push(destinoTrasLogin(next, perfil.rol));
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : tCommon("unexpectedError"));
+      setError(
+        err instanceof ApiError
+          ? err.code && t.has(`errors.${err.code}`)
+            ? t(`errors.${err.code}`)
+            : err.message
+          : tCommon("unexpectedError"),
+      );
     } finally {
       setCargando(false);
     }
@@ -56,6 +66,13 @@ export default function LoginPage() {
         <div className="px-6 pb-8 pt-7 sm:px-8">
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{t("title")}</h1>
           <p className="mt-1.5 text-sm text-neutral-500">{t("subtitle")}</p>
+
+          {aviso && (
+            <div role="status" className="mt-5 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+              <Info className="mt-0.5 size-4 shrink-0" />
+              <span>{aviso}</span>
+            </div>
+          )}
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div>
@@ -134,5 +151,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  const tCommon = useTranslations("common");
+  return (
+    <Suspense fallback={<p className="text-neutral-500">{tCommon("loading")}</p>}>
+      <Login />
+    </Suspense>
   );
 }

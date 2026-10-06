@@ -1,38 +1,56 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import { IsEmail, IsISO8601, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min, MaxLength } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
 import {
   CODIGO_POSTAL_MENSAJE,
   CODIGO_POSTAL_REGEX,
+  CIF_MENSAJE,
+  CIF_REGEX,
+  NormalizarCif,
+  DominioCorporativo,
   DOMINIO_MENSAJE,
   DOMINIO_REGEX,
   TELEFONO_MENSAJE,
   TELEFONO_REGEX,
+  MARCAS_CATALOGO,
 } from './validadores-ficha-cliente.js';
 
 export class ActualizarPartnerDto {
+  /// `updatedAt` de la ficha tal como la tenía quien edita (bloqueo optimista): si otra
+  /// persona la ha guardado desde entonces, el cambio se rechaza en vez de pisarla.
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  razonSocial?: string;
+  @IsISO8601()
+  actualizadoEn?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
+  razonSocial?: string;
+
+  @IsOptional()
+  @NormalizarCif()
+  @IsString()
+  @IsNotEmpty()
+  @Matches(CIF_REGEX, { message: CIF_MENSAJE })
   cif?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   direccionFiscal?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   pais?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @Matches(DOMINIO_REGEX, { message: DOMINIO_MENSAJE })
+  @DominioCorporativo()
   dominioWeb?: string;
 
   /// Código de cliente del ERP interno (ver "FICHA CLIENTE"). `null`
@@ -46,6 +64,15 @@ export class ActualizarPartnerDto {
   @IsString()
   @IsNotEmpty()
   marcaComercial?: string;
+
+  /// Ojo: `tipo` (Partner/Distribuidor) NO se edita aquí. Solo un admin puede cambiarlo,
+  /// y lo hace con `promocionar` / `degradar` para que quede en la auditoría.
+  /// Al no estar en este DTO, enviarlo da 400 (forbidNonWhitelisted).
+
+  /// Marca cuyos dispositivos ve la empresa.
+  @IsOptional()
+  @IsIn(MARCAS_CATALOGO)
+  marcaCatalogo?: (typeof MARCAS_CATALOGO)[number];
 
   @IsOptional()
   @IsString()

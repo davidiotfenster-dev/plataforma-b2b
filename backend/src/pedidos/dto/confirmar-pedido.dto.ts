@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { Recortar } from '../../common/dto/recortar.js';
 
 export class ConfirmarPedidoDto {
+  @Recortar()
   @IsString()
   @IsNotEmpty()
   @MaxLength(500)
@@ -8,11 +10,13 @@ export class ConfirmarPedidoDto {
 
   /// PO Number del cliente: es la orden de compra diferida que sustituye
   /// al pago online (ver CLAUDE.md — sin pasarela de pago).
+  @Recortar()
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   poNumber!: string;
 
+  @Recortar()
   @IsOptional()
   @IsString()
   @MaxLength(2000)

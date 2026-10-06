@@ -38,6 +38,13 @@ export class CarritoController {
     return this.carritoService.agregarItem(partnerId, userId, dto.representacionPartnerId, dto.cantidad);
   }
 
+  /// Vuelve a meter en el carrito las líneas de un pedido propio ("repetir pedido").
+  @Post('repetir/:pedidoId')
+  async repetir(@CurrentUser() usuario: UsuarioAutenticado, @Param('pedidoId', ParseUUIDPipe) pedidoId: string) {
+    const [partnerId, userId] = this.identificarComprador(usuario);
+    return this.carritoService.repetirPedido(partnerId, userId, pedidoId);
+  }
+
   @Patch('items/:id')
   async actualizar(
     @CurrentUser() usuario: UsuarioAutenticado,

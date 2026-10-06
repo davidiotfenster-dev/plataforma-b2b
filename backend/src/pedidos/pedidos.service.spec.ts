@@ -6,6 +6,7 @@ import type { PrismaService } from '../prisma/prisma.service.js';
 import type { RedisService } from '../common/redis/redis.service.js';
 import type { PedidoPdfService } from '../common/pdf/pedido-pdf.service.js';
 import type { EmailService } from '../common/email/email.service.js';
+import type { ConfigService } from '@nestjs/config';
 
 /// Cobertura del cálculo de precio/descuento en `confirmar()`: es la parte
 /// del sistema con más riesgo económico (congela precios en `OrderItem`) y
@@ -17,10 +18,12 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
   let prisma: {
     $transaction: ReturnType<typeof vi.fn>;
     partner: { findUniqueOrThrow: ReturnType<typeof vi.fn> };
+    user: { findMany: ReturnType<typeof vi.fn> };
   };
   let tx: {
     cart: { findUnique: ReturnType<typeof vi.fn> };
     partner: { findUniqueOrThrow: ReturnType<typeof vi.fn> };
+    $executeRaw: ReturnType<typeof vi.fn>;
     $queryRaw: ReturnType<typeof vi.fn>;
     order: { create: ReturnType<typeof vi.fn> };
     cartItem: { deleteMany: ReturnType<typeof vi.fn> };
@@ -52,7 +55,8 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
     tx = {
       cart: { findUnique: vi.fn() },
       partner: { findUniqueOrThrow: vi.fn() },
-      $queryRaw: vi.fn().mockResolvedValue([{ nextval: 1n }]),
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      $queryRaw: vi.fn().mockResolvedValue([{ ultimo: 6 }]),
       order: {
         create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
           const items = (data.items as { createMany: { data: Record<string, unknown>[] } }).createMany.data;
@@ -75,13 +79,16 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
     prisma = {
       $transaction: vi.fn(async (callback: (tx: unknown) => unknown) => callback(tx)),
       partner: { findUniqueOrThrow: tx.partner.findUniqueOrThrow },
+      user: { findMany: vi.fn().mockResolvedValue([{ email: 'admin@iotfenster.com' }]) },
     };
 
     redis = { del: vi.fn().mockResolvedValue(undefined) } as unknown as RedisService;
     pdfService = { generar: vi.fn().mockResolvedValue(Buffer.from('pdf')) } as unknown as PedidoPdfService;
     emailService = { enviar: vi.fn().mockResolvedValue(undefined) } as unknown as EmailService;
 
-    service = new PedidosService(prisma as unknown as PrismaService, redis, pdfService, emailService);
+    service = new PedidosService(prisma as unknown as PrismaService, redis, pdfService, emailService, {
+      get: () => 'https://b2b.iotfenster.com',
+    } as unknown as ConfigService);
   });
 
   it('aplica el descuento general del partner cuando el producto no tiene descuento propio', async () => {
@@ -236,6 +243,31 @@ describe('PedidosService.confirmar — cálculo de precio y descuento', () => {
       await expect(
         service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never),
       ).resolves.toBeDefined();
+    });
+  });
+
+  describe('avisos por correo al confirmar', () => {
+    beforeEach(() => {
+      tx.cart.findUnique.mockResolvedValue(cartConLinea(2, representacion({ pvpBase: 100, descuentoOverride: null })));
+      tx.partner.findUniqueOrThrow.mockResolvedValue({ id: PARTNER_ID, razonSocial: 'Ventanas <Norte>', descuentoPorcentaje: new Prisma.Decimal(10) });
+    });
+
+    it('avisa al cliente y a cada administrador de IoT FENSTER, con el PDF y el enlace al pedido', async () => {
+      await service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-77' } as never);
+
+      const envios = vi.mocked(emailService.enviar).mock.calls;
+      expect(envios.map((e) => e[0])).toEqual(['partner@test.com', 'admin@iotfenster.com']);
+      const [, asunto, cuerpo, adjuntos] = envios[1];
+      expect(asunto).toMatch(/^Nuevo pedido PED-.*: Ventanas <Norte>$/);
+      expect(cuerpo).toContain('Ventanas &lt;Norte&gt;');
+      expect(cuerpo).toContain('PO-77');
+      expect(cuerpo).toContain('https://b2b.iotfenster.com/admin/pedidos/order-1');
+      expect(adjuntos?.[0].filename).toMatch(/\.pdf$/);
+    });
+
+    it('si falla el aviso interno, el pedido queda confirmado igual', async () => {
+      prisma.user.findMany.mockRejectedValue(new Error('BD caída'));
+      await expect(service.confirmar(PARTNER_ID, USER_ID, { direccionEnvio: 'Calle 1', poNumber: 'PO-1' } as never)).resolves.toBeDefined();
     });
   });
 });

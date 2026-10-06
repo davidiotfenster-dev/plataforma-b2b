@@ -4,34 +4,115 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { ChevronDown, ChevronRight, Plus, Search, Users, X } from "lucide-react";
-import { api, ApiError } from "@/lib/api";
+import { Boxes, ChevronDown, ChevronRight, ImageIcon, Plus, Search, Tags, Upload, Users, X } from "lucide-react";
+import { api, ApiError, urlImagen } from "@/lib/api";
 import {
   agruparPorModelo,
   especificacionesVisibles,
+  FAMILIAS_DE_MARCA,
+  nombreEnMarca,
+  productosPorMarca,
+  SIN_MARCA,
   etiquetaCortaGrupo,
   type Modelo,
   muestraDeColor,
   numPartners,
+  partesDeNombre,
   referenciasDe,
   tieneCodigos,
 } from "@/lib/catalogo-admin";
 import type { ProductoBaseAdmin, RepresentacionDeBase } from "@/lib/types";
 import { AsignarPanel } from "./asignar-panel";
+import { SoloAdmin } from "@/components/solo-admin";
+import { usePrecio } from "@/lib/formato";
 
 type FiltroRapido = "todos" | "sinAsignar" | "sinCodigos";
+type Vista = "aparato" | "marca";
+
+/// En la vista por marca, cada modelo lleva el nombre con el que lo vende esa marca.
+type ModeloVista = Modelo & { nombreMarca?: string };
+
+/// Color de cada marca en el panel (solo decorativo).
+const ESTILO_MARCA: Record<string, { acento: string; suave: string; texto: string; iniciales: string }> = {
+  vbh: { acento: "bg-sky-600", suave: "bg-sky-50", texto: "text-sky-700", iniciales: "VBH" },
+  procomsa: { acento: "bg-orange-500", suave: "bg-orange-50", texto: "text-orange-700", iniciales: "PR" },
+  mysmartwindow: { acento: "bg-teal-600", suave: "bg-teal-50", texto: "text-teal-700", iniciales: "MSW" },
+  [SIN_MARCA]: { acento: "bg-neutral-500", suave: "bg-neutral-100", texto: "text-neutral-600", iniciales: "—" },
+};
+
+/// Etiqueta de marca que devuelve `partesDeNombre` para cada familia.
+const MARCA_DE_FAMILIA: Record<string, string> = { vbh: "VBH", procomsa: "Procomsa", mysmartwindow: "MySmartWindow" };
+
+/// Un aparato con varios nombres según la marca: cada nombre en su propia
+/// etiqueta con la marca debajo, en vez de pegados con barras.
+function NombreMultimarca({ nombre, className = "" }: { nombre: string; className?: string }) {
+  const partes = partesDeNombre(nombre);
+  if (partes.length < 2) return <span className={className}>{nombre}</span>;
+  return (
+    <span className="flex flex-wrap items-center gap-1.5">
+      {partes.map((p) => (
+        <span key={p.texto} className="inline-flex flex-col rounded-md border border-neutral-200 bg-white px-2 py-0.5 leading-tight">
+          <span className={className}>{p.texto}</span>
+          {p.marca && <span className="text-[10px] font-normal text-neutral-400">{p.marca}</span>}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 function grupoDe(p: ProductoBaseAdmin, sinGrupo: string) {
   return p.especificacionesJson?.grupo ?? sinGrupo;
 }
 
+/// Cambiar / quitar la foto de uno o varios productos. La misma foto sirve para
+/// todas las marcas y colores del aparato.
+function useImagenes(onError: (mensaje: string) => void) {
+  const queryClient = useQueryClient();
+  const t = useTranslations("adminCatalogoBase");
+  const refrescar = () => queryClient.invalidateQueries({ queryKey: ["admin-productos-base"] });
+  const fallo = (err: unknown) => onError(err instanceof ApiError ? err.message : t("genericError"));
+  const subir = useMutation({
+    mutationFn: ({ ids, archivo }: { ids: string[]; archivo: File }) => {
+      const form = new FormData();
+      form.append("ids", JSON.stringify(ids));
+      form.append("archivo", archivo);
+      return api.upload("/productos-base/imagen", form);
+    },
+    onSuccess: refrescar,
+    onError: fallo,
+  });
+  const quitar = useMutation({
+    mutationFn: (ids: string[]) => api.delete("/productos-base/imagen", { ids }),
+    onSuccess: refrescar,
+    onError: fallo,
+  });
+  return { subir, quitar, ocupado: subir.isPending || quitar.isPending };
+}
+
+function Miniatura({ producto, tamano = "h-8 w-8" }: { producto: ProductoBaseAdmin; tamano?: string }) {
+  const src = urlImagen(producto.imagenUrl);
+  return (
+    <span className={`flex ${tamano} shrink-0 items-center justify-center overflow-hidden rounded-md border border-neutral-200 bg-neutral-50`}>
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+      ) : (
+        <ImageIcon size={14} className="text-neutral-300" />
+      )}
+    </span>
+  );
+}
+
 function DetalleProducto({ producto, onAsignar }: { producto: ProductoBaseAdmin; onAsignar: () => void }) {
   const t = useTranslations("adminCatalogoBase");
+  const precio = usePrecio();
   const queryClient = useQueryClient();
   const [nombre, setNombre] = useState(producto.nombreTecnico);
   const [error, setError] = useState<string | null>(null);
   const refs = referenciasDe(producto);
   const specs = especificacionesVisibles(producto);
+  const [errorImagen, setErrorImagen] = useState<string | null>(null);
+  const imagenes = useImagenes(setErrorImagen);
 
   const { data: asignaciones, isLoading } = useQuery<RepresentacionDeBase[]>({
     queryKey: ["admin-producto-partners", producto.id],
@@ -48,6 +129,46 @@ function DetalleProducto({ producto, onAsignar }: { producto: ProductoBaseAdmin;
   return (
     <div className="grid gap-4 border-t border-neutral-100 bg-neutral-50 px-4 py-4 lg:grid-cols-2">
       <div>
+        <div className="mb-4 flex items-center gap-3">
+          <Miniatura producto={producto} tamano="h-20 w-20" />
+          <div>
+            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">{t("image")}</h4>
+            <div className="flex gap-2">
+              <label
+                className={`inline-flex cursor-pointer items-center gap-1 rounded-md border border-neutral-300 bg-white px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-100 ${imagenes.ocupado ? "pointer-events-none opacity-50" : ""}`}
+              >
+                <Upload size={12} /> {producto.imagenUrl ? t("changeImage") : t("uploadImage")}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const archivo = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!archivo) return;
+                    setErrorImagen(null);
+                    imagenes.subir.mutate({ ids: [producto.id], archivo });
+                  }}
+                />
+              </label>
+              {producto.imagenUrl && (
+                <button
+                  onClick={() => {
+                    if (!window.confirm(t("removeImageConfirm", { n: 1 }))) return;
+                    setErrorImagen(null);
+                    imagenes.quitar.mutate([producto.id]);
+                  }}
+                  disabled={imagenes.ocupado}
+                  className="rounded-md border border-transparent px-2.5 py-1 text-xs font-medium text-red-600 hover:border-red-200 hover:bg-red-50 disabled:opacity-50"
+                >
+                  {t("removeImage")}
+                </button>
+              )}
+            </div>
+            <p className="mt-1 text-[11px] text-neutral-400">{t("imageHelp")}</p>
+            {errorImagen && <p className="mt-1 text-xs text-red-600">{errorImagen}</p>}
+          </div>
+        </div>
         <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">{t("namesByBrand")}</h4>
         {producto.especificacionesJson?.pendiente && (
           <p className="mb-2 rounded bg-amber-50 px-2 py-1 text-xs text-amber-700">{producto.especificacionesJson.pendiente}</p>
@@ -147,7 +268,7 @@ function DetalleProducto({ producto, onAsignar }: { producto: ProductoBaseAdmin;
                     {a.skuComercial} · {a.nombreComercial}
                   </span>
                 </Link>
-                <span className="text-neutral-700">{Number(a.pvpBase).toFixed(2)} €</span>
+                <span className="text-neutral-700">{precio(a.pvpBase)}</span>
                 {!a.activo && <span className="rounded bg-neutral-200 px-1.5 py-0.5 text-neutral-500">{t("inactive")}</span>}
               </li>
             ))}
@@ -170,6 +291,7 @@ function FilaProducto({
   onAbrir,
   onAsignar,
   variante = false,
+  nombre,
 }: {
   producto: ProductoBaseAdmin;
   seleccionado: boolean;
@@ -178,6 +300,8 @@ function FilaProducto({
   onAbrir: () => void;
   onAsignar: () => void;
   variante?: boolean;
+  /// Nombre a mostrar en vez del técnico (vista por marca).
+  nombre?: string;
 }) {
   const t = useTranslations("adminCatalogoBase");
   const partners = numPartners(producto);
@@ -189,14 +313,15 @@ function FilaProducto({
         <input type="checkbox" checked={seleccionado} onChange={onSeleccionar} aria-label={t("select")} />
         <button onClick={onAbrir} className="flex min-w-0 flex-1 items-center gap-3 text-left">
           {abierto ? <ChevronDown size={14} className="text-neutral-400" /> : <ChevronRight size={14} className="text-neutral-400" />}
+          <Miniatura producto={producto} />
           <span
             className="h-4 w-4 shrink-0 rounded-full border border-neutral-300"
             style={{ background: muestraDeColor(color) }}
             title={color ?? ""}
           />
           <span className="min-w-0">
-            <span className="block truncate font-medium text-neutral-900">
-              {variante ? (color ?? producto.nombreTecnico) : producto.nombreTecnico}
+            <span className="block font-medium text-neutral-900">
+              {variante ? (color ?? producto.nombreTecnico) : <NombreMultimarca nombre={nombre ?? producto.nombreTecnico} className="text-sm font-medium text-neutral-900" />}
             </span>
             <span className="block truncate text-xs text-neutral-400">{producto.skuIndustrial}</span>
           </span>
@@ -240,7 +365,7 @@ function FilaModelo({
   onAbrir,
   onAsignar,
 }: {
-  modelo: Modelo;
+  modelo: ModeloVista;
   seleccion: Set<string>;
   abiertos: Set<string>;
   onSeleccionar: (id: string) => void;
@@ -261,6 +386,7 @@ function FilaModelo({
         onSeleccionar={() => onSeleccionar(p.id)}
         onAbrir={() => onAbrir(p.id)}
         onAsignar={() => onAsignar([p])}
+        nombre={modelo.nombreMarca}
       />
     );
   }
@@ -286,6 +412,7 @@ function FilaModelo({
         />
         <button onClick={() => setDesplegado((v) => !v)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
           {desplegado ? <ChevronDown size={14} className="text-neutral-400" /> : <ChevronRight size={14} className="text-neutral-400" />}
+          <Miniatura producto={variantes[0]} />
           <span className="flex shrink-0 -space-x-1">
             {variantes.map((p) => (
               <span
@@ -297,7 +424,9 @@ function FilaModelo({
             ))}
           </span>
           <span className="min-w-0">
-            <span className="block truncate font-medium text-neutral-900">{modelo.nombre}</span>
+            <span className="block font-medium text-neutral-900">
+              <NombreMultimarca nombre={modelo.nombreMarca ?? modelo.nombre} className="text-sm font-medium text-neutral-900" />
+            </span>
             <span className="block truncate text-xs text-neutral-400">
               {variantes.map((p) => p.especificacionesJson?.color).filter(Boolean).join(" · ")}
             </span>
@@ -341,7 +470,7 @@ function FilaModelo({
   );
 }
 
-export default function AdminCatalogoBasePage() {
+function AdminCatalogoBasePageContenido() {
   const t = useTranslations("adminCatalogoBase");
   const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState("");
@@ -349,6 +478,11 @@ export default function AdminCatalogoBasePage() {
   const [filtro, setFiltro] = useState<FiltroRapido>("todos");
   const [seleccion, setSeleccion] = useState<Set<string>>(new Set());
   const [abiertos, setAbiertos] = useState<Set<string>>(new Set());
+  // Los apartados empiezan cerrados; aquí van los que el admin ha abierto.
+  const [gruposAbiertos, setGruposAbiertos] = useState<Set<string>>(new Set());
+  const [vista, setVista] = useState<Vista>("aparato");
+  const [errorImagen, setErrorImagen] = useState<string | null>(null);
+  const imagenes = useImagenes(setErrorImagen);
   const [aAsignar, setAAsignar] = useState<ProductoBaseAdmin[] | null>(null);
   const [mostrarNuevo, setMostrarNuevo] = useState(false);
   const [skuIndustrial, setSkuIndustrial] = useState("");
@@ -404,12 +538,54 @@ export default function AdminCatalogoBasePage() {
 
   const porGrupo = useMemo(() => Array.from(agruparPorModelo(filtrados, t("noGroup")).entries()), [filtrados, t]);
 
+  /// Vista por marca: un apartado por marca de partner y, dentro, sus modelos
+  /// con el nombre de esa marca (un aparato de 3 marcas sale en las 3).
+  const porMarca = useMemo(() => {
+    const mapa = productosPorMarca(filtrados);
+    const marcas = [...FAMILIAS_DE_MARCA.map((f) => ({ clave: f.clave, etiqueta: f.etiqueta })), { clave: SIN_MARCA, etiqueta: t("noBrand") }];
+    return marcas
+      .map((m) => {
+        const productosMarca = mapa.get(m.clave) ?? [];
+        const grupos = Array.from(agruparPorModelo(productosMarca, t("noGroup")).entries()).map(([grupo, modelos]) => {
+          const parte = partesDeNombre(grupo).find((p) => p.marca === MARCA_DE_FAMILIA[m.clave]);
+          return {
+            grupo: parte?.texto ?? etiquetaCortaGrupo(grupo),
+            modelos: modelos.map(
+              (mo): ModeloVista => ({
+                ...mo,
+                clave: `${m.clave}|${mo.clave}`,
+                nombreMarca: m.clave === SIN_MARCA ? undefined : nombreEnMarca(mo.variantes[0], m.clave) || undefined,
+              }),
+            ),
+          };
+        });
+        return { ...m, productos: productosMarca, grupos };
+      })
+      .filter((m) => m.productos.length > 0);
+  }, [filtrados, t]);
+
+  const clavesApartados = vista === "aparato" ? porGrupo.map(([g]) => `g:${g}`) : porMarca.map((m) => `m:${m.clave}`);
+  // Mientras se busca se ve todo abierto, para no esconder resultados.
+  const estaAbierto = (clave: string) => gruposAbiertos.has(clave) || !!busqueda.trim();
+
   function alternar(set: Set<string>, id: string): Set<string> {
     const s = new Set(set);
     if (s.has(id)) s.delete(id);
     else s.add(id);
     return s;
   }
+
+  const filaModelo = (modelo: ModeloVista) => (
+    <FilaModelo
+      key={modelo.clave}
+      modelo={modelo}
+      seleccion={seleccion}
+      abiertos={abiertos}
+      onSeleccionar={(id) => setSeleccion((s) => alternar(s, id))}
+      onAbrir={(id) => setAbiertos((s) => alternar(s, id))}
+      onAsignar={setAAsignar}
+    />
+  );
 
   function alternarGrupo(items: ProductoBaseAdmin[]) {
     const todos = items.every((p) => seleccion.has(p.id));
@@ -426,7 +602,9 @@ export default function AdminCatalogoBasePage() {
   const seleccionados = lista.filter((p) => seleccion.has(p.id));
 
   return (
-    <div className="pb-24">
+    // Más ancho que el resto del portal para que quepan nombres y etiquetas. Sin
+    // `transform`: la barra de selección y el panel de asignar son `fixed`.
+    <div className="pb-24" style={{ width: "min(1440px, calc(100vw - 3rem))", marginLeft: "calc(50% - min(720px, 50vw - 1.5rem))" }}>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900">{t("title")}</h1>
@@ -492,6 +670,34 @@ export default function AdminCatalogoBasePage() {
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="inline-flex rounded-lg border border-neutral-300 bg-white p-0.5" role="group" aria-label={t("groupBy")}>
+          {(
+            [
+              ["aparato", t("byDevice"), Boxes],
+              ["marca", t("byBrand"), Tags],
+            ] as const
+          ).map(([clave, etiqueta, Icono]) => (
+            <button
+              key={clave}
+              onClick={() => {
+                setVista(clave);
+                setGruposAbiertos(new Set());
+              }}
+              aria-pressed={vista === clave}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition ${
+                vista === clave ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-100"
+              }`}
+            >
+              <Icono size={14} /> {etiqueta}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setGruposAbiertos(gruposAbiertos.size > 0 ? new Set() : new Set(clavesApartados))}
+          className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
+        >
+          {gruposAbiertos.size > 0 ? t("collapseAll") : t("expandAll")}
+        </button>
         <div className="relative min-w-64 flex-1">
           <Search size={15} className="absolute left-3 top-2.5 text-neutral-400" />
           <input
@@ -534,36 +740,116 @@ export default function AdminCatalogoBasePage() {
       {isLoading ? (
         <p className="text-neutral-500">{t("loading")}</p>
       ) : (
-        <div className="space-y-4">
-          {porGrupo.map(([grupo, modelos]) => {
-            const items = modelos.flatMap((m) => m.variantes);
-            return (
-              <section key={grupo} className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
-                <header className="flex items-center gap-3 border-b border-neutral-200 bg-neutral-100 px-3 py-2">
-                  <input
-                    type="checkbox"
-                    checked={items.every((p) => seleccion.has(p.id))}
-                    onChange={() => alternarGrupo(items)}
-                    aria-label={t("selectGroup")}
-                  />
-                  <h2 className="text-sm font-semibold text-neutral-800">
-                    {grupo} <span className="font-normal text-neutral-500">({modelos.length})</span>
-                  </h2>
-                </header>
-                {modelos.map((modelo) => (
-                  <FilaModelo
-                    key={modelo.clave}
-                    modelo={modelo}
-                    seleccion={seleccion}
-                    abiertos={abiertos}
-                    onSeleccionar={(id) => setSeleccion((s) => alternar(s, id))}
-                    onAbrir={(id) => setAbiertos((s) => alternar(s, id))}
-                    onAsignar={setAAsignar}
-                  />
-                ))}
-              </section>
-            );
-          })}
+        <div className={vista === "aparato" ? "grid grid-cols-1 items-start gap-3 xl:grid-cols-2" : "space-y-4"}>
+          {vista === "aparato" &&
+            porGrupo.map(([grupo, modelos]) => {
+              const items = modelos.flatMap((m) => m.variantes);
+              const clave = `g:${grupo}`;
+              const abierto = estaAbierto(clave);
+              const partes = partesDeNombre(grupo);
+              const asignados = items.filter((p) => numPartners(p) > 0).length;
+              const conFoto = items.find((p) => p.imagenUrl) ?? items[0];
+              return (
+                <section key={grupo} className={`overflow-hidden rounded-xl border bg-white transition ${abierto ? "border-neutral-300 shadow-sm xl:col-span-2" : "border-neutral-200 hover:border-neutral-300"}`}>
+                  <header className="flex items-center gap-3 px-3 py-2.5">
+                    <input
+                      type="checkbox"
+                      checked={items.every((p) => seleccion.has(p.id))}
+                      onChange={() => alternarGrupo(items)}
+                      aria-label={t("selectGroup")}
+                    />
+                    <button
+                      onClick={() => setGruposAbiertos((s) => alternar(s, clave))}
+                      aria-expanded={abierto}
+                      className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                    >
+                      {abierto ? <ChevronDown size={16} className="text-neutral-500" /> : <ChevronRight size={16} className="text-neutral-500" />}
+                      <Miniatura producto={conFoto} tamano="h-11 w-11" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-neutral-900">
+                          {partes.length > 1 ? etiquetaCortaGrupo(partes[0].texto) : grupo}
+                        </span>
+                        <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                          {partes.length > 1 ? (
+                            partes.map((p) => {
+                              const familia = Object.keys(MARCA_DE_FAMILIA).find((k) => MARCA_DE_FAMILIA[k] === p.marca);
+                              const estilo = ESTILO_MARCA[familia ?? SIN_MARCA];
+                              return (
+                                <span key={p.texto} className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${estilo.suave} ${estilo.texto}`}>
+                                  {p.texto}
+                                </span>
+                              );
+                            })
+                          ) : (
+                            <span className="text-xs text-neutral-500">{t("modelsCount", { n: modelos.length })}</span>
+                          )}
+                        </span>
+                      </span>
+                    </button>
+                    <span className="hidden text-right text-xs text-neutral-500 sm:block">
+                      <span className="block font-medium text-neutral-800">{t("productsCount", { n: items.length })}</span>
+                      <span className={asignados === 0 ? "text-red-600" : "text-green-700"}>{t("assignedCount", { a: asignados, n: items.length })}</span>
+                    </span>
+                  </header>
+                  {abierto && <div className="border-t border-neutral-200">{modelos.map(filaModelo)}</div>}
+                </section>
+              );
+            })}
+
+          {vista === "marca" &&
+            porMarca.map((m) => {
+              const clave = `m:${m.clave}`;
+              const abierto = estaAbierto(clave);
+              const estilo = ESTILO_MARCA[m.clave] ?? ESTILO_MARCA[SIN_MARCA];
+              const asignados = m.productos.filter((p) => numPartners(p) > 0).length;
+              const numModelos = m.grupos.reduce((n, g) => n + g.modelos.length, 0);
+              return (
+                <section key={m.clave} className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+                  <header className={`flex items-center gap-4 px-4 py-3 ${estilo.suave}`}>
+                    <input
+                      type="checkbox"
+                      checked={m.productos.every((p) => seleccion.has(p.id))}
+                      onChange={() => alternarGrupo(m.productos)}
+                      aria-label={t("selectGroup")}
+                    />
+                    <button
+                      onClick={() => setGruposAbiertos((s) => alternar(s, clave))}
+                      aria-expanded={abierto}
+                      className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                    >
+                      {abierto ? <ChevronDown size={18} className={estilo.texto} /> : <ChevronRight size={18} className={estilo.texto} />}
+                      <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white ${estilo.acento}`}>
+                        {estilo.iniciales}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-base font-semibold text-neutral-900">{m.etiqueta}</span>
+                        <span className="block text-xs text-neutral-500">
+                          {t("modelsCount", { n: numModelos })} · {t("productsCount", { n: m.productos.length })}
+                        </span>
+                      </span>
+                    </button>
+                    <div className="hidden w-48 sm:block">
+                      <div className="mb-1 flex justify-between text-xs text-neutral-600">
+                        <span>{t("assignedLabel")}</span>
+                        <span className="font-medium">
+                          {asignados}/{m.productos.length}
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-white">
+                        <div className={`h-full rounded-full ${estilo.acento}`} style={{ width: `${m.productos.length ? (asignados / m.productos.length) * 100 : 0}%` }} />
+                      </div>
+                    </div>
+                  </header>
+                  {abierto &&
+                    m.grupos.map((g) => (
+                      <div key={g.grupo} className="border-t border-neutral-200">
+                        <p className="bg-neutral-50 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">{g.grupo}</p>
+                        {g.modelos.map(filaModelo)}
+                      </div>
+                    ))}
+                </section>
+              );
+            })}
           {filtrados.length === 0 && <p className="text-neutral-500">{lista.length ? t("noResults") : t("empty")}</p>}
         </div>
       )}
@@ -577,6 +863,35 @@ export default function AdminCatalogoBasePage() {
           >
             {t("assignToPartners")}
           </button>
+          <label
+            className={`inline-flex cursor-pointer items-center gap-1 rounded-full border border-neutral-500 px-3 py-1 text-xs font-medium hover:bg-neutral-800 ${imagenes.ocupado ? "pointer-events-none opacity-50" : ""}`}
+          >
+            <Upload size={12} /> {t("changeImage")}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const archivo = e.target.files?.[0];
+                e.target.value = "";
+                if (!archivo) return;
+                setErrorImagen(null);
+                imagenes.subir.mutate({ ids: seleccionados.map((p) => p.id), archivo });
+              }}
+            />
+          </label>
+          <button
+            onClick={() => {
+              if (!window.confirm(t("removeImageConfirm", { n: seleccionados.length }))) return;
+              setErrorImagen(null);
+              imagenes.quitar.mutate(seleccionados.map((p) => p.id));
+            }}
+            disabled={imagenes.ocupado}
+            className="rounded-full border border-neutral-500 px-3 py-1 text-xs font-medium hover:bg-neutral-800 disabled:opacity-50"
+          >
+            {t("removeImage")}
+          </button>
+          {errorImagen && <span className="text-xs text-red-300">{errorImagen}</span>}
           <button onClick={() => setSeleccion(new Set())} className="text-xs text-neutral-300 underline hover:text-white">
             {t("clearSelection")}
           </button>
@@ -594,5 +909,13 @@ export default function AdminCatalogoBasePage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminCatalogoBasePage() {
+  return (
+    <SoloAdmin>
+      <AdminCatalogoBasePageContenido />
+    </SoloAdmin>
   );
 }

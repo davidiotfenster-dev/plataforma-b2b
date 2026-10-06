@@ -1,3 +1,4 @@
+import { FAMILIA_DE_MARCA } from "./marcas";
 import type { Partner, ProductoBaseAdmin, ReferenciaMarca } from "./types";
 
 /// Marcas comerciales con las que se vende un mismo aparato. Las "marcas" del
@@ -14,7 +15,7 @@ export interface FamiliaMarca {
 export const FAMILIAS_DE_MARCA: FamiliaMarca[] = [
   { clave: "vbh", etiqueta: "VBH · Wave", marcas: ["VBH", "GREENTEQ", "WAVE"] },
   { clave: "procomsa", etiqueta: "Procomsa · ICON", marcas: ["PROCOMSA", "ICON"] },
-  { clave: "mysmartwindow", etiqueta: "MySmartWindow · Connect", marcas: ["MYSMARTWINDOW"] },
+  { clave: "mysmartwindow", etiqueta: "MySmartWindow · Connect", marcas: ["MYSMARTWINDOW", "C-WALL"] },
 ];
 
 function normalizar(texto: string): string {
@@ -25,30 +26,10 @@ function normalizar(texto: string): string {
     .replace(/[^A-Z0-9]/g, "");
 }
 
-/// Palabras sueltas de un texto ("VBH Ibérica S.L." -> VBH, IBERICA, S, L), para
-/// comparar por palabra completa y no por prefijo ("ICONOS S.L." no es ICON).
-function palabras(texto: string): string[] {
-  return texto
-    .toUpperCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .split(/[^A-Z0-9]+/)
-    .filter(Boolean);
-}
-
-/// Familias de marca que se deducen de la ficha del partner (su marca comercial
-/// y, si no, su razón social). Vacío si no se reconoce ninguna: entonces el
-/// admin la elige a mano en el panel.
-export function familiasDelPartner(partner: Pick<Partner, "razonSocial" | "marcaComercial">): string[] {
-  const textos = [partner.marcaComercial, partner.razonSocial].filter((t): t is string => !!t);
-  const halladas = new Set<string>();
-  for (const familia of FAMILIAS_DE_MARCA) {
-    const marcas = familia.marcas.map(normalizar);
-    if (textos.some((t) => palabras(t).some((palabra) => marcas.includes(palabra)))) halladas.add(familia.clave);
-    // También cuando la marca comercial es la marca a secas, aunque lleve símbolos.
-    if (partner.marcaComercial && marcas.includes(normalizar(partner.marcaComercial))) halladas.add(familia.clave);
-  }
-  return [...halladas];
+/// Familia de marca que ve la empresa: la marca de catálogo de su ficha
+/// (partner: la suya; distribuidor: MySmartWindow salvo que se cambie).
+export function familiasDelPartner(partner: Pick<Partner, "marcaCatalogo">): string[] {
+  return [FAMILIA_DE_MARCA[partner.marcaCatalogo]];
 }
 
 export function referenciasDe(producto: ProductoBaseAdmin): ReferenciaMarca[] {
@@ -147,7 +128,7 @@ export function propuestaCatalogoDeMarca(productos: ProductoBaseAdmin[], familia
 /// ninguno es del partner: nunca se rellena con el nombre técnico multimarca.
 export function sugerenciaManual(
   producto: ProductoBaseAdmin,
-  partner: Pick<Partner, "razonSocial" | "marcaComercial"> | null,
+  partner: Pick<Partner, "marcaCatalogo"> | null,
 ): { nombre: string; sku: string } {
   const familias = partner ? familiasDelPartner(partner) : [];
   const [primero] = candidatosParaPartner(producto, familias);
@@ -173,6 +154,8 @@ export function muestraDeColor(color: string | null | undefined): string {
   if (c.startsWith("blanco")) return "#ffffff";
   if (c.startsWith("negro")) return "#171717";
   if (c.startsWith("inox") || c.startsWith("plata")) return "linear-gradient(135deg,#e5e5e5,#9ca3af)";
+  if (c.startsWith("antracita")) return "#3f4348";
+  if (c.startsWith("marr")) return "#6b4423";
   if (c.startsWith("especial")) return "linear-gradient(135deg,#f59e0b,#8b5cf6)";
   return "transparent";
 }
@@ -223,4 +206,66 @@ export function especificacionesVisibles(producto: ProductoBaseAdmin): [string, 
   return Object.entries(publicas)
     .filter(([, valor]) => ["string", "number", "boolean"].includes(typeof valor))
     .map(([clave, valor]) => [clave, String(valor)]);
+}
+
+export interface ParteNombre {
+  texto: string;
+  /// Marca a la que pertenece ese nombre, si se reconoce por el prefijo.
+  marca: string | null;
+}
+
+/// "Connect-1 / Wave-1 / Icon1" -> tres nombres, cada uno con su marca. Un mismo
+/// aparato se llama distinto según la empresa; en pantalla se ven por separado.
+export function partesDeNombre(nombre: string): ParteNombre[] {
+  const dentro = nombre.match(/^(.*?)\s*\((.*)\)\s*(.*)$/);
+  const texto = dentro ? [dentro[2], dentro[3]].filter(Boolean).join(" ") : nombre;
+  return texto
+    .split(" / ")
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .map((t) => {
+      const n = t.toLowerCase();
+      const marca = n.startsWith("connect")
+        ? "MySmartWindow"
+        : n.startsWith("wave") || n.startsWith("pulsar")
+          ? "VBH"
+          : n.startsWith("icon")
+            ? "Procomsa"
+            : null;
+      return { texto: t, marca };
+    });
+}
+
+/// Clave del apartado "sin marca": productos sin nombre en ninguna marca de
+/// partner (mando estándar, pulsadores C-WALL...).
+export const SIN_MARCA = "comun";
+
+/// Reparte los productos por marca de partner (VBH, Procomsa, MySmartWindow).
+/// Un aparato con nombre en varias marcas aparece en todas ellas.
+export function productosPorMarca(productos: ProductoBaseAdmin[]): Map<string, ProductoBaseAdmin[]> {
+  const mapa = new Map<string, ProductoBaseAdmin[]>();
+  for (const p of productos) {
+    const marcas = new Set(referenciasDe(p).map((r) => normalizar(r.marca)));
+    const familias = FAMILIAS_DE_MARCA.filter((f) => f.marcas.some((m) => marcas.has(normalizar(m)))).map((f) => f.clave);
+    for (const clave of familias.length ? familias : [SIN_MARCA]) mapa.set(clave, [...(mapa.get(clave) ?? []), p]);
+  }
+  return mapa;
+}
+
+/// Nombre del producto en una marca, sin el color ("Pulsador Wave1 blanco" ->
+/// "Pulsador Wave1"). Vacío si no tiene nombre en esa marca.
+export function nombreEnMarca(producto: ProductoBaseAdmin, familia: string): string {
+  const marcas = (FAMILIAS_DE_MARCA.find((f) => f.clave === familia)?.marcas ?? []).map(normalizar);
+  const color = producto.especificacionesJson?.color ?? "";
+  const nombres = referenciasDe(producto)
+    .filter((r) => marcas.includes(normalizar(r.marca)))
+    .map((r) => {
+      let n = r.nombre;
+      for (const parte of color.split("/").filter(Boolean)) {
+        const i = n.toLowerCase().indexOf(parte.toLowerCase());
+        if (i >= 0) n = n.slice(0, i) + n.slice(i + parte.length);
+      }
+      return n.replace(/\s+/g, " ").trim();
+    });
+  return [...new Set(nombres)].join(" / ");
 }

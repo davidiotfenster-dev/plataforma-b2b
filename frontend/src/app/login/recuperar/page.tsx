@@ -45,16 +45,24 @@ export default function RecuperarPasswordPage() {
       <p className="mb-6 text-sm text-neutral-500">{t("description")}</p>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-neutral-700">{t("email")}</label>
+          <label htmlFor="recuperar-email" className="mb-1 block text-sm font-medium text-neutral-700">
+            {t("email")}
+          </label>
           <input
+            id="recuperar-email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
           />
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-red-600">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={cargando}

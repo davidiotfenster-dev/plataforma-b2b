@@ -1,11 +1,18 @@
 import { EstadoPedido, Idioma } from '../../generated/prisma/enums.js';
 
-/// Traducciones de los emails transaccionales existentes (confirmación de
-/// pedido y cambio de estado), en el idioma preferido del destinatario
+/// Traducciones de los emails transaccionales (confirmación de pedido, cambio
+/// de estado, restablecer contraseña y alta de empresas: verificación,
+/// aprobada, rechazada; bienvenida a una empresa dada de alta por IoT FENSTER), en el idioma preferido del destinatario
 /// (`User.idioma`). Deliberadamente separado de `EmailService` (que solo
 /// sabe enviar, no de negocio) para mantener el servicio de envío agnóstico
-/// del idioma. La verificación de registro y el resumen en PDF quedan fuera
-/// de este alcance (ver PROGRESO.md, bloque E del backlog de frontend).
+/// del idioma. Los avisos internos (nueva solicitud, pedido nuevo) van siempre
+/// en español: los reciben los administradores de IoT FENSTER.
+
+/// Los datos que escribe el usuario (razón social, país) acaban dentro del HTML
+/// de un correo: se escapan para que no puedan inyectar etiquetas.
+export function escaparHtml(texto: string): string {
+  return texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 const ESTADOS: Record<Idioma, Record<EstadoPedido, string>> = {
   ES: {
@@ -54,6 +61,32 @@ interface DatosExpedicion {
   transportista: string | null;
   numeroExpedicion: string | null;
   trackingUrl: string | null;
+}
+
+/// Botón de acción de un correo (a prueba de clientes de correo: tabla y estilos en línea).
+/// En la versión de texto plano sale como "Texto: enlace".
+export function boton(enlace: string, texto: string): string {
+  const url = escaparHtml(enlace);
+  return (
+    `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0"><tr>` +
+    `<td style="background:#0d9488;border-radius:8px"><a href="${url}" style="display:inline-block;padding:12px 24px;color:#ffffff;font-weight:600;text-decoration:none">${escaparHtml(texto)}</a></td>` +
+    `</tr></table>`
+  );
+}
+
+/// Marco visual común de todos los correos: cabecera de marca, tarjeta y pie. Lo aplica
+/// `EmailService` al enviar; las plantillas solo escriben el contenido.
+export function envolverCorreo(contenido: string): string {
+  return (
+    `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7"><tr><td align="center" style="padding:24px 12px">` +
+    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">` +
+    `<tr><td style="height:5px;background:#0d9488;font-size:0;line-height:0">&nbsp;</td></tr>` +
+    `<tr><td style="padding:22px 32px 0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;letter-spacing:.5px;color:#111827">IoT <span style="color:#0d9488">FENSTER</span></td></tr>` +
+    `<tr><td style="padding:12px 32px 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#374151">${contenido}</td></tr>` +
+    `<tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#6b7280">IoT FENSTER · iotfenster.com</td></tr>` +
+    `</table></td></tr></table></body></html>`
+  );
 }
 
 export function nombreEstado(idioma: Idioma, estado: EstadoPedido): string {
@@ -118,7 +151,7 @@ export function cuerpoCambioEstado(
       IT: 'Motivo',
       PT: 'Motivo',
     };
-    return cuerpos[idioma] + `<p>${etiquetaMotivo[idioma]}: ${motivoCancelacion}</p>`;
+    return cuerpos[idioma] + `<p>${etiquetaMotivo[idioma]}: ${escaparHtml(motivoCancelacion)}</p>`;
   }
 
   if (estado !== EstadoPedido.ENVIADO) {
@@ -133,11 +166,12 @@ export function cuerpoCambioEstado(
     PT: { transportista: 'Transportadora', numeroExpedicion: 'Nº de expedição', seguimiento: 'Rastreio' },
   };
   const etiqueta = etiquetas[idioma];
+  const trackingUrl = datosExpedicion.trackingUrl ?? '';
 
   const tracking =
-    `<p>${etiqueta.transportista}: ${datosExpedicion.transportista}<br/>` +
-    `${etiqueta.numeroExpedicion}: ${datosExpedicion.numeroExpedicion}<br/>` +
-    `${etiqueta.seguimiento}: <a href="${datosExpedicion.trackingUrl}">${datosExpedicion.trackingUrl}</a></p>`;
+    `<p>${etiqueta.transportista}: ${escaparHtml(datosExpedicion.transportista ?? '')}<br/>` +
+    `${etiqueta.numeroExpedicion}: ${escaparHtml(datosExpedicion.numeroExpedicion ?? '')}</p>` +
+    boton(trackingUrl, etiqueta.seguimiento);
 
   return cuerpos[idioma] + tracking;
 }
@@ -155,11 +189,174 @@ export function asuntoResetPassword(idioma: Idioma): string {
 
 export function cuerpoResetPassword(idioma: Idioma, enlace: string): string {
   const cuerpos: Record<Idioma, string> = {
-    ES: `<p>Hemos recibido una solicitud para restablecer tu contraseña. Este enlace caduca en 1 hora:</p><p><a href="${enlace}">${enlace}</a></p><p>Si no fuiste tú, puedes ignorar este correo.</p>`,
-    EN: `<p>We received a request to reset your password. This link expires in 1 hour:</p><p><a href="${enlace}">${enlace}</a></p><p>If this wasn't you, you can ignore this email.</p>`,
-    DE: `<p>Wir haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Dieser Link läuft in 1 Stunde ab:</p><p><a href="${enlace}">${enlace}</a></p><p>Falls Sie das nicht waren, können Sie diese E-Mail ignorieren.</p>`,
-    IT: `<p>Abbiamo ricevuto una richiesta per reimpostare la tua password. Questo link scade tra 1 ora:</p><p><a href="${enlace}">${enlace}</a></p><p>Se non sei stato tu, puoi ignorare questa email.</p>`,
-    PT: `<p>Recebemos um pedido para repor a sua palavra-passe. Este link expira em 1 hora:</p><p><a href="${enlace}">${enlace}</a></p><p>Se não foi você, pode ignorar este email.</p>`,
+    ES: `<p>Hemos recibido una solicitud para restablecer tu contraseña. Este enlace caduca en 1 hora:</p>${boton(enlace, 'Crear nueva contraseña')}<p>Si no fuiste tú, puedes ignorar este correo.</p>`,
+    EN: `<p>We received a request to reset your password. This link expires in 1 hour:</p>${boton(enlace, 'Create new password')}<p>If this wasn't you, you can ignore this email.</p>`,
+    DE: `<p>Wir haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Dieser Link läuft in 1 Stunde ab:</p>${boton(enlace, 'Neues Passwort festlegen')}<p>Falls Sie das nicht waren, können Sie diese E-Mail ignorieren.</p>`,
+    IT: `<p>Abbiamo ricevuto una richiesta per reimpostare la tua password. Questo link scade tra 1 ora:</p>${boton(enlace, 'Crea una nuova password')}<p>Se non sei stato tu, puoi ignorare questa email.</p>`,
+    PT: `<p>Recebemos um pedido para repor a sua palavra-passe. Este link expira em 1 hora:</p>${boton(enlace, 'Criar nova palavra-passe')}<p>Se não foi você, pode ignorar este email.</p>`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoInvitacionUsuario(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Tu acceso al portal de pedidos de IoT FENSTER',
+    EN: 'Your access to the IoT FENSTER ordering portal',
+    DE: 'Ihr Zugang zum Bestellportal von IoT FENSTER',
+    IT: 'Il tuo accesso al portale ordini di IoT FENSTER',
+    PT: 'O seu acesso ao portal de encomendas da IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+/// Usuario nuevo dado de alta por IoT FENSTER o por el administrador de su
+/// empresa: el enlace es el de restablecer contraseña, con 7 días de plazo.
+export function cuerpoInvitacionUsuario(idioma: Idioma, enlace: string, razonSocial: string): string {
+  const empresa = escaparHtml(razonSocial);
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Te han dado acceso al portal de pedidos de IoT FENSTER como usuario de ${empresa}. Crea tu contraseña con este enlace (caduca en 7 días):</p><p><a href="${enlace}">${enlace}</a></p><p>Después podrás entrar con este email y la contraseña que elijas. Si no esperabas este correo, puedes ignorarlo.</p>`,
+    EN: `<p>You have been given access to the IoT FENSTER ordering portal as a user of ${empresa}. Create your password with this link (it expires in 7 days):</p><p><a href="${enlace}">${enlace}</a></p><p>You can then log in with this email and the password you choose. If you weren't expecting this email, you can ignore it.</p>`,
+    DE: `<p>Sie haben Zugang zum Bestellportal von IoT FENSTER als Benutzer von ${empresa} erhalten. Erstellen Sie Ihr Passwort über diesen Link (gültig für 7 Tage):</p><p><a href="${enlace}">${enlace}</a></p><p>Danach können Sie sich mit dieser E-Mail-Adresse und Ihrem Passwort anmelden. Falls Sie diese E-Mail nicht erwartet haben, können Sie sie ignorieren.</p>`,
+    IT: `<p>Ti è stato dato accesso al portale ordini di IoT FENSTER come utente di ${empresa}. Crea la tua password con questo link (scade tra 7 giorni):</p><p><a href="${enlace}">${enlace}</a></p><p>Poi potrai accedere con questa email e la password che scegli. Se non ti aspettavi questa email, puoi ignorarla.</p>`,
+    PT: `<p>Recebeu acesso ao portal de encomendas da IoT FENSTER como utilizador de ${empresa}. Crie a sua palavra-passe com este link (expira em 7 dias):</p><p><a href="${enlace}">${enlace}</a></p><p>Depois poderá entrar com este email e a palavra-passe que escolher. Se não esperava este email, pode ignorá-lo.</p>`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoVerificacionEmail(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Confirma tu correo en IoT FENSTER',
+    EN: 'Confirm your email at IoT FENSTER',
+    DE: 'Bestätigen Sie Ihre E-Mail-Adresse bei IoT FENSTER',
+    IT: 'Conferma la tua email su IoT FENSTER',
+    PT: 'Confirme o seu email na IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoVerificacionEmail(idioma: Idioma, enlace: string): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Gracias por registrar tu empresa. Confirma tu correo corporativo con este enlace (caduca en 24 horas):</p>${boton(enlace, 'Confirmar mi correo')}<p>Después, un administrador de IoT FENSTER revisará y aprobará el alta. Si no has sido tú, puedes ignorar este correo.</p>`,
+    EN: `<p>Thank you for registering your company. Please confirm your corporate email with this link (it expires in 24 hours):</p>${boton(enlace, 'Confirm my email')}<p>An IoT FENSTER administrator will then review and approve your registration. If this wasn't you, you can ignore this email.</p>`,
+    DE: `<p>Vielen Dank für die Registrierung Ihres Unternehmens. Bitte bestätigen Sie Ihre Firmen-E-Mail über diesen Link (gültig für 24 Stunden):</p>${boton(enlace, 'E-Mail bestätigen')}<p>Anschließend prüft und genehmigt ein Administrator von IoT FENSTER Ihre Registrierung. Falls Sie das nicht waren, können Sie diese E-Mail ignorieren.</p>`,
+    IT: `<p>Grazie per aver registrato la tua azienda. Conferma la tua email aziendale con questo link (scade tra 24 ore):</p>${boton(enlace, 'Conferma la mia email')}<p>Poi un amministratore di IoT FENSTER esaminerà e approverà la registrazione. Se non sei stato tu, puoi ignorare questa email.</p>`,
+    PT: `<p>Obrigado por registar a sua empresa. Confirme o seu email corporativo com este link (expira em 24 horas):</p>${boton(enlace, 'Confirmar o meu email')}<p>Depois, um administrador da IoT FENSTER irá analisar e aprovar o registo. Se não foi você, pode ignorar este email.</p>`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoCuentaAprobada(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Tu cuenta de IoT FENSTER está activa',
+    EN: 'Your IoT FENSTER account is active',
+    DE: 'Ihr IoT FENSTER-Konto ist aktiv',
+    IT: 'Il tuo account IoT FENSTER è attivo',
+    PT: 'A sua conta IoT FENSTER está ativa',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoCuentaAprobada(idioma: Idioma, enlaceLogin: string): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>Tu empresa ha sido aprobada. Ya puedes iniciar sesión y hacer pedidos:</p>${boton(enlaceLogin, 'Iniciar sesión')}`,
+    EN: `<p>Your company has been approved. You can now sign in and place orders:</p>${boton(enlaceLogin, 'Sign in')}`,
+    DE: `<p>Ihr Unternehmen wurde genehmigt. Sie können sich jetzt anmelden und Bestellungen aufgeben:</p>${boton(enlaceLogin, 'Anmelden')}`,
+    IT: `<p>La tua azienda è stata approvata. Ora puoi accedere e fare ordini:</p>${boton(enlaceLogin, 'Accedi')}`,
+    PT: `<p>A sua empresa foi aprovada. Já pode iniciar sessão e fazer encomendas:</p>${boton(enlaceLogin, 'Iniciar sessão')}`,
+  };
+  return cuerpos[idioma];
+}
+
+export function asuntoCuentaRechazada(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Sobre tu solicitud de alta en IoT FENSTER',
+    EN: 'About your IoT FENSTER registration request',
+    DE: 'Zu Ihrer Registrierungsanfrage bei IoT FENSTER',
+    IT: 'Sulla tua richiesta di registrazione su IoT FENSTER',
+    PT: 'Sobre o seu pedido de registo na IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoCuentaRechazada(idioma: Idioma): string {
+  const cuerpos: Record<Idioma, string> = {
+    ES: '<p>No hemos podido aprobar el alta de tu empresa en este momento. Si crees que se trata de un error, ponte en contacto con IoT FENSTER.</p>',
+    EN: '<p>We were unable to approve your company registration at this time. If you believe this is a mistake, please contact IoT FENSTER.</p>',
+    DE: '<p>Wir konnten die Registrierung Ihres Unternehmens derzeit nicht genehmigen. Wenn Sie glauben, dass es sich um einen Irrtum handelt, wenden Sie sich bitte an IoT FENSTER.</p>',
+    IT: '<p>Al momento non siamo riusciti ad approvare la registrazione della tua azienda. Se pensi che si tratti di un errore, contatta IoT FENSTER.</p>',
+    PT: '<p>De momento não foi possível aprovar o registo da sua empresa. Se considera que se trata de um engano, contacte a IoT FENSTER.</p>',
+  };
+  return cuerpos[idioma];
+}
+
+/// Aviso interno (siempre en español) a los administradores cuando una empresa
+/// ha verificado su correo y queda pendiente de aprobación.
+export function asuntoNuevaSolicitud(razonSocial: string): string {
+  return `Nueva solicitud de alta: ${razonSocial.replace(/[\r\n]+/g, ' ')}`;
+}
+
+export function cuerpoNuevaSolicitud(razonSocial: string, pais: string, enlace: string): string {
+  return (
+    `<p>La empresa <strong>${escaparHtml(razonSocial)}</strong> (${escaparHtml(pais)}) ha verificado su correo y espera aprobación.</p>` +
+    boton(enlace, 'Revisar la solicitud')
+  );
+}
+
+/// Aviso interno (siempre en español) a los administradores de que ha entrado un
+/// pedido. Los datos los escribe el cliente: se escapan.
+export interface DatosAvisoPedidoNuevo {
+  codigoPed: string;
+  razonSocial: string;
+  emailUsuario: string;
+  poNumber: string;
+  totalNeto: string;
+  lineas: number;
+  direccionEnvio: string;
+  notas: string | null;
+  enlace: string;
+}
+
+export function asuntoPedidoNuevo(codigoPed: string, razonSocial: string): string {
+  return `Nuevo pedido ${codigoPed}: ${razonSocial.replace(/[\r\n]+/g, ' ')}`;
+}
+
+export function cuerpoPedidoNuevo(d: DatosAvisoPedidoNuevo): string {
+  const total = Number(d.totalNeto).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+  return (
+    `<p>La empresa <strong>${escaparHtml(d.razonSocial)}</strong> ha confirmado el pedido <strong>${d.codigoPed}</strong>. Adjuntamos el resumen en PDF.</p>` +
+    `<p>Hecho por: ${escaparHtml(d.emailUsuario)}<br/>` +
+    `Su referencia (PO): ${escaparHtml(d.poNumber)}<br/>` +
+    `Líneas: ${d.lineas}<br/>` +
+    `Total neto: ${total}<br/>` +
+    `Dirección de envío: ${escaparHtml(d.direccionEnvio)}` +
+    (d.notas ? `<br/>Notas: ${escaparHtml(d.notas)}` : '') +
+    `</p>` +
+    boton(d.enlace, 'Ver el pedido')
+  );
+}
+
+/// Bienvenida al primer usuario de una empresa que da de alta directamente IoT
+/// FENSTER (sin pasar por el registro). No lleva la contraseña: si no la conoce,
+/// la crea desde "He olvidado mi contraseña".
+export function asuntoBienvenidaEmpresa(idioma: Idioma): string {
+  const asuntos: Record<Idioma, string> = {
+    ES: 'Bienvenido a la plataforma de pedidos de IoT FENSTER',
+    EN: 'Welcome to the IoT FENSTER ordering platform',
+    DE: 'Willkommen auf der Bestellplattform von IoT FENSTER',
+    IT: 'Benvenuto nella piattaforma ordini di IoT FENSTER',
+    PT: 'Bem-vindo à plataforma de encomendas da IoT FENSTER',
+  };
+  return asuntos[idioma];
+}
+
+export function cuerpoBienvenidaEmpresa(idioma: Idioma, email: string, enlaceLogin: string, enlaceRecuperar: string): string {
+  const e = escaparHtml(email);
+  const cuerpos: Record<Idioma, string> = {
+    ES: `<p>IoT FENSTER ha dado de alta a tu empresa en su plataforma de pedidos. Puedes entrar con tu correo <strong>${e}</strong>:</p>${boton(enlaceLogin, 'Entrar en la plataforma')}<p>Si no conoces tu contraseña, crea una nueva aquí: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    EN: `<p>IoT FENSTER has registered your company on its ordering platform. You can sign in with your email <strong>${e}</strong>:</p>${boton(enlaceLogin, 'Go to the platform')}<p>If you don't know your password, create a new one here: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    DE: `<p>IoT FENSTER hat Ihr Unternehmen auf seiner Bestellplattform registriert. Sie können sich mit Ihrer E-Mail-Adresse <strong>${e}</strong> anmelden:</p>${boton(enlaceLogin, 'Zur Plattform')}<p>Wenn Sie Ihr Passwort nicht kennen, legen Sie hier ein neues fest: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    IT: `<p>IoT FENSTER ha registrato la tua azienda sulla sua piattaforma ordini. Puoi accedere con la tua email <strong>${e}</strong>:</p>${boton(enlaceLogin, 'Vai alla piattaforma')}<p>Se non conosci la tua password, creane una nuova qui: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
+    PT: `<p>A IoT FENSTER registou a sua empresa na plataforma de encomendas. Pode entrar com o seu email <strong>${e}</strong>:</p>${boton(enlaceLogin, 'Entrar na plataforma')}<p>Se não sabe a sua palavra-passe, crie uma nova aqui: <a href="${enlaceRecuperar}">${enlaceRecuperar}</a></p>`,
   };
   return cuerpos[idioma];
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, recargarSiCambio } from "@/lib/api";
 import { ESTADOS_PEDIDO, type EstadoPedido, type Order } from "@/lib/types";
 
 export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalidateKeys: unknown[][] }) {
@@ -31,13 +31,17 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       setConfirmando(false);
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("forceError")),
+    onError: (err) => {
+      setError(err instanceof ApiError ? err.message : t("forceError"));
+      recargarSiCambio(err, invalidateKeys, queryClient);
+    },
   });
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-      <p className="mb-2 text-sm font-medium text-amber-900">{t("title")}</p>
-      <p className="mb-3 text-xs text-amber-700">{t("description")}</p>
+    // Es una herramienta excepcional: va plegada para que no compita con el flujo normal.
+    <details className="group rounded-lg border border-amber-200 bg-amber-50/60 px-4 py-2.5" open={confirmando || undefined}>
+      <summary className="cursor-pointer text-sm font-medium text-amber-900">{t("title")}</summary>
+      <p className="mb-3 mt-2 text-xs text-amber-700">{t("description")}</p>
       <div className="flex flex-wrap items-center gap-2">
         <select
           value={seleccionado}
@@ -76,18 +80,21 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
             <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
               <input
                 placeholder={t("carrierPlaceholder")}
+                aria-label={t("carrierPlaceholder")}
                 value={transportista}
                 onChange={(e) => setTransportista(e.target.value)}
                 className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
               />
               <input
                 placeholder={t("trackingNumberPlaceholder")}
+                aria-label={t("trackingNumberPlaceholder")}
                 value={numeroExpedicion}
                 onChange={(e) => setNumeroExpedicion(e.target.value)}
                 className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
               />
               <input
                 placeholder={t("trackingUrlPlaceholder")}
+                aria-label={t("trackingUrlPlaceholder")}
                 value={trackingUrl}
                 onChange={(e) => setTrackingUrl(e.target.value)}
                 className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
@@ -112,6 +119,6 @@ export function ForzarEstado({ order, invalidateKeys }: { order: Order; invalida
           </div>
         </div>
       )}
-    </div>
+    </details>
   );
 }

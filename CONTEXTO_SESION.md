@@ -1,4 +1,287 @@
-# Contexto de la sesión en curso (2026-09-29)
+# Contexto de la sesión en curso (actualizado 2026-10-02)
+
+## CAMBIO 2026-10-02 — «cliente» pasa a «distribuidor» (leer primero)
+
+Decidido por David. Distribuidor y partner son la **misma clase de empresa**;
+partner = el distribuidor que compra más y tiene submarca propia. El tipo
+`CLIENTE` se llama ahora `DISTRIBUIDOR` (BD, backend, frontend y los 5 idiomas).
+Todo lo que más abajo diga «cliente» como tipo de empresa se lee «distribuidor».
+- **Los pedidos los gestiona siempre IoT FENSTER**, también los de VBH y
+  Procomsa. La idea de que el partner viese y aprobase los pedidos de sus
+  distribuidores se planteó y se **descartó** el mismo día (la pregunta 1 de 0.1
+  queda respondida: todo pasa por IoT FENSTER).
+- **Rol COMERCIAL desactivado por ahora**: interruptor `COMERCIAL_ACTIVO`
+  (apagado por defecto; `true` en `backend/.env` lo reactiva). Sin él, un
+  comercial no puede entrar ni usar una sesión abierta. No se borra ningún dato.
+  Las altas de empresas las hace solo el administrador mientras tanto.
+- Migración nueva `20261002150000_renombrar_tipo_empresa_cliente_a_distribuidor`
+  (`ALTER TYPE ... RENAME VALUE`, reversible con el valor inverso). Respuesta de
+  `GET /catalogos-marca/:marca`: la clave `empresas.clientes` pasó a `empresas.distribuidores`.
+- No se tocó (otro sentido de «cliente»): `codigoCliente` y «FICHA CLIENTE» (ERP),
+  la etiqueta «CLIENTE» del PDF del pedido y «PO Number del cliente».
+- Las filas antiguas de auditoría `PARTNER_PROMOCIONADO/DEGRADADO` conservan
+  `"CLIENTE"` en su contenido (el registro es inmutable).
+- Sigue abierto: la palabra alemana (hoy «Händler»), si el comercial vuelve a dar
+  de alta cuando se reactive, y quién factura al distribuidor.
+- Base local: 13 distribuidores (todos con marca MySmartWindow) y 3 partners.
+
+## CAMBIO 2026-10-05 — PVP reales y descuento general por empresa
+
+- PVP de tarifa reales (deducidos de la oferta VBH, que es PVP − 50 %): Connect-1/Wave-1/Icon1 90,
+  1+ 100, Connect-2 164, 2+ 174, Connect-2 Security/Wave2S 130, Pulsar+/Wave-4+ 108 (también con cable
+  1,6 m) y Wave3 Air 82 (= C-WALL). En `dispositivos.json`; quitado `datosDePrueba: precio`.
+- Siguen a 50 € de prueba: Wave2S+ (2) y tapas ICON (4).
+- VBH y Procomsa: 50 % de descuento general (se pone en su ficha, Editar → Descuento).
+- Para llevarlo a la base: `npm run import:dispositivos` y luego `npm run tarifa:marcas`
+  (sin `--aplicar` solo enseña los cambios). `rellenar` solo copia el PVP al añadir un producto.
+- EVO y mandos ya están en los catálogos de VBH y Procomsa (`ambito: 'todos'`).
+
+## 0. ESTADO AL 2026-09-30 — leer primero
+
+**Resumen de una línea**: el portal distingue ya **partners** (VBH, Procomsa,
+MySmartWindow, con submarca propia) y **distribuidores** (antes «clientes»; el resto, que ven los
+dispositivos de la marca de un partner; MySmartWindow por defecto). Hay un
+**catálogo único por marca** que se aplica solo a todas sus empresas. Todo
+probado con los 3 roles. Todo está commiteado (ver 0.6). Detalle paso a paso en `PROCESO_CARGA_CATALOGO.md`.
+
+### 0.1 Modelo de negocio (decidido por David)
+- **Partner** = empresa que compra volumen y tiene submarca propia: VBH → Wave,
+  Procomsa → ICON, MySmartWindow → Connect. Su marca es fija.
+- **Distribuidor** (antes «Cliente») = todas las demás empresas. Ven el
+  catálogo de UNA marca; por defecto MySmartWindow (Connect), el admin la puede
+  cambiar (p. ej. un distribuidor del norte a VBH).
+- Un mismo aparato se llama distinto según la marca (Connect-1 = Wave-1 =
+  Icon1): es UN `ProductoBase` con los nombres/GTIN por marca en
+  `especificacionesJson.referencias`. NO se separa (se probó y se deshizo).
+- Precio = PVP de tarifa − descuento de la empresa (con excepciones por
+  producto). Un catálogo por marca; por empresa solo descuento y ocultar.
+- **Pendiente de dirección** (documento para el jefe, con las preguntas):
+  https://claude.ai/code/artifact/7affca0c-a1a9-4d5d-a0e0-2ccddcbff17d
+  La clave era la pregunta 1: ¿el distribuidor compra a IoT FENSTER directamente
+  o a través del partner? **Respondida el 2026-10-02**: todo pasa por IoT FENSTER;
+  el partner NO ve nada de los distribuidores de su marca.
+
+### 0.2 Qué hay implementado hoy (backend + frontend)
+- **Base de datos** (5 migraciones nuevas, ya aplicadas en local; la 5ª, `historial_estados_pedido`, es de 0.8):
+  `imagen_producto_base` (`ProductoBase.imagenUrl`),
+  `tipo_empresa_y_marca_catalogo` (`Partner.tipo` PARTNER/DISTRIBUIDOR (antes CLIENTE) y
+  `Partner.marcaCatalogo` VBH/PROCOMSA/MYSMARTWINDOW),
+  `catalogo_por_marca` (tabla `ProductoMarca` + `RepresentacionPartner.productoMarcaId`),
+  `numeracion_pedidos_sin_huecos` (borra la secuencia `pedido_codigo_seq`).
+- **Catálogo por marca**: módulo `backend/src/catalogo-marca/`. Cada cambio en
+  la marca se sincroniza al momento a todas sus empresas (`sincronizarEmpresa`),
+  también al crear, aprobar o cambiar de marca una empresa. En una empresa, los
+  productos de su marca solo admiten descuento y ocultar; los "extras" a mano
+  siguen como antes. Carga inicial: Wave 41, ICON 35, Connect 42 productos.
+- **Imágenes de producto** gestionables por el admin (subir/cambiar/quitar,
+  una o varias a la vez): `GET /imagenes/:archivo` (público, nombres UUID),
+  `POST|DELETE /productos-base/imagen`. Archivos en `backend/uploads/productos/`
+  (las 6 de serie `default-*.png` van en git, las subidas NO → incluir esa
+  carpeta en las copias de seguridad).
+- **Numeración de pedidos sin huecos**: `src/pedidos/codigo-pedido.ts` (último
+  PED + 1 con bloqueo de PostgreSQL). **El siguiente pedido será PED-000007.**
+- **Pantallas admin**: menú "Partners" → **"Empresas"** (tarjetas: partners
+  arriba, distribuidores debajo, borde del color de su marca); menú nuevo **"Marcas"**
+  (catálogo de cada submarca, editable, "Añadir lo que falta"); ficha de
+  empresa con tipo y marca en Datos → Comercial; catálogo de la empresa con
+  "Productos de su marca" + "Productos extra" + "Borrar extras"; catálogo
+  global (Productos) con miniaturas, subir imagen, grupos plegables cerrados
+  por defecto y vista "Aparato | Marca". Marcas, Productos y Estadísticas
+  muestran "solo para administradores" a un comercial.
+- **Pantallas del cliente**: catálogo en tarjetas grandes, una por modelo, con
+  círculos de color para elegir variante; imagen del aparato.
+- **Barra superior**: "Salir" como botón con borde (rojo al pasar el ratón),
+  siempre arriba a la derecha. Escritorio ≥1280 px: una fila; tablet: marca +
+  idioma + Salir arriba y secciones debajo; móvil: marca + Salir arriba. Encima
+  de la barra hay una franja fina con "Sesión iniciada como <email> · <empresa
+  o rol>" (para saber con qué cuenta se ha entrado); el email sigue también en
+  el tooltip de "Salir".
+- Accesibilidad: etiquetas enlazadas a sus campos en checkout, registro,
+  recuperar y restablecer contraseña.
+
+### 0.3 Datos (base local)
+- 3 partners: VBH, Procomsa ("Procedimientos de construc. Moderna S.A.") y
+  **MySmartWindow** (creado hoy con datos PROVISIONALES:
+  `PENDIENTE-MYSMARTWINDOW`, sin usuario de acceso → completar su ficha).
+- 12 distribuidores (hoy 13 en la base local), todos con marca MySmartWindow (incluido el "Partner Ficticio
+  S.L." de pruebas, cuyo login es `partner@fenster.test`).
+- **Datos de PRUEBA en el catálogo** (hay que sustituirlos por los reales):
+  PVP 50 € en 23 productos sin precio de tarifa y GTIN `TEST000000001`…`022`.
+  Marcados con `datosDePrueba` en `backend/scripts/data/dispositivos.json`.
+- 2 pedidos (PED-000004 y PED-000006) del Partner Ficticio.
+- Copia de seguridad de la base de antes del catálogo por marca:
+  `%TEMP%\backups\fenster-antes-catalogo-marca.dump` (formato `pg_dump -Fc`).
+
+### 0.4 Scripts nuevos (idempotentes)
+- `npx tsx scripts/migrar-partners-clientes.ts` — clasifica partners/clientes
+  y crea MySmartWindow (ya ejecutado).
+- `npx tsx scripts/poblar-catalogos-marca.ts` — rellena los catálogos de marca
+  y sincroniza todas las empresas (ya ejecutado).
+- `npm run import:dispositivos` — recarga `dispositivos.json` (solo pone la
+  foto de serie al CREAR un producto; nunca pisa lo cambiado por el admin).
+
+### 0.5 Servidores ahora mismo
+- Backend: `node dist/main` en **3010** (compilado, NO en modo watch: tras
+  cambiar backend → `npm run build` en `backend/` y reiniciar).
+- Frontend: `next start -p 3004` (producción, por el túnel: tras cambiar
+  frontend → `npm run build` en `frontend/` y reiniciar).
+- Los arranqué yo en segundo plano; si se reinicia el equipo hay que volver a
+  lanzarlos (sección 8) y recrear los túneles (sección 2).
+- Puertos ocupados por OTRO proyecto (no tocar): 3000 y 3005 (pm2
+  `panel-ventanas` / `panel-ventanas-dev`).
+- Para probar con login SIN pasar por el túnel se usó una copia local:
+  backend en 3011 (`PORT=3011 FRONTEND_URL=http://localhost:3006
+  COOKIE_SAME_SITE=strict node dist/main`) y frontend `next dev -p 3006` con
+  `NEXT_PUBLIC_API_URL=http://localhost:3011` (el modo dev compila en
+  `.next/dev` y no pisa el build del 3004). Ahora están parados.
+
+### 0.6 Git
+- Ver si hay commits sin subir con `git status -sb`. Lo de antes de 0.8 se commiteó en 5 commits (imágenes, numeración de pedidos, barra superior,
+  documentación y el grande de partners/clientes/catálogo por marca). Por
+  compartir archivos, solo el último compila por separado.
+- A Claude le deniegan el permiso de `git push`: subir los commits pendientes a mano
+  con `git push origin master`.
+- `backend/scripts/data/dispositivos.backup-antes-paso2.json` sigue sin
+  guardar en git (copia temporal, se puede borrar).
+- Remoto: `https://github.com/davidiotfenster-dev/plataforma-b2b.git`.
+
+### 0.7 Pendientes
+1. Respuestas del jefe (documento de 0.1), sobre todo la pregunta 1.
+2. Datos reales de MySmartWindow (CIF, dirección, dominio, usuario).
+3. Precios y GTIN reales para sustituir los de prueba (0.3). Revisado con la tarifa
+   "Septiembre 2026" (`Downloads/TARIFA 2026 IoT FENSTER (2).pdf`): sus 11 referencias
+   (C-WALL 82, EVO Shutter 108 / Security 114 / Plus 138, cable datos EVO 12, Pulsar 98,
+   botón Pulsar 20, cables Pulsar 1 m 12 y 2 m 24, White Box 90, mando bluConnect 30) ya
+   coincidían con el catálogo. **Siguen sin precio real (50 € de prueba) 23 referencias**:
+   Connect-1 / 1+ / 2 / 2+ / 2S / 2S+ (2 colores cada uno = 12), tapas ICON1 e ICON2
+   (blanco y negro = 4), Pulsar+ (inox y negro = 2) y Pulsar+ cable 1,6 m (2), y Wave3
+   Air (3). **Siguen sin GTIN real** 19 productos (22 códigos `TEST…`): EVO ×12, C-WALL
+   Flex, White Box, botón Pulsar, cables Pulsar 1 m y 2 m, cable datos EVO y mando
+   Witooth. La tarifa no trae GTIN. Fuera de la tarifa pero con precio sin marcar como
+   de prueba: Wave3 de pared (82), mando Connect estándar (30) y Pulsar cable 1,6 m (98).
+4. Confirmar si el Pulsar con cable 1,6 m es el mismo aparato que el Pulsar.
+5. Fotos de tapas ICON, cables y Connect Smart White Box (se suben desde
+   Admin → Productos).
+6. Al aprobar un registro público, el diálogo no pide marca ni tipo: queda
+   cliente MySmartWindow y se cambia luego en la ficha (valorar añadirlo).
+7. Subir los commits a GitHub (0.6). Al terminar la demo: devolver los `.env`
+   a local y cambiar la contraseña del admin de prueba.
+8. Emails del registro (David lo hará pronto): hoy el token de verificación solo
+   se escribe en el log del servidor; falta la plantilla de email (5 idiomas), la
+   pantalla `/verificar-email`, los avisos de alta aprobada/rechazada y el aviso
+   al admin. No configurar `RESEND_API_KEY` hasta que lo pida.
+9. Cuidado: si se cambia un cliente de marca y se devuelve, los extras que
+   coincidían con productos de la otra marca desaparecen (así pasó con 12
+   productos Wave del Partner Ficticio).
+
+### 0.8 "Mis pedidos" del cliente (mejorado el 2026-09-30)
+- **Historial de estados**: tabla `PedidoEstadoHistorial` (migración
+  `20260930160000_historial_estados_pedido`). Se escribe al confirmar (RECIBIDO)
+  y en cada cambio de estado. Los pedidos que ya existían se rellenaron desde
+  el registro de auditoría. En la línea de tiempo cada paso enseña la PRIMERA
+  vez que se alcanzó (un cambio forzado hacia atrás no desordena las fechas).
+- **Lista** (`/pedidos`): contadores (en curso, enviados 7 días, total),
+  buscador (PED, PO Number, producto o SKU), filtro por estado con contador,
+  fechas desde/hasta, orden (fecha o total), paginación de 10, resumen de
+  productos y enlace de seguimiento en cada fila; tarjetas en móvil.
+  `GET /pedidos` ahora devuelve `{data,total,page,limit,resumen}` (antes un
+  array) y no expone `partnerId` ni `userId`.
+- **Detalle** (`/pedidos/[id]`): línea de tiempo (vertical en móvil), aviso de
+  cancelación con fecha y motivo, PVP y descuento por línea, "Descargar PDF"
+  (`GET /pedidos/:id/pdf`, 404 opaco si es ajeno) y "Repetir pedido"
+  (`POST /carrito/repetir/:pedidoId`: mete las líneas en el carrito con el
+  precio de HOY y avisa de los productos que ya no están y de los precios que
+  han cambiado; oculto para PARTNER_CONSULTA).
+- Los emails de cambio de estado ya existían (no hay que hacer nada).
+- Probado con el cliente de pruebas: lista, filtros, búsqueda, detalle, PDF,
+  repetir, cancelación y móvil. Datos de prueba borrados; 55 tests backend en
+  verde. Servidores 3010/3004 reiniciados con el código nuevo.
+- **PDF del pedido rediseñado** (el que se envía por email al confirmar y el que
+  se descarga en "Descargar PDF"): banda azul marino con el logo, panel con
+  cliente / PO / fecha / dirección, notas, tabla con referencia, producto,
+  cantidad, PVP, descuento, neto y total, total destacado y pie con "Página x de
+  y"; varias páginas con cabecera repetida si hay muchas líneas. Código en
+  `backend/src/common/pdf/pedido-pdf.service.ts`. El logo es
+  `backend/assets/logo-iot-fenster.png` (recortado del PNG "AzulBlanco sin
+  fondo"; su "FENSTER" es blanco, por eso va sobre banda oscura). Si falta el
+  archivo, el PDF sale con el nombre en texto.
+- **PDF en 5 idiomas** (es/en/de/it/pt): rótulos, fechas e importes por idioma en
+  `backend/src/common/pdf/pedido-pdf.textos.ts` (en inglés `€1,234.50`, en el
+  resto `1.234,50 €`). `GET /pedidos/:id/pdf?idioma=DE` (400 si el valor no es
+  válido; sin parámetro usa el idioma guardado del usuario). En la pantalla,
+  "Descargar PDF" abre un menú "Idioma del PDF" con el idioma actual primero
+  (`frontend/src/components/descargar-pdf.tsx`). El email de confirmación
+  adjunta el PDF en el idioma del destinatario. Los nombres de producto y la
+  dirección no se traducen (son datos).
+- Foto del producto en cada línea del detalle (la del catálogo actual; sin foto
+  si el producto ya no está).
+- No hecho (ideas): IVA/base imponible en el detalle (el pedido no guarda el
+  IVA vigente al confirmar, habría que congelarlo primero) y filtro por varios
+  estados a la vez.
+
+### 0.9 Archivar y eliminar empresas (2026-09-30)
+- **Archivar** (reversible): `POST /partners/:id/archivar` y `/desarchivar` (ADMIN y
+  COMERCIAL con su alcance). Campo `Partner.archivadoEn` (migración
+  `empresa_archivada`). Una empresa archivada no sale en las listas ni en los
+  contadores, no puede entrar (comprobado en login y en cada petición) y no recibe
+  catálogo de marca ni productos nuevos. Conserva datos y pedidos. No se puede
+  archivar con pedidos sin enviar (RECIBIDO…PREPARADO). Sus pedidos ya no salen en
+  el panel de pedidos del admin (sí en su ficha).
+- **Eliminar definitivamente**: `DELETE /partners/:id` con `{confirmarRazonSocial}`,
+  solo ADMIN_FENSTER y solo si la empresa NO tiene pedidos (la base de datos lo
+  impide además, `onDelete: Restrict`). Borra usuarios, catálogo y carritos, deja
+  `PARTNER_ELIMINADO` en la auditoría y libera CIF y email (así una solicitud
+  rechazada puede volver a registrarse).
+- **Pantallas**: pestaña "Archivadas (n)" en Empresas (`?archivadas=1`), acciones
+  Archivar / Desarchivar / Eliminar… en el menú de cada empresa y en su ficha
+  (Eliminar solo aparece sin pedidos y pide escribir la razón social).
+- Probado con una empresa de prueba (borrada): archivar, sesión abierta cortada,
+  login bloqueado, desarchivar, nombre incorrecto (400), con pedidos (409).
+
+### 0.11 Ayuda dentro del portal (2026-09-30)
+- **Burbuja de ayuda** ("?" flotante abajo a la derecha, para TODOS: visitantes, clientes
+  y personal): abre un panel con las preguntas de la pantalla en la que estás y unas
+  generales (idioma, y con sesión "¿con qué cuenta he entrado?"). Contenido fijo y
+  traducido a los 5 idiomas; no toca datos de nadie (no es un chat con IA).
+  Código en `frontend/src/components/ayuda/`: `temas.ts` (qué preguntas salen en cada
+  ruta), `ayuda-burbuja.tsx` y `ayuda-puntual.tsx`. Textos en `messages/*.json`, clave
+  `ayuda` (`ayuda.q.<id>.p|r`, `ayuda.temas.<tema>`, `ayuda.puntual.*`).
+- **Buscador y "Otros temas"** (2026-10-05): el panel tiene un buscador (sin tildes ni
+  mayúsculas, busca en preguntas y respuestas) y abajo los demás temas para consultarlos
+  desde cualquier pantalla. Cada usuario solo ve los suyos: el personal de IoT FENSTER los
+  del panel (`TEMAS_PERSONAL`), los clientes los del portal (sin entrar/registro con
+  sesión). Con ayuda propia también: Nueva empresa, Catálogo de la empresa y Usuarios de
+  la empresa. La barra fija de guardar de la ficha deja sitio a la derecha para el botón.
+- **Iconos "?" puntuales** (pasas el ratón, los enfocas o los pulsas): estados en Mis
+  pedidos, "Precio neto" en el carrito y en el detalle del pedido, y "Tipo de empresa"
+  en la ficha de la empresa.
+- **Para añadir ayuda a una pantalla nueva**: añadir el tema y sus ids en `temas.ts`,
+  la ruta en `temaDeRuta`, y los textos en los 5 idiomas.
+- **Contacto** (2026-10-05, datos de David): al pie de la ayuda, solo para clientes y
+  visitantes. Comercial (información, precios y ofertas): info@iotfenster.com.
+  Incidencias: soporte@iotfenster.com. Cada uno con botón de WhatsApp y un mensaje ya
+  escrito. WhatsApp: +34 660 804 391, el mismo para los dos (constante `WHATSAPP` en
+  `frontend/src/components/ayuda/contacto.ts`; vacía, los botones no salen).
+- Dos respuestas suponen que los emails funcionan (recuperar contraseña y verificar
+  correo); revisarlas al activar los emails del registro (ver pendientes).
+
+### 0.10 Pendientes de usuarios y roles (análisis del 2026-09-30, sin hacer)
+1. No se puede añadir un 2º usuario a una empresa (solo el primero, en el registro o
+   el alta directa). Los roles COMPRADOR y SOLO CONSULTA existen pero no se pueden
+   crear. Falta una pantalla "Mi equipo" para el PARTNER_ADMIN (crear usuarios,
+   roles, desactivar); depende de los emails para invitar (o contraseña temporal).
+2. `PARTNER_ADMIN` y `PARTNER_COMPRADOR` hacen lo mismo hoy (solo CONSULTA se distingue).
+3. No hay "cambiar mi contraseña" con la sesión abierta ni pantalla "Mi cuenta".
+4. Nada protege al último administrador de una empresa.
+5. El personal interno (admins y comerciales) se crea por script; el COMERCIAL no
+   puede restablecer la contraseña de sus clientes.
+6. Sin doble factor para ADMIN_FENSTER (imprescindible antes de producción, junto
+   con cambiar la contraseña de prueba).
+7. Esperar la respuesta del jefe sobre partner/distribuidor antes de tocar el alcance por marca.
+
+---
+
+# Contexto anterior (2026-09-29)
 
 Este archivo es un "volcado" del estado exacto de esta sesión de trabajo con
 Claude Code, para poder retomarla igual tras un `/clear` o desde otra
@@ -219,7 +502,7 @@ Casos con matices que David debería revisar cuando pueda:
 |---|---|---|
 | Admin FENSTER | `admin@fenster.test` | `Fenster2026!` |
 | Comercial | `comercial@fenster.test` | `Fenster2026!` |
-| Partner (cliente) | `partner@fenster.test` | `Fenster2026!` |
+| Partner Ficticio (distribuidor) | `partner@fenster.test` | `Fenster2026!` |
 
 ## 8. Cómo arrancar todo desde cero
 

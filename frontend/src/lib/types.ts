@@ -4,6 +4,10 @@ export type Idioma = "ES" | "EN" | "DE" | "IT" | "PT";
 
 export type EstadoPartner = "PENDIENTE_VERIFICACION_EMAIL" | "PENDIENTE_APROBACION" | "ACTIVO" | "SUSPENDIDO" | "RECHAZADO";
 
+export type TipoEmpresa = "PARTNER" | "DISTRIBUIDOR";
+
+export type MarcaCatalogo = "VBH" | "PROCOMSA" | "MYSMARTWINDOW";
+
 export type EstadoPedido = "RECIBIDO" | "CONFIRMADO" | "EN_PREPARACION" | "PREPARADO" | "ENVIADO" | "CANCELADO";
 
 export interface Perfil {
@@ -13,7 +17,7 @@ export interface Perfil {
   rol: RolUsuario;
   idioma: Idioma;
   partnerId: string | null;
-  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner } | null;
+  partner: { razonSocial: string; marcaComercial: string | null; estado: EstadoPartner; direccionEnvio: string | null } | null;
 }
 
 export interface Producto {
@@ -23,7 +27,13 @@ export interface Producto {
   imagenUrl: string | null;
   documentacionUrl: string | null;
   pvpBase: string;
+  /// Descuento (%) y precio neto unitario de la empresa del usuario, calculados en el servidor.
+  descuentoPorcentaje: string;
+  precioNeto: string;
   activo: boolean;
+  /// Color y modelo (identificador opaco) para agrupar las variantes de color; solo en el listado.
+  color?: string | null;
+  modeloId?: string;
 }
 
 export interface ProductoDetalle extends Producto {
@@ -43,6 +53,8 @@ export interface LineaCarrito {
   descuentoPorcentaje: string;
   precioNetoUnitario: string;
   totalLinea: string;
+  /// `false` si el producto se retiró de la venta después de meterlo en el carrito.
+  disponible: boolean;
 }
 
 export interface ResumenCarrito {
@@ -60,6 +72,8 @@ export interface OrderItem {
   precioNetoUnitario: string;
   cantidad: number;
   totalLinea: string;
+  /// Solo en el detalle del cliente; nulo si el producto ya no está en el catálogo.
+  imagenUrl?: string | null;
 }
 
 export const ESTADOS_PEDIDO: EstadoPedido[] = ["RECIBIDO", "CONFIRMADO", "EN_PREPARACION", "PREPARADO", "ENVIADO"];
@@ -82,6 +96,38 @@ export interface Order {
   updatedAt: string;
   items?: OrderItem[];
   partner?: { razonSocial: string };
+  /// Solo en el detalle (del cliente y del admin): cuándo entró el pedido en cada estado.
+  historial?: HistorialEstado[];
+  /// Solo en el detalle del admin: quién hizo el pedido.
+  usuario?: { nombre: string; email: string };
+}
+
+export interface HistorialEstado {
+  estado: EstadoPedido;
+  createdAt: string;
+}
+
+/// Fila de "Mis pedidos": el pedido sin sus líneas, con un resumen de lo que lleva.
+export type PedidoResumen = Omit<Order, "partnerId" | "userId" | "items" | "partner" | "historial"> & {
+  articulos: number;
+  productos: { nombre: string; cantidad: number }[];
+  productosRestantes: number;
+};
+
+export interface PedidosPagina {
+  data: PedidoResumen[];
+  total: number;
+  page: number;
+  limit: number;
+  /// Del conjunto completo de pedidos del cliente, sin los filtros de la búsqueda.
+  resumen: { porEstado: Partial<Record<EstadoPedido, number>>; enviadosUltimos7Dias: number };
+}
+
+export interface ResultadoRepetirPedido {
+  carrito: ResumenCarrito;
+  agregadas: number;
+  noDisponibles: string[];
+  preciosCambiados: { nombre: string; anterior: string; actual: string }[];
 }
 
 export interface AuditLogEntry {
@@ -104,12 +150,20 @@ export interface Usuario {
   createdAt: string;
 }
 
+export type GranularidadEstadisticas = "day" | "week" | "month";
+
+/// Respuesta de `GET /pedidos/admin/estadisticas`. Importes en euros (número);
+/// los pedidos cancelados solo cuentan en `porEstado` y `kpis.cancelados`.
 export interface Estadisticas {
-  totalPedidos: number;
-  totalFacturado: string;
-  porEstado: { estado: EstadoPedido; cantidad: number; totalNeto: string }[];
-  porPartner: { partnerId: string; razonSocial: string; cantidad: number; totalNeto: string }[];
-  pedidosPorDia: { dia: string; cantidad: number }[];
+  periodo: { desde: string; hasta: string; granularidad: GranularidadEstadisticas };
+  kpis: { pedidos: number; facturado: number; ticketMedio: number; unidades: number; sinEnviar: number; cancelados: number };
+  periodoAnterior: { pedidos: number; facturado: number; unidades: number };
+  serie: { tramo: string; pedidos: number; unidades: number; facturado: number }[];
+  porEstado: { estado: EstadoPedido; cantidad: number; facturado: number }[];
+  porMarca: { marca: MarcaCatalogo; pedidos: number; unidades: number; facturado: number }[];
+  topEmpresas: { partnerId: string; razonSocial: string; marca: MarcaCatalogo | null; pedidos: number; unidades: number; facturado: number }[];
+  topProductos: { sku: string; nombre: string; unidades: number; facturado: number }[];
+  empresas: { id: string; razonSocial: string; marca: MarcaCatalogo }[];
 }
 
 export interface Paginado<T> {
@@ -128,6 +182,8 @@ export interface ProductoBaseAdmin {
   especificacionesJson?: EspecificacionesDispositivo | null;
   /// PVP de la tarifa oficial (igual para todos los partners); null = sin precio en tarifa.
   pvpTarifa?: string | null;
+  /// Foto del aparato (ruta `/imagenes/...`), la misma para todas las marcas.
+  imagenUrl?: string | null;
   _count?: { representaciones: number };
 }
 
@@ -171,11 +227,40 @@ export interface RepresentacionAdmin {
   pvpBase: string;
   descuentoOverride: string | null;
   activo: boolean;
-  productoBase: { id: string; skuIndustrial: string; nombreTecnico: string };
+  /// Producto del catálogo de su marca (nombre, SKU y PVP los fija la marca); null = extra asignado a mano.
+  productoMarcaId: string | null;
+  productoMarca: { marca: MarcaCatalogo; activo: boolean } | null;
+  productoBase: { id: string; skuIndustrial: string; nombreTecnico: string; imagenUrl: string | null };
+}
+
+/// Producto del catálogo de una submarca (`GET /catalogos-marca/:marca`).
+export interface ProductoMarcaAdmin {
+  id: string;
+  marca: MarcaCatalogo;
+  productoBaseId: string;
+  skuComercial: string;
+  nombreComercial: string;
+  pvpBase: string;
+  activo: boolean;
+  productoBase: {
+    id: string;
+    skuIndustrial: string;
+    nombreTecnico: string;
+    imagenUrl: string | null;
+    activo: boolean;
+    especificacionesJson: EspecificacionesDispositivo | null;
+  };
+}
+
+export interface CatalogoMarcaAdmin {
+  marca: MarcaCatalogo;
+  productos: ProductoMarcaAdmin[];
+  empresas: { partners: number; distribuidores: number };
 }
 
 export interface Partner {
   id: string;
+  updatedAt?: string;
   razonSocial: string;
   cif: string;
   direccionFiscal: string;
@@ -203,10 +288,26 @@ export interface Partner {
   iva: string | null;
   notas: string | null;
   estado: EstadoPartner;
+  /// Partner (submarca propia) o distribuidor (usa la marca de un partner).
+  tipo: TipoEmpresa;
+  /// Marca cuyos dispositivos ve la empresa.
+  marcaCatalogo: MarcaCatalogo;
   creadoPorUsuarioId: string | null;
+  /// Fecha en que se archivó; nulo si no lo está. Una empresa archivada no sale en las listas ni puede entrar.
+  archivadoEn: string | null;
   createdAt: string;
   /// Cuántos usuarios, productos de catálogo y pedidos tiene (el listado y la ficha los traen ya contados).
   _count?: { usuarios: number; representaciones: number; ordenes: number };
+  /// Solo viene en la ficha (`GET /partners/:id`), no en el listado.
+  volumen?: VolumenCompras;
+}
+
+/// Lo que lleva comprado una empresa (sin pedidos cancelados). `umbralPromocion` es el
+/// aviso configurado en el servidor (PARTNER_UMBRAL_UNIDADES); nulo si no hay.
+export interface VolumenCompras {
+  unidades: number;
+  pedidos: number;
+  umbralPromocion: number | null;
 }
 
 /// Cifras de las pestañas del panel de partners (`GET /partners/resumen`).
@@ -215,9 +316,13 @@ export interface ResumenPartners {
   porEstado: Record<EstadoPartner, number>;
   /// Partners con datos provisionales (CIF, dominio o dirección "PENDIENTE").
   datosPorCompletar: number;
+  /// Empresas archivadas (no cuentan en `total` ni en `porEstado`).
+  archivadas: number;
 }
 
 export interface CrearPartnerInput {
+  tipo?: TipoEmpresa;
+  marcaCatalogo?: MarcaCatalogo;
   razonSocial: string;
   cif: string;
   direccionFiscal: string;

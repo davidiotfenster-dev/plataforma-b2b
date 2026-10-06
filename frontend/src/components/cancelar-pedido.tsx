@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, recargarSiCambio } from "@/lib/api";
 import type { Order } from "@/lib/types";
 
 export function CancelarPedido({ order, invalidateKeys }: { order: Order; invalidateKeys: unknown[][] }) {
@@ -14,19 +14,25 @@ export function CancelarPedido({ order, invalidateKeys }: { order: Order; invali
   const [error, setError] = useState<string | null>(null);
 
   const cancelar = useMutation({
-    mutationFn: () => api.patch(`/pedidos/${order.id}/estado`, { estado: "CANCELADO", motivoCancelacion: motivo }),
+    mutationFn: () => api.patch(`/pedidos/${order.id}/estado`, { estado: "CANCELADO", motivoCancelacion: motivo.trim() }),
     onSuccess: () => {
       invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       setAbierto(false);
       setMotivo("");
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("error")),
+    onError: (err) => {
+      setError(err instanceof ApiError ? err.message : t("error"));
+      recargarSiCambio(err, invalidateKeys, queryClient);
+    },
   });
 
   const reactivar = useMutation({
     mutationFn: () => api.patch(`/pedidos/${order.id}/estado`, { estado: "RECIBIDO", forzar: true }),
     onSuccess: () => invalidateKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey })),
-    onError: (err) => setError(err instanceof ApiError ? err.message : t("error")),
+    onError: (err) => {
+      setError(err instanceof ApiError ? err.message : t("error"));
+      recargarSiCambio(err, invalidateKeys, queryClient);
+    },
   });
 
   if (order.estado === "ENVIADO") return null;

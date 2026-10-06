@@ -10,6 +10,7 @@ import { EstadoPartner, RolUsuario } from '../../generated/prisma/enums.js';
 describe('JwtStrategy.validate', () => {
   let findUnique: ReturnType<typeof vi.fn>;
   let strategy: JwtStrategy;
+  let comercialActivo: boolean;
 
   const ahora = Math.floor(Date.now() / 1000);
   const payload = (extra: Record<string, unknown> = {}) =>
@@ -17,7 +18,9 @@ describe('JwtStrategy.validate', () => {
 
   beforeEach(() => {
     findUnique = vi.fn();
-    strategy = new JwtStrategy({ get: () => 'secreto-de-prueba' } as never, { user: { findUnique } } as never);
+    comercialActivo = false;
+    const config = { get: (clave: string) => (clave === 'comercialActivo' ? comercialActivo : 'secreto-de-prueba') };
+    strategy = new JwtStrategy(config as never, { user: { findUnique } } as never);
   });
 
   it('usa el rol y el partner de la BD, no los del token', async () => {
@@ -33,6 +36,20 @@ describe('JwtStrategy.validate', () => {
     const usuario = await strategy.validate(payload());
 
     expect(usuario).toEqual({ userId: 'user-1', partnerId: 'partner-real', rol: RolUsuario.PARTNER_CONSULTA });
+  });
+
+  it('un token de un solo uso (verificar correo, restablecer contraseña) no vale como sesión', async () => {
+    findUnique.mockResolvedValue({
+      activo: true,
+      sesionInvalidadaEn: null,
+      rol: RolUsuario.ADMIN_FENSTER,
+      partnerId: null,
+      partner: null,
+    });
+
+    await expect(strategy.validate(payload({ tipo: 'verificacion-email' }))).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(strategy.validate(payload({ tipo: 'reset-password' }))).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(findUnique).not.toHaveBeenCalled();
   });
 
   it('rechaza a un usuario cuyo partner está suspendido, aunque su cookie siga viva', async () => {
@@ -59,6 +76,36 @@ describe('JwtStrategy.validate', () => {
     const usuario = await strategy.validate(payload({ partnerId: null }));
 
     expect(usuario).toEqual({ userId: 'user-1', partnerId: null, rol: RolUsuario.ADMIN_FENSTER });
+  });
+
+  describe('interruptor COMERCIAL_ACTIVO', () => {
+    const comercial = {
+      activo: true,
+      sesionInvalidadaEn: null,
+      rol: RolUsuario.COMERCIAL,
+      partnerId: null,
+      partner: null,
+    };
+
+    it('con el rol apagado rechaza una sesión de comercial ya abierta', async () => {
+      findUnique.mockResolvedValue(comercial);
+      await expect(strategy.validate(payload({ partnerId: null }))).rejects.toBeInstanceOf(UnauthorizedException);
+    });
+
+    it('con el rol encendido deja pasar al comercial como antes', async () => {
+      comercialActivo = true;
+      findUnique.mockResolvedValue(comercial);
+      await expect(strategy.validate(payload({ partnerId: null }))).resolves.toEqual({
+        userId: 'user-1',
+        partnerId: null,
+        rol: RolUsuario.COMERCIAL,
+      });
+    });
+
+    it('el apagado no afecta al administrador', async () => {
+      findUnique.mockResolvedValue({ ...comercial, rol: RolUsuario.ADMIN_FENSTER });
+      await expect(strategy.validate(payload({ partnerId: null }))).resolves.toMatchObject({ rol: RolUsuario.ADMIN_FENSTER });
+    });
   });
 
   it('rechaza usuarios desactivados y sesiones anteriores a un cierre forzado', async () => {

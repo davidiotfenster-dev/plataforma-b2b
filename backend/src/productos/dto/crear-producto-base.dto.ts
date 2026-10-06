@@ -1,12 +1,14 @@
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CrearProductoBaseDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
   skuIndustrial!: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   nombreTecnico!: string;
 
   /// Ficha libre del dispositivo (grupo/familia, color, referencias por
