@@ -75,14 +75,19 @@ export function boton(enlace: string, texto: string): string {
 }
 
 /// Marco visual común de todos los correos: cabecera de marca, tarjeta y pie. Lo aplica
-/// `EmailService` al enviar; las plantillas solo escriben el contenido.
-export function envolverCorreo(contenido: string): string {
+/// `EmailService` al enviar; las plantillas solo escriben el contenido. Con `logoUrl`
+/// (dirección pública https) la cabecera lleva el logo; sin ella, el nombre en texto.
+export function envolverCorreo(contenido: string, logoUrl?: string): string {
+  const marca =
+    logoUrl && /^https?:\/\//i.test(logoUrl)
+      ? `<img src="${escaparHtml(logoUrl)}" alt="IoT FENSTER" height="34" style="display:block;border:0;height:34px;width:auto">`
+      : `IoT <span style="color:#0d9488">FENSTER</span>`;
   return (
     `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7">` +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7"><tr><td align="center" style="padding:24px 12px">` +
     `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">` +
     `<tr><td style="height:5px;background:#0d9488;font-size:0;line-height:0">&nbsp;</td></tr>` +
-    `<tr><td style="padding:22px 32px 0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;letter-spacing:.5px;color:#111827">IoT <span style="color:#0d9488">FENSTER</span></td></tr>` +
+    `<tr><td style="padding:22px 32px 0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;letter-spacing:.5px;color:#111827">${marca}</td></tr>` +
     `<tr><td style="padding:12px 32px 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#374151">${contenido}</td></tr>` +
     `<tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#6b7280">IoT FENSTER · iotfenster.com</td></tr>` +
     `</table></td></tr></table></body></html>`

@@ -10,6 +10,8 @@ export default () => ({
   resendApiKey: process.env.RESEND_API_KEY,
   emailFrom: process.env.EMAIL_FROM ?? 'pedidos@iotfenster.com',
   emailReplyTo: process.env.EMAIL_REPLY_TO,
+  /// Dirección pública (https) del logo de la cabecera de los correos. Sin ella, va el nombre en texto.
+  emailLogoUrl: process.env.EMAIL_LOGO_URL,
   /// `ses` para enviar por Amazon SES; vacío, Resend si hay `RESEND_API_KEY`.
   emailProveedor: process.env.EMAIL_PROVEEDOR,
   awsSesRegion: process.env.AWS_SES_REGION ?? 'eu-west-1',
