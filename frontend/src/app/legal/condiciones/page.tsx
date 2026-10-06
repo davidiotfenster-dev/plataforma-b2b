@@ -91,8 +91,21 @@ export default function CondicionesPage() {
             transportista y, si existe, el enlace de seguimiento.
           </li>
           <li>
-            Las garantías, incidencias de transporte y devoluciones se rigen por{" "}
-            <Pendiente>condiciones generales de venta o política de devoluciones</Pendiente>.
+            Los productos tienen la{" "}
+            <a
+              href="https://www.iotfenster.com/es/legal/garantia-comercial"
+              target="_blank"
+              rel="noopener"
+              className="text-teal-700 underline"
+            >
+              garantía comercial de IoT FENSTER
+            </a>{" "}
+            de 5 años frente a defectos de fabricación. Las reclamaciones se tramitan en info@iotfenster.com o
+            soporte@iotfenster.com indicando modelo, número de serie y factura de compra.
+          </li>
+          <li>
+            Las incidencias de transporte y las devoluciones que no sean por garantía se rigen por{" "}
+            <Pendiente>política de devoluciones e incidencias de transporte</Pendiente>.
           </li>
         </Lista>
       </Seccion>

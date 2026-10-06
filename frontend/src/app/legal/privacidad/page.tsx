@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Dato, Lista, Pendiente, Seccion } from "../componentes";
+import { Dato, Lista, Seccion } from "../componentes";
 
 export const metadata: Metadata = { title: "Política de privacidad — IoT FENSTER" };
 
@@ -81,7 +81,7 @@ export default function PrivacidadPage() {
           activa. Después se bloquean durante los plazos de prescripción de las obligaciones legales (con carácter
           general, seis años para la documentación mercantil según el artículo 30 del Código de Comercio) y,
           transcurridos, se eliminan. Los registros de auditoría y seguridad se conservan el tiempo necesario para
-          investigar incidentes, y como máximo <Pendiente>plazo, p. ej. 12 meses</Pendiente>.
+          investigar incidentes, y como máximo 12 meses.
         </p>
       </Seccion>
 
@@ -94,8 +94,8 @@ export default function PrivacidadPage() {
           </li>
           <li>
             Proveedores que tratan los datos por cuenta de IoT FENSTER con contrato de encargado del tratamiento:
-            alojamiento de la web y la base de datos (<Dato campo="alojamiento" />) y envío de emails (Resend,
-            Inc., Estados Unidos).
+            alojamiento de la web y la base de datos (<Dato campo="alojamiento" />) y envío de emails (Amazon
+            Simple Email Service, servidores en la Unión Europea).
           </li>
           <li>Administraciones públicas, juzgados y tribunales cuando exista obligación legal.</li>
         </Lista>
@@ -103,9 +103,10 @@ export default function PrivacidadPage() {
 
       <Seccion titulo="6. Transferencias internacionales">
         <p>
-          El proveedor de email Resend, Inc. está en Estados Unidos. La transferencia se ampara en el Marco de
-          Privacidad de Datos UE-EE. UU. o, en su defecto, en las cláusulas contractuales tipo aprobadas por la
-          Comisión Europea (art. 46 RGPD).
+          Los datos se alojan y procesan en servidores situados en la Unión Europea. Amazon Web Services pertenece
+          a un grupo con sede en Estados Unidos; si se produjera algún acceso desde fuera del Espacio Económico
+          Europeo, se ampara en el Marco de Privacidad de Datos UE-EE. UU. y en las cláusulas contractuales tipo
+          aprobadas por la Comisión Europea (art. 46 RGPD).
         </p>
       </Seccion>
 
