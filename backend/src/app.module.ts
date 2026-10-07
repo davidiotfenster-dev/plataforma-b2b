@@ -18,6 +18,7 @@ import { CarritoModule } from './carrito/carrito.module.js';
 import { PedidosModule } from './pedidos/pedidos.module.js';
 import { AuditoriaModule } from './auditoria/auditoria.module.js';
 import { AjustesLegalesModule } from './ajustes-legales/ajustes-legales.module.js';
+import { PartnersApiModule } from './partners-api/partners-api.module.js';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AjustesLegalesModule } from './ajustes-legales/ajustes-legales.module.j
     }),
     PrismaModule,
     RedisModule,
+    PartnersApiModule,
     PdfModule,
     EmailModule,
     AuthModule,

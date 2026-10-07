@@ -26,7 +26,8 @@
     "seed:demo:cleanup": "tsx scripts/seed-demo-cleanup.ts",
     "import:partners-reales": "tsx scripts/import-partners-reales.ts",
     "import:dispositivos": "tsx scripts/import-dispositivos.ts",
-    "tarifa:marcas": "tsx scripts/aplicar-tarifa-marcas.ts"
+    "tarifa:marcas": "tsx scripts/aplicar-tarifa-marcas.ts",
+    "api:contrato": "tsx scripts/probar-partners-api.ts"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1146.0",

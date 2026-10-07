@@ -19,4 +19,13 @@ export default () => ({
   /// Interruptor del rol COMERCIAL: apagado por defecto (decisión 2026-10-02). Con
   /// `COMERCIAL_ACTIVO=true` el rol vuelve a funcionar tal como estaba, sin tocar datos.
   comercialActivo: process.env.COMERCIAL_ACTIVO === 'true',
+  /// API de Partners de IoT FENSTER (AWS API Gateway, stage incluido: `…/v1`). Vacía, no se usa.
+  partnersApiUrl: process.env.PARTNERS_API_URL ?? '',
+  /// API key de API Gateway (cabecera `x-api-key`), si el API la exige.
+  partnersApiKey: process.env.PARTNERS_API_KEY,
+  partnersApiTimeoutMs: parseInt(process.env.PARTNERS_API_TIMEOUT_MS ?? '10000', 10),
+  /// Reintentos extra, solo en GET y escrituras con Idempotency-Key.
+  partnersApiReintentos: parseInt(process.env.PARTNERS_API_REINTENTOS ?? '2', 10),
+  /// Copiar también los eventos de auditoría a `POST /v1/audit/events`.
+  partnersApiAuditoria: process.env.PARTNERS_API_AUDITORIA === 'true',
 });

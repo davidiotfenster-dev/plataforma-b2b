@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
 import { validarEntorno } from './config/validar-entorno.js';
+import { middlewareRequestId } from './partners-api/contexto-peticion.js';
 
 async function bootstrap() {
   const logger = new Logger('Arranque');
@@ -26,11 +27,13 @@ async function bootstrap() {
     app.set('trust proxy', Number(process.env.TRUST_PROXY));
   }
 
+  app.use(middlewareRequestId);
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
     credentials: true,
+    exposedHeaders: ['X-Request-Id'],
   });
   app.useGlobalPipes(
     new ValidationPipe({
