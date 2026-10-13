@@ -9,7 +9,11 @@ import { ControlAcceso } from "@/components/control-acceso";
 import { Marca } from "@/components/marca";
 import { AyudaBurbuja } from "@/components/ayuda/ayuda-burbuja";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { PAGINAS_LEGALES } from "./legal/paginas";
+
+/// Web de la empresa, la misma a la que ya enlazan los textos legales.
+const WEB_EMPRESA = { url: "https://www.iotfenster.com", texto: "www.iotfenster.com" };
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,7 +57,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                     </Link>
                   ))}
                 </nav>
-                <span>© {new Date().getFullYear()} IoT FENSTER</span>
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span>© {new Date().getFullYear()} IoT FENSTER</span>
+                  <a
+                    href={WEB_EMPRESA.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-neutral-900"
+                  >
+                    {WEB_EMPRESA.texto}
+                    <ExternalLink className="size-3" aria-hidden />
+                  </a>
+                </span>
               </div>
             </footer>
             <NavegacionMovil />

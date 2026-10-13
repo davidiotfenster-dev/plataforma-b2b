@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Eye, EyeOff, Info, Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Info, Languages, Loader2, Lock, Mail, Tag, Truck } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { Perfil } from "@/lib/types";
 import { destinoTrasLogin } from "@/lib/acceso";
@@ -13,6 +13,13 @@ import { localeCookieName } from "@/i18n/locales";
 
 const CAMPO =
   "h-11 w-full rounded-lg border border-neutral-300 bg-white pl-10 pr-3 text-sm text-neutral-900 placeholder:text-neutral-400 transition focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-600/15";
+
+/// Lo que se cuenta en el panel de bienvenida del login (solo en pantallas anchas).
+const BENEFICIOS = [
+  { icono: Tag, clave: "benefit1" },
+  { icono: Truck, clave: "benefit2" },
+  { icono: Languages, clave: "benefit3" },
+] as const;
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -60,10 +67,30 @@ function Login() {
   }
 
   return (
-    <div className="mx-auto mt-6 w-full max-w-md sm:mt-12">
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <div className="h-1 bg-teal-600" />
-        <div className="px-6 pb-8 pt-7 sm:px-8">
+    <div className="mx-auto mt-2 w-full max-w-md sm:mt-8 md:max-w-4xl">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:grid md:grid-cols-[5fr_6fr]">
+        <aside className="relative overflow-hidden bg-[#10263b] px-6 py-6 text-white md:flex md:flex-col md:justify-between md:px-9 md:py-10">
+          <div aria-hidden className="pointer-events-none absolute -bottom-28 -right-24 size-80 rounded-full bg-teal-400/10" />
+          <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 size-40 rounded-full bg-teal-400/10" />
+          <div className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-iot-fenster.png" alt="IoT FENSTER" className="h-9 w-auto md:h-11" />
+            <h2 className="mt-4 text-lg font-semibold tracking-tight md:mt-12 md:text-2xl md:leading-snug">{t("welcomeTitle")}</h2>
+            <p className="mt-3 hidden text-sm leading-relaxed text-slate-300 md:block">{t("welcomeText")}</p>
+          </div>
+          <ul className="relative mt-10 hidden space-y-3 text-sm text-slate-200 md:block">
+            {BENEFICIOS.map(({ icono: Icono, clave }) => (
+              <li key={clave} className="flex items-center gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-teal-400/15 text-teal-300">
+                  <Icono className="size-4" aria-hidden />
+                </span>
+                {t(clave)}
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <div className="flex flex-col">
+        <div className="flex-1 px-6 pb-8 pt-7 sm:px-8 md:px-10 md:pt-10">
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{t("title")}</h1>
           <p className="mt-1.5 text-sm text-neutral-500">{t("subtitle")}</p>
 
@@ -143,11 +170,12 @@ function Login() {
           </form>
         </div>
 
-        <div className="border-t border-neutral-100 bg-neutral-50 px-6 py-4 text-center text-sm text-neutral-600 sm:px-8">
+        <div className="border-t border-neutral-100 bg-neutral-50 px-6 py-4 text-center text-sm text-neutral-600 sm:px-8 md:px-10">
           {t("noAccount")}{" "}
           <Link href="/registro" className="font-medium text-teal-700 hover:text-teal-800 hover:underline">
             {t("register")}
           </Link>
+        </div>
         </div>
       </div>
     </div>

@@ -4,3 +4,54 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+
+/* ---------- Pulsarito (botón de ayuda) ----------
+   Los giros de las piezas del SVG llevan el punto de giro en unidades del propio
+   dibujo. Cerrado: solo el botón. Abierto: cara, manos y pies, y de vez en cuando
+   un gesto (saludar, pasitos, mirar) sin moverse del sitio. */
+.pul { position: relative; display: block; width: 62px; height: 67px; }
+.pul.abierto { width: 86px; height: 102px; animation: pul-sale .5s cubic-bezier(.2, 1.4, .4, 1) 1; }
+.pul svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pul-mover { display: block; width: 100%; height: 100%; }
+.pul.abierto .pul-mover { animation: pul-flota 3.2s ease-in-out infinite; }
+.pul:hover .pul-anillo { filter: brightness(1.25); }
+.pul-anillo { animation: pul-late 2.6s ease-in-out infinite; }
+
+.pul-brazo, .pul-pierna, .pul-cara { opacity: 0; transition: opacity .25s, transform .45s cubic-bezier(.2, 1.5, .4, 1); }
+.pul-brazo-i { transform-origin: 25px 84px; transform: scale(.3); }
+.pul-brazo-d { transform-origin: 98px 84px; transform: scale(.3); }
+.pul-pierna-i { transform-origin: 46px 106px; transform: scale(.3); }
+.pul-pierna-d { transform-origin: 70px 106px; transform: scale(.3); }
+.pul-cara { transform-origin: 56px 76px; transform: scale(.5); }
+.pul.abierto .pul-brazo, .pul.abierto .pul-pierna, .pul.abierto .pul-cara { opacity: 1; transform: none; }
+.pul-interrogante { transition: opacity .2s; }
+.pul.abierto .pul-interrogante { opacity: 0; }
+
+.pul-ojos { transform-origin: 56px 70px; transition: transform .08s; }
+.pul.parpadea .pul-ojos { transform: scaleY(.08); }
+.pul-pupilas { transition: transform .35s ease; }
+.pul.gesto-mira .pul-pupilas { transform: translate(3.5px, -1px); }
+
+.pul.gesto-saluda .pul-brazo-d { animation: pul-saludo .4s ease-in-out 5 alternate; }
+.pul.gesto-pasitos .pul-pierna-i { animation: pul-paso .35s ease-in-out 5 alternate; }
+.pul.gesto-pasitos .pul-pierna-d { animation: pul-paso .35s ease-in-out 5 alternate-reverse; }
+.pul.gesto-pasitos .pul-brazo-i { animation: pul-balanceo .35s ease-in-out 5 alternate; }
+.pul.gesto-pasitos .pul-brazo-d { animation: pul-balanceo .35s ease-in-out 5 alternate-reverse; }
+
+/* Hay un mensaje en el aire: el anillo late fuerte y el botón da un saltito. */
+.pul.llama { animation: pul-salto .7s ease-out 2; }
+.pul.llama .pul-anillo { animation: pul-llama .5s ease-in-out infinite alternate; }
+
+@keyframes pul-late { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+@keyframes pul-llama { from { opacity: .55; } to { opacity: 1; filter: brightness(1.5); } }
+@keyframes pul-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5%); } }
+@keyframes pul-sale { from { transform: translateY(34px) scale(.85); } to { transform: none; } }
+@keyframes pul-salto { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-9px); } }
+@keyframes pul-saludo { from { transform: rotate(-135deg); } to { transform: rotate(-90deg); } }
+@keyframes pul-paso { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+@keyframes pul-balanceo { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+@keyframes pul-burbuja { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pul, .pul *, .pul-burbuja { animation: none !important; transition: none !important; }
+}

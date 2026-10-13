@@ -3,6 +3,7 @@ import { PartnersApiClient, segmento, type Actor } from './partners-api.client.j
 import type {
   AccionCarrito,
   Carrito,
+  CarritoConAvisos,
   ConfirmarPedido,
   FichaProducto,
   Listado,
@@ -15,9 +16,9 @@ import type {
   UsuarioEmpresa,
 } from './partners-api.tipos.js';
 
-/// Acciones de carrito que se pueden repetir sin efecto doble: llevan Idempotency-Key
-/// (y por tanto reintento). `add` y `repeat-order` no, para no sumar dos veces.
-const ACCIONES_CARRITO_IDEMPOTENTES = new Set(['set-quantity', 'remove']);
+/// Acciones de carrito que suman: la API exige `Idempotency-Key` (v1.3), así un reintento
+/// con la misma clave no añade dos veces. `set-quantity` y `remove` fijan un valor y no la llevan.
+const ACCIONES_CARRITO_IDEMPOTENTES = new Set(['add', 'repeat-order']);
 
 /// Rutas 8-16 del contrato v1: lo que ve y hace una empresa cliente. El `companyId`
 /// sale SIEMPRE de la sesión (JWT) en el controlador, nunca de la petición del
@@ -51,8 +52,9 @@ export class PartnersApiEmpresasRepository {
     return this.api.get(`/companies/${segmento(companyId)}/users/${segmento(userId)}/cart`);
   }
 
-  /// 13. Acción de carrito (add, set-quantity, remove, repeat-order). Devuelve el carrito completo.
-  accionCarrito(companyId: string, userId: string, accion: AccionCarrito, actor: Actor): Promise<Carrito> {
+  /// 13. Acción de carrito (add, set-quantity, remove, repeat-order). Devuelve el carrito completo;
+  /// `repeat-order` añade `agregadas`, `noDisponibles` y `preciosCambiados`.
+  accionCarrito(companyId: string, userId: string, accion: AccionCarrito, actor: Actor): Promise<CarritoConAvisos> {
     return this.api.peticion('POST', `/companies/${segmento(companyId)}/users/${segmento(userId)}/cart/action`, {
       body: accion,
       actor,

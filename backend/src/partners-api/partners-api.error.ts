@@ -10,7 +10,13 @@ export type CodigoErrorPartnersApi =
   | 'PRODUCTOS_NO_DISPONIBLES'
   | 'CARRITO_YA_CONFIRMADO'
   | 'TIENE_PEDIDOS'
+  /// Misma `Idempotency-Key` con un cuerpo distinto (409, desde la v1.3).
+  | 'IDEMPOTENCY_KEY_REUSED'
+  /// Ya hay un `apply-rate` real en curso para esa marca (409, desde la v1.4).
+  | 'JOB_ALREADY_RUNNING'
   | 'VALIDACION'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
   | 'NO_DISPONIBLE'
   | (string & {});
 

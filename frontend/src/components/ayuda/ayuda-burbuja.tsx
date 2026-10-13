@@ -3,8 +3,9 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ChevronDown, CircleHelp, Mail, MessageCircle, Search, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Mail, MessageCircle, Search, X } from "lucide-react";
 import { useMe } from "@/hooks/use-me";
+import { Pulsarito } from "./pulsarito";
 import {
   PREGUNTAS_GENERALES,
   PREGUNTAS_GENERALES_CON_SESION,
@@ -206,6 +207,32 @@ function PanelAyuda({
 /// ve los del panel; clientes y visitantes, los del portal, y al pie cómo
 /// contactar con IoT FENSTER). No toca datos de nadie: es contenido fijo, en el
 /// idioma de la interfaz.
+/// Mensajes de Pulsarito (`pulsaritoMsg1`…): unos ofrecen ayuda y otros cuentan un
+/// dato de IoT FENSTER. Salen de uno en uno, sin repetirse hasta haber salido todos,
+/// y con tiempo de sobra entre uno y otro para no cansar.
+const NUM_MENSAJES = 9;
+const CLAVE_SILENCIO = "pulsarito-silencio";
+const MENSAJES_DESCARTADOS_PARA_CALLAR = 2;
+
+const aleatorio = (min: number, max: number) => min + Math.random() * (max - min);
+
+function barajar(n: number): number[] {
+  const orden = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [orden[i], orden[j]] = [orden[j], orden[i]];
+  }
+  return orden;
+}
+
+function silenciado(): boolean {
+  try {
+    return sessionStorage.getItem(CLAVE_SILENCIO) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function AyudaBurbuja() {
   const t = useTranslations("ayuda");
   const pathname = usePathname();
@@ -224,6 +251,57 @@ export function AyudaBurbuja() {
   function cerrar() {
     setAbiertaEn(null);
     boton.current?.focus();
+  }
+
+  const mensajes = useMemo(
+    () => Array.from({ length: NUM_MENSAJES }, (_, i) => t(`pulsaritoMsg${i + 1}` as "pulsaritoMsg1")),
+    [t],
+  );
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const bolsa = useRef<number[]>([]);
+  const descartados = useRef(0);
+
+  // Con la ayuda cerrada, de vez en cuando Pulsarito suelta un mensaje (primero a los
+  // 20-40 s, luego cada 1-2,5 min) para que quien necesite ayuda sepa que está ahí.
+  // Si se descarta un par de veces, se calla hasta la próxima visita.
+  useEffect(() => {
+    if (abierta) return;
+    let activo = true;
+    let espera: ReturnType<typeof setTimeout>;
+    const programar = (primera: boolean) => {
+      espera = setTimeout(
+        () => {
+          if (!activo || silenciado()) return;
+          if (document.visibilityState !== "visible") return programar(false);
+          if (bolsa.current.length === 0) bolsa.current = barajar(mensajes.length);
+          setMensaje(mensajes[bolsa.current.pop()!]);
+          espera = setTimeout(() => {
+            if (!activo) return;
+            setMensaje(null);
+            programar(false);
+          }, 9000);
+        },
+        primera ? aleatorio(20_000, 40_000) : aleatorio(60_000, 150_000),
+      );
+    };
+    programar(true);
+    return () => {
+      activo = false;
+      clearTimeout(espera);
+      setMensaje(null);
+    };
+  }, [abierta, mensajes]);
+
+  function descartarMensaje() {
+    setMensaje(null);
+    descartados.current += 1;
+    if (descartados.current >= MENSAJES_DESCARTADOS_PARA_CALLAR) {
+      try {
+        sessionStorage.setItem(CLAVE_SILENCIO, "1");
+      } catch {
+        /* sin almacenamiento, simplemente seguirá avisando */
+      }
+    }
   }
 
   useEffect(() => {
@@ -246,12 +324,14 @@ export function AyudaBurbuja() {
           ref={panel}
           id={panelId}
           role="dialog"
-          aria-label={t("titulo")}
+          aria-label={`${t("nombre")} · ${t("titulo")}`}
           tabIndex={-1}
-          className="max-h-[min(36rem,calc(100vh-7rem))] w-[min(24rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-xl focus:outline-none"
+          className="max-h-[min(36rem,calc(100vh-14rem))] w-[min(24rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-xl focus:outline-none"
         >
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-neutral-100 bg-white px-4 py-3">
-            <h2 className="text-sm font-semibold text-neutral-900">{t("titulo")}</h2>
+            <h2 className="text-sm font-semibold text-neutral-900">
+              {t("nombre")} <span className="font-normal text-neutral-500">· {t("titulo")}</span>
+            </h2>
             <button
               type="button"
               onClick={cerrar}
@@ -265,18 +345,43 @@ export function AyudaBurbuja() {
         </div>
       )}
 
-      <button
-        ref={boton}
-        type="button"
-        onClick={() => setAbiertaEn(abierta ? null : pathname)}
-        aria-expanded={abierta}
-        aria-controls={abierta ? panelId : undefined}
-        aria-label={abierta ? t("cerrar") : t("abrir")}
-        title={t("boton")}
-        className="flex size-12 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition-colors hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
-      >
-        {abierta ? <X className="size-5" aria-hidden /> : <CircleHelp className="size-6" aria-hidden />}
-      </button>
+      {mensaje && !abierta && (
+        <div
+          role="status"
+          className="pul-burbuja relative max-w-[16rem] rounded-2xl border border-neutral-200 bg-white py-2.5 pl-3.5 pr-8 text-sm leading-snug text-neutral-800 shadow-lg"
+          style={{ animation: "pul-burbuja .3s ease-out" }}
+        >
+          <button type="button" onClick={() => setAbiertaEn(pathname)} className="text-left">
+            {mensaje}
+          </button>
+          <button
+            type="button"
+            onClick={descartarMensaje}
+            aria-label={t("cerrarMensaje")}
+            className="absolute right-1.5 top-1.5 rounded p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+          >
+            <X className="size-3.5" aria-hidden />
+          </button>
+          <span aria-hidden className="absolute -bottom-1.5 right-7 size-3 rotate-45 border-b border-r border-neutral-200 bg-white" />
+        </div>
+      )}
+
+      <div className="flex items-end gap-2">
+        {!abierta && (
+          <span aria-hidden className="mb-5 hidden rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white shadow-md md:inline">
+            {t("nombre")}
+          </span>
+        )}
+        <Pulsarito
+          abierto={abierta}
+          llama={!!mensaje}
+          botonRef={boton}
+          onClick={() => setAbiertaEn(abierta ? null : pathname)}
+          ariaLabel={`${t("nombre")} · ${abierta ? t("cerrar") : t("abrir")}`}
+          titulo={`${t("nombre")} · ${t("boton")}`}
+          ariaControls={panelId}
+        />
+      </div>
     </div>
   );
 }

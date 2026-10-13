@@ -12,14 +12,19 @@ import type {
   ExportacionEstadisticas,
   FichaEmpresa,
   FiltrosEstadisticas,
+  Idioma,
+  JobMarca,
   Listado,
+  ListadoEmpresas,
   NuevaEmpresa,
   PedidoAdmin,
   ProcesoMarca,
   ProductoBase,
-  ProductoCatalogoEmpresaAdmin,
+  ProductoCatalogo,
   ProductoMarca,
-  ResultadoProcesoMarca,
+  ResultadoCatalogoEmpresa,
+  ResultadoCatalogoMarca,
+  ResultadoProducto,
   ResultadoTransicionEmpresa,
   Rol,
   SincronizacionCatalogo,
@@ -36,8 +41,9 @@ export class PartnersApiAdminRepository {
 
   // --- Empresas ---
 
-  /// 17. Listado de empresas (filtros de la pantalla: estado, tipo, marca, q, page, limit…).
-  empresas(filtros: Filtros = {}): Promise<Listado<Empresa>> {
+  /// 17. Listado de empresas (filtros: estado, tipo, archivadas, busqueda, datosPorCompletar,
+  /// createdBy, include=summary, page, limit).
+  empresas(filtros: Filtros = {}): Promise<ListadoEmpresas> {
     return this.api.get('/admin/companies', filtros);
   }
 
@@ -86,17 +92,17 @@ export class PartnersApiAdminRepository {
   // --- Catálogo de una empresa ---
 
   /// 25. Catálogo de una empresa visto por el admin.
-  catalogoEmpresa(id: string, filtros: Filtros = {}): Promise<{ companyId: string; items: ProductoCatalogoEmpresaAdmin[] }> {
+  catalogoEmpresa(id: string, filtros: Filtros = {}): Promise<{ companyId: string; items: ProductoCatalogo[] }> {
     return this.api.get(`/admin/companies/${segmento(id)}/catalog`, filtros);
   }
 
-  /// 26. Asignar / quitar / editar productos del catálogo de una empresa.
-  accionCatalogoEmpresa(
-    id: string,
-    accion: AccionCatalogoEmpresa,
-    actor: Actor,
-  ): Promise<{ success: boolean; affected: number; catalog: ProductoCatalogoEmpresaAdmin[] }> {
-    return this.api.peticion('POST', `/admin/companies/${segmento(id)}/catalog/action`, { body: accion, actor });
+  /// 26. Asignar / editar / quitar productos del catálogo de una empresa. Solo `assign` es [Idem].
+  accionCatalogoEmpresa(id: string, accion: AccionCatalogoEmpresa, actor: Actor): Promise<ResultadoCatalogoEmpresa> {
+    return this.api.peticion('POST', `/admin/companies/${segmento(id)}/catalog/action`, {
+      body: accion,
+      actor,
+      idempotente: accion.action === 'assign',
+    });
   }
 
   // --- Productos base ---
@@ -106,8 +112,8 @@ export class PartnersApiAdminRepository {
     return this.api.get('/admin/products', filtros);
   }
 
-  /// 28. Crear / editar / borrar producto base.
-  accionProducto(accion: AccionProducto, actor: Actor): Promise<{ success: boolean; product?: ProductoBase }> {
+  /// 28. Crear / editar producto base, asignarlo a empresas (`bulk-assign`) o cambiar su foto (`set-image`).
+  accionProducto(accion: AccionProducto, actor: Actor): Promise<ResultadoProducto> {
     return this.api.peticion('POST', '/admin/products/action', { body: accion, actor });
   }
 
@@ -123,14 +129,24 @@ export class PartnersApiAdminRepository {
     return this.api.get(`/admin/brands/${segmento(marca)}/catalog`, filtros);
   }
 
-  /// 31. Añadir / editar / quitar un producto del catálogo de la marca (se propaga a sus empresas).
-  accionCatalogoMarca(marca: string, accion: AccionCatalogoMarca, actor: Actor): Promise<{ success: boolean; sync: SincronizacionCatalogo }> {
+  /// 31. Añadir (varios a la vez) / editar / quitar productos del catálogo de la marca (se propaga a sus empresas).
+  accionCatalogoMarca(marca: string, accion: AccionCatalogoMarca, actor: Actor): Promise<ResultadoCatalogoMarca> {
     return this.api.peticion('POST', `/admin/brands/${segmento(marca)}/catalog/action`, { body: accion, actor });
   }
 
-  /// 32. Procesos masivos de marca: rellenar catálogos o aplicar tarifa (con simulación).
-  procesoMarca(marca: string, proceso: ProcesoMarca, actor: Actor): Promise<ResultadoProcesoMarca> {
-    return this.api.peticion('POST', `/admin/brands/${segmento(marca)}/jobs`, { body: proceso, actor });
+  /// 32. Aplicar la tarifa a una marca (con simulación). Es un job asíncrono: responde 202 con el `jobId`
+  /// y el resultado se consulta con `estadoJob`. Solo el job real (`simulate: false`) es [Idem].
+  procesoMarca(marca: string, proceso: ProcesoMarca, actor: Actor, idempotencyKey: string | true = true): Promise<JobMarca> {
+    return this.api.peticion('POST', `/admin/brands/${segmento(marca)}/jobs`, {
+      body: proceso,
+      actor,
+      idempotente: proceso.simulate ? false : idempotencyKey,
+    });
+  }
+
+  /// 32b. Estado y resultado de un job de marca.
+  estadoJob(marca: string, jobId: string): Promise<JobMarca> {
+    return this.api.get(`/admin/brands/${segmento(marca)}/jobs/${segmento(jobId)}`);
   }
 
   // --- Pedidos ---
@@ -151,7 +167,7 @@ export class PartnersApiAdminRepository {
     transicion: TransicionPedido,
     actor: Actor,
     idempotencyKey: string | true = true,
-  ): Promise<{ order: PedidoAdmin; notify?: { email: string; idioma: string } }> {
+  ): Promise<{ order: PedidoAdmin; notify: { email: string; idioma: Idioma } | null }> {
     return this.api.peticion('POST', `/admin/orders/${segmento(orderId)}/transition`, { body: transicion, actor, idempotente: idempotencyKey });
   }
 
