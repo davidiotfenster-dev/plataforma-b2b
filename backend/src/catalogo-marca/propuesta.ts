@@ -1,4 +1,5 @@
 import type { MarcaCatalogo } from '../generated/prisma/enums.js';
+import { cuidarNombreComercial } from './nombre-comercial.js';
 
 /// Marcas del Excel de dispositivos que pertenecen a cada submarca (VBH vende
 /// como Wave/Greenteq, Procomsa como ICON, MySmartWindow como Connect y C-WALL).
@@ -55,7 +56,7 @@ export function nombreEnMarca(p: ProductoParaPropuesta, marca: MarcaCatalogo): {
   const marcas = MARCAS_DEL_EXCEL[marca];
   const elegida = refs.find((r) => marcas.includes(normalizar(r.marca))) ?? (json.ambito === 'todos' ? refs[0] : undefined);
   if (!elegida) return null;
-  return { nombre: nombreConColor(elegida.nombre, json.color), sku: elegida.refInterna || p.skuIndustrial };
+  return { nombre: cuidarNombreComercial(nombreConColor(elegida.nombre, json.color)), sku: elegida.refInterna || p.skuIndustrial };
 }
 
 /// Propuesta de catálogo de una marca a partir de los productos base: los que

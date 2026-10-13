@@ -280,10 +280,7 @@
         "gtin": "8437025278282"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 135,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -299,10 +296,7 @@
         "gtin": "8437025278299"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ],
+    "pvpTarifa": 135,
     "imagen": "/imagenes/default-connect-2.png"
   },
   {
@@ -315,13 +309,13 @@
         "marca": "PROCOMSA",
         "nombre": "Cable 2 metros",
         "refInterna": "CABLE-2M-MINI",
-        "gtin": "TEST000000001"
+        "gtin": "0"
       },
       {
         "marca": "MySmartWindow",
         "nombre": "Cable Pulsar 2 m",
         "refInterna": "CABLE_2M_PL",
-        "gtin": "TEST000000002"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 24 EUR",
@@ -344,10 +338,7 @@
         "gtin": "8437025278268"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ]
+    "pvpTarifa": 5
   },
   {
     "skuIndustrial": "TAPAICON1B",
@@ -362,10 +353,7 @@
         "gtin": "8437025278244"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ]
+    "pvpTarifa": 5
   },
   {
     "skuIndustrial": "TAPAICON1N",
@@ -380,10 +368,7 @@
         "gtin": "8437025278251"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ]
+    "pvpTarifa": 5
   },
   {
     "skuIndustrial": "TAPAICON2N",
@@ -398,10 +383,7 @@
         "gtin": "8437025278275"
       }
     ],
-    "pvpTarifa": 50,
-    "datosDePrueba": [
-      "precio"
-    ]
+    "pvpTarifa": 5
   },
   {
     "skuIndustrial": "PULSAR-INOX",
@@ -500,6 +482,12 @@
         "nombre": "Dispositivo PULSAR+ Inox",
         "refInterna": "PULSAR+I",
         "gtin": "8437025278480"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR+ Inox cable 1.6m",
+        "refInterna": "PULSAR+I16",
+        "gtin": "8437025278640"
       }
     ],
     "pvpTarifa": 108,
@@ -534,6 +522,12 @@
         "nombre": "Dispositivo PULSAR+ Negro",
         "refInterna": "PULSAR+N",
         "gtin": "8437025278497"
+      },
+      {
+        "marca": "MySmartWindow",
+        "nombre": "Dispositivo PULSAR+ Negro cable 1.6m",
+        "refInterna": "PULSAR+N16",
+        "gtin": "8437025278671"
       }
     ],
     "pvpTarifa": 108,
@@ -541,7 +535,7 @@
   },
   {
     "skuIndustrial": "WALL-SKY-BLANCO",
-    "nombreTecnico": "Pulsador de pared SKY Blanco",
+    "nombreTecnico": "Pulsador de pared SKY / Wave3 Air Blanco",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Blanco",
     "referencias": [
@@ -550,14 +544,20 @@
         "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYB",
         "gtin": "8437025278138"
+      },
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 AIR BLANCO",
+        "refInterna": "WAVEAIR3BL",
+        "gtin": "8437025278343"
       }
     ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-BLANCO",
-    "nombreTecnico": "Pulsador de pared SHUTTER Blanco",
+    "nombreTecnico": "Pulsador de pared SHUTTER / Wave3 Blanco",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Blanco",
     "referencias": [
@@ -566,17 +566,7 @@
         "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERB",
         "gtin": "8437025278091"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALL-WAVE3-BLANCO",
-    "nombreTecnico": "Pulsador de pared Wave3 Blanco",
-    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
-    "color": "Blanco",
-    "referencias": [
+      },
       {
         "marca": "Greenteq",
         "nombre": "GreenteQ Funksender WAVE 3 BLANCO",
@@ -584,44 +574,12 @@
         "gtin": "8437025278329"
       }
     ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALL-SHUTTER-ESPECIAL",
-    "nombreTecnico": "Pulsador de pared SHUTTER Especial",
-    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
-    "color": "Especial",
-    "referencias": [
-      {
-        "marca": "C-WALL",
-        "nombre": "C-WALL SHUTTER",
-        "refInterna": "C-WALLSHUTTERE",
-        "gtin": "8437025278114"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALL-SKY-ESPECIAL",
-    "nombreTecnico": "Pulsador de pared SKY Especial",
-    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
-    "color": "Especial",
-    "referencias": [
-      {
-        "marca": "C-WALL",
-        "nombre": "C-WALL SKY",
-        "refInterna": "C-WALLSKYE",
-        "gtin": "8437025278152"
-      }
-    ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SKY-INOX",
-    "nombreTecnico": "Pulsador de pared SKY Inox/Plata",
+    "nombreTecnico": "Pulsador de pared SKY / Wave3 Air Inox/Plata",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Inox/Plata",
     "referencias": [
@@ -630,14 +588,20 @@
         "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYP",
         "gtin": "8437025278145"
+      },
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 AIR PLATA",
+        "refInterna": "WAVEAIR3P",
+        "gtin": "8437025278367"
       }
     ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-INOX",
-    "nombreTecnico": "Pulsador de pared SHUTTER Inox/Plata",
+    "nombreTecnico": "Pulsador de pared SHUTTER / Wave3 Inox/Plata",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Inox/Plata",
     "referencias": [
@@ -646,17 +610,7 @@
         "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERP",
         "gtin": "8437025278107"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALL-WAVE3-INOX",
-    "nombreTecnico": "Pulsador de pared Wave3 Inox/Plata",
-    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
-    "color": "Inox/Plata",
-    "referencias": [
+      },
       {
         "marca": "Greenteq",
         "nombre": "GreenteQ Funksender WAVE 3 PLATA",
@@ -664,12 +618,12 @@
         "gtin": "8437025278374"
       }
     ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SHUTTER-NEGRO",
-    "nombreTecnico": "Pulsador de pared SHUTTER Negro",
+    "nombreTecnico": "Pulsador de pared SHUTTER / Wave3 Negro",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Negro",
     "referencias": [
@@ -678,14 +632,20 @@
         "nombre": "C-WALL SHUTTER",
         "refInterna": "C-WALLSHUTTERN",
         "gtin": "8437025278084"
+      },
+      {
+        "marca": "Greenteq",
+        "nombre": "GreenteQ Funksender WAVE 3 NEGRO",
+        "refInterna": "WAVE3N",
+        "gtin": "8437025278336"
       }
     ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
     "skuIndustrial": "WALL-SKY-NEGRO",
-    "nombreTecnico": "Pulsador de pared SKY Negro",
+    "nombreTecnico": "Pulsador de pared SKY / Wave3 Air Negro",
     "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
     "color": "Negro",
     "referencias": [
@@ -694,65 +654,7 @@
         "nombre": "C-WALL SKY",
         "refInterna": "C-WALLSKYN",
         "gtin": "8437025278121"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALL-WAVE3-NEGRO",
-    "nombreTecnico": "Pulsador de pared Wave3 Negro",
-    "grupo": "Pulsador de pared (Wave3 / C-WALL / ICON WALL)",
-    "color": "Negro",
-    "referencias": [
-      {
-        "marca": "Greenteq",
-        "nombre": "GreenteQ Funksender WAVE 3 NEGRO",
-        "refInterna": "WAVE3N",
-        "gtin": "8437025278336"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALLAIR-BLANCO",
-    "nombreTecnico": "Wave3 Air Blanco",
-    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
-    "color": "Blanco",
-    "referencias": [
-      {
-        "marca": "Greenteq",
-        "nombre": "GreenteQ Funksender WAVE 3 AIR BLANCO",
-        "refInterna": "WAVEAIR3BL",
-        "gtin": "8437025278343"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALLAIR-INOX",
-    "nombreTecnico": "Wave3 Air Inox/Plata",
-    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
-    "color": "Inox/Plata",
-    "referencias": [
-      {
-        "marca": "Greenteq",
-        "nombre": "GreenteQ Funksender WAVE 3 AIR PLATA",
-        "refInterna": "WAVEAIR3P",
-        "gtin": "8437025278367"
-      }
-    ],
-    "pvpTarifa": 82,
-    "imagen": "/imagenes/default-c-wall.png"
-  },
-  {
-    "skuIndustrial": "WALLAIR-NEGRO",
-    "nombreTecnico": "Wave3 Air Negro",
-    "grupo": "Pulsador de pared (C-WALL / Wave3 / ICON WALL) · versión Air",
-    "color": "Negro",
-    "referencias": [
+      },
       {
         "marca": "Greenteq",
         "nombre": "GreenteQ Funksender WAVE 3 AIR NEGRO",
@@ -760,7 +662,7 @@
         "gtin": "8437025278350"
       }
     ],
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "imagen": "/imagenes/default-c-wall.png"
   },
   {
@@ -783,19 +685,19 @@
         "marca": "MySmartWindow",
         "nombre": "bluConnect",
         "refInterna": "BLUECTN",
-        "gtin": "TEST000000003"
+        "gtin": "0"
       },
       {
         "marca": "PROCOMSA",
         "nombre": "ICON BLUE",
         "refInterna": null,
-        "gtin": "TEST000000004"
+        "gtin": "0"
       },
       {
         "marca": "VBH",
         "nombre": "WAVE BLUE",
         "refInterna": null,
-        "gtin": "TEST000000005"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 2026: BLUECTN 30 EUR (bluConnect); mismo precio supuesto para ICON BLUE y WAVE BLUE",
@@ -807,90 +709,6 @@
     "imagen": "/imagenes/default-mando.png"
   },
   {
-    "skuIndustrial": "EVO-SHUTTER-BLANCO",
-    "nombreTecnico": "Connect EVO Shutter Blanco",
-    "grupo": "Connect EVO Shutter",
-    "color": "Blanco",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "EVO Shutter",
-        "refInterna": null,
-        "gtin": "TEST000000006"
-      }
-    ],
-    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 108,
-    "ambito": "todos",
-    "datosDePrueba": [
-      "gtin"
-    ],
-    "imagen": "/imagenes/default-evo.png"
-  },
-  {
-    "skuIndustrial": "EVO-SHUTTER-ANTRACITA",
-    "nombreTecnico": "Connect EVO Shutter Antracita",
-    "grupo": "Connect EVO Shutter",
-    "color": "Antracita",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "EVO Shutter",
-        "refInterna": null,
-        "gtin": "TEST000000007"
-      }
-    ],
-    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 108,
-    "ambito": "todos",
-    "datosDePrueba": [
-      "gtin"
-    ],
-    "imagen": "/imagenes/default-evo.png"
-  },
-  {
-    "skuIndustrial": "EVO-SHUTTER-NEGRO",
-    "nombreTecnico": "Connect EVO Shutter Negro",
-    "grupo": "Connect EVO Shutter",
-    "color": "Negro",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "EVO Shutter",
-        "refInterna": null,
-        "gtin": "TEST000000008"
-      }
-    ],
-    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 108,
-    "ambito": "todos",
-    "datosDePrueba": [
-      "gtin"
-    ],
-    "imagen": "/imagenes/default-evo.png"
-  },
-  {
-    "skuIndustrial": "EVO-SHUTTER-MARRON",
-    "nombreTecnico": "Connect EVO Shutter Marrón",
-    "grupo": "Connect EVO Shutter",
-    "color": "Marrón",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "EVO Shutter",
-        "refInterna": null,
-        "gtin": "TEST000000009"
-      }
-    ],
-    "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 108,
-    "ambito": "todos",
-    "datosDePrueba": [
-      "gtin"
-    ],
-    "imagen": "/imagenes/default-evo.png"
-  },
-  {
     "skuIndustrial": "EVO-SECURITY-BLANCO",
     "nombreTecnico": "Connect EVO Security Blanco",
     "grupo": "Connect EVO Security",
@@ -900,11 +718,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": "TEST000000010"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 114,
+    "pvpTarifa": 96,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -921,11 +739,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": "TEST000000011"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 114,
+    "pvpTarifa": 96,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -942,11 +760,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": "TEST000000012"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 114,
+    "pvpTarifa": 96,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -963,11 +781,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Security",
         "refInterna": null,
-        "gtin": "TEST000000013"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 114,
+    "pvpTarifa": 96,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -984,11 +802,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": "TEST000000014"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 138,
+    "pvpTarifa": 116,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -1005,11 +823,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": "TEST000000015"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 138,
+    "pvpTarifa": 116,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -1026,11 +844,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": "TEST000000016"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 138,
+    "pvpTarifa": 116,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -1047,11 +865,11 @@
         "marca": "MySmartWindow",
         "nombre": "EVO Plus",
         "refInterna": null,
-        "gtin": "TEST000000017"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Color Antracita/Acero por confirmar. Solo MySmartWindow",
-    "pvpTarifa": 138,
+    "pvpTarifa": 116,
     "ambito": "todos",
     "datosDePrueba": [
       "gtin"
@@ -1068,11 +886,11 @@
         "marca": "MySmartWindow",
         "nombre": "C-WALL Flex",
         "refInterna": "C-WALL_FLEX",
-        "gtin": "TEST000000018"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN ni colores definidos. Tarifa 82 EUR",
-    "pvpTarifa": 82,
+    "pvpTarifa": 102,
     "datosDePrueba": [
       "gtin"
     ],
@@ -1088,7 +906,7 @@
         "marca": "MySmartWindow",
         "nombre": "Connect Smart White Box",
         "refInterna": "WHITE_BOX",
-        "gtin": "TEST000000019"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 90 EUR",
@@ -1108,7 +926,7 @@
         "marca": "MySmartWindow",
         "nombre": "Botón suelto Pulsar",
         "refInterna": "BOTON_PULSAR",
-        "gtin": "TEST000000020"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 20 EUR",
@@ -1129,7 +947,7 @@
         "marca": "MySmartWindow",
         "nombre": "Cable Pulsar 1 m",
         "refInterna": "CABLE_1M_PL",
-        "gtin": "TEST000000021"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 12 EUR",
@@ -1149,7 +967,7 @@
         "marca": "MySmartWindow",
         "nombre": "Cable datos EVO 1,5 m",
         "refInterna": "CABLE_DATOS_EVO",
-        "gtin": "TEST000000022"
+        "gtin": "0"
       }
     ],
     "pendiente": "Sin GTIN. Tarifa 12 EUR",
@@ -1191,40 +1009,6 @@
     ],
     "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
     "pvpTarifa": 98,
-    "imagen": "/imagenes/default-pulsar.png"
-  },
-  {
-    "skuIndustrial": "PULSARP-C16-INOX",
-    "nombreTecnico": "Pulsar+ Inox/Plata · cable 1,6 m",
-    "grupo": "Pulsar+ (Wave4+ / ICON4+ / ICON MINI+)",
-    "color": "Inox/Plata",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "Dispositivo PULSAR+ Inox cable 1.6m",
-        "refInterna": "PULSAR+I16",
-        "gtin": "8437025278640"
-      }
-    ],
-    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 108,
-    "imagen": "/imagenes/default-pulsar.png"
-  },
-  {
-    "skuIndustrial": "PULSARP-C16-NEGRO",
-    "nombreTecnico": "Pulsar+ Negro · cable 1,6 m",
-    "grupo": "Pulsar+ (Wave4+ / ICON4+ / ICON MINI+)",
-    "color": "Negro",
-    "referencias": [
-      {
-        "marca": "MySmartWindow",
-        "nombre": "Dispositivo PULSAR+ Negro cable 1.6m",
-        "refInterna": "PULSAR+N16",
-        "gtin": "8437025278671"
-      }
-    ],
-    "pendiente": "Pulsar con cable 1,6 m de MySmartWindow: sin confirmar si es el mismo aparato que Pulsar/Wave-4",
-    "pvpTarifa": 108,
     "imagen": "/imagenes/default-pulsar.png"
   }
 ]

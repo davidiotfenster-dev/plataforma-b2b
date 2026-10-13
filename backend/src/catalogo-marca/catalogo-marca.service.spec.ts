@@ -30,7 +30,7 @@ describe('propuestaDeMarca', () => {
     expect(icon.find((p) => p.productoBaseId === 'w1')).toMatchObject({ skuComercial: 'ICON1B', nombreComercial: 'Dispositivo ICON1 Blanco' });
     expect(icon.some((p) => p.productoBaseId === 'sky')).toBe(false);
     const connect = propuestaDeMarca(productos, 'MYSMARTWINDOW');
-    expect(connect.find((p) => p.productoBaseId === 'w1')).toMatchObject({ skuComercial: 'Connect1BL', nombreComercial: 'CONNECT 1 BLANCO' });
+    expect(connect.find((p) => p.productoBaseId === 'w1')).toMatchObject({ skuComercial: 'Connect1BL', nombreComercial: 'Connect 1 Blanco' });
     expect(connect.find((p) => p.productoBaseId === 'sky')?.skuComercial).toBe('C-WALLSKYB');
   });
 
