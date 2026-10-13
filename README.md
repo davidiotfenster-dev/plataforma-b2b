@@ -85,29 +85,115 @@ Portal de pedidos para partners (fabricantes de ventanas, distribuidores y herra
 
 ## Puesta en marcha
 
-Requisitos: Node.js, Docker Desktop en ejecución y Git.
+Comprobado el 2026-10-13 con Node.js 24.19, npm 11.17 y Docker Desktop en Windows 11. Desde un **clon limpio de GitHub** (sin `.env` ni `node_modules`): `npm install`, `prisma generate`, `nest build` y `next build` terminan sin errores y los 254 tests del backend pasan (32 ficheros). Las 20 migraciones de Prisma están aplicadas en la base del equipo original (`prisma migrate status`: *up to date*). Lo que **no** se ha probado desde cero es el arranque con una base de datos vacía (pasos 4 y 5).
+
+**Requisitos:** Git (con acceso al repositorio privado), Node.js (probado con 24.19), Docker Desktop **en ejecución** y estos puertos libres: `5433` (PostgreSQL), `6379` (Redis), `3010` (API) y `3004` (frontend).
+
+**En Windows:** clona en una ruta corta (por ejemplo `C:\proyectos`) y ejecuta antes `git config --global core.longpaths true`. Si no, el clon falla con `Filename too long` en las carpetas de migraciones de Prisma.
+
+### Qué NO viaja con `git clone`
+
+| Qué falta en un equipo nuevo | Qué hay que hacer |
+|---|---|
+| `backend/.env` y `frontend/.env.local` (configuración y secretos, ignorados por git) | Crearlos desde la plantilla, paso 3 y 5 |
+| `node_modules`, `backend/dist`, `frontend/.next`, `backend/src/generated` | `npm install` y `npx prisma generate` |
+| **Los datos de la base de datos** (partners, usuarios, pedidos de prueba): viven en un volumen de Docker del equipo original | La base empieza vacía: cargar los datos iniciales, paso 4 |
+| Fotos de producto subidas desde el panel (`backend/uploads/productos/*`, solo se versionan las 6 por defecto) | Las que se suban a partir de ahora hay que copiarlas a mano entre equipos |
+| `backend/scripts/data/dispositivos.backup-antes-paso2.json` (copia puntual de datos) | No hace falta para funcionar |
+
+### Pasos
+
+**1. Clonar**
 
 ```bash
-# 1. Base de datos y Redis (PostgreSQL en el puerto 5433, Redis en el 6379)
-docker compose up -d
-
-# 2. Backend
-cd backend
-npm install
-cp .env.example .env          # rellena los valores (ver tabla)
-npx prisma migrate deploy
-npx prisma generate
-npm run seed:admin            # ADMIN_EMAIL, ADMIN_PASSWORD y ADMIN_NOMBRE por variables de entorno
-npm run import:dispositivos   # carga el catálogo base con sus precios de tarifa
-npm run start:dev             # http://localhost:3010
-
-# 3. Frontend (otra terminal)
-cd frontend
-npm install
-npm run dev                   # http://localhost:3004
+git clone https://github.com/davidiotfenster-dev/plataforma-b2b.git
+cd plataforma-b2b
 ```
 
-La guía completa, con comprobaciones y solución de problemas, está en [`SETUP.md`](SETUP.md).
+**2. Base de datos y Redis** (con Docker Desktop abierto)
+
+```bash
+docker compose up -d
+docker compose ps             # fenster-postgres (5433) y fenster-redis (6379) en estado Up
+```
+
+**3. Backend: dependencias, configuración y migraciones**
+
+```bash
+cd backend
+npm install
+cp .env.example .env          # en PowerShell: copy .env.example .env
+```
+
+Edita `backend/.env` y comprueba estos valores:
+
+| Variable | Valor en local |
+|---|---|
+| `DATABASE_URL` | Déjala como viene en el ejemplo (usuario `fenster`, puerto `5433`) |
+| `JWT_SECRET` | Pon cualquier cadena larga y aleatoria |
+| `FRONTEND_URL` | **`http://localhost:3004`**. El ejemplo trae `3000`; si no coincide con el puerto del frontend, el navegador bloquea las llamadas por CORS |
+| `RESEND_API_KEY`, `EMAIL_PROVEEDOR` | **Déjalas vacías** en desarrollo: los correos solo se apuntan en el log |
+| `PARTNERS_API_URL` | Ya apunta al MOCK de la API corporativa; `PARTNERS_API_KEY` vacía (el MOCK no la pide) |
+
+```bash
+npx prisma migrate deploy     # aplica las 20 migraciones (no uses migrate dev en un equipo nuevo)
+npx prisma generate           # crea backend/src/generated (sin esto el backend no compila)
+```
+
+**4. Datos iniciales** (desde `backend/`)
+
+```bash
+# Administrador: ADMIN_EMAIL, ADMIN_PASSWORD y ADMIN_NOMBRE. Elige tú la contraseña.
+ADMIN_EMAIL=admin@iotfenster.com ADMIN_PASSWORD='cambia-esto' npm run seed:admin
+# PowerShell:  $env:ADMIN_EMAIL="admin@iotfenster.com"; $env:ADMIN_PASSWORD="cambia-esto"; npm run seed:admin
+
+npm run import:dispositivos   # catálogo base con precios de tarifa (idempotente)
+```
+
+Opcionales: `npm run import:partners-reales` (alta de los partners del listado, con CIF y direcciones provisionales «PENDIENTE-…»), `npm run seed:comercial` (necesita `COMERCIAL_EMAIL` y `COMERCIAL_PASSWORD`, y `COMERCIAL_ACTIVO=true` en `.env` para que el rol pueda entrar) y `npm run seed:demo` (datos de prueba masivos).
+
+**5. Arrancar backend y frontend** (dos terminales)
+
+```bash
+# Terminal 1, en backend/
+npm run start:dev             # http://localhost:3010
+```
+
+```bash
+# Terminal 2, en frontend/
+npm install
+# Crea frontend/.env.local con una sola línea: NEXT_PUBLIC_API_URL=http://localhost:3010
+# (con un editor de texto; en PowerShell, ">" guarda en UTF-16 y Next no lo lee bien)
+npm run dev -- -p 3004        # http://localhost:3004
+```
+
+`npm run dev` a secas arranca en el puerto `3000`: usa `-p 3004` o cambia `FRONTEND_URL` para que coincidan. `NEXT_PUBLIC_API_URL` se incorpora al compilar, así que hay que reiniciar el frontend si cambia. **No copies el `.env.local` del equipo original**: apunta a un túnel de Cloudflare de las demos.
+
+**6. Comprobar que todo funciona**
+
+```bash
+cd backend && npm test        # 254 tests deben pasar
+cd backend && npm run build   # sin errores
+cd frontend && npm run build  # sin errores
+```
+
+Entra en `http://localhost:3004/login` con el administrador del paso 4.
+
+### Si algo falla
+
+| Síntoma | Causa y solución |
+|---|---|
+| `Cannot find module '…/generated/prisma/…'` | Falta `npx prisma generate` |
+| El login falla o el navegador muestra errores de CORS | `FRONTEND_URL` no coincide con el puerto del frontend |
+| `connect ECONNREFUSED 127.0.0.1:5433` | Docker Desktop no está abierto o falta `docker compose up -d` |
+| Puerto `5433` o `6379` ocupado | Cambia el mapeo en `docker-compose.yml` y `DATABASE_URL` / `REDIS_URL` a la vez |
+| El catálogo sale vacío | Falta `npm run import:dispositivos`, y asignar el catálogo al partner desde el panel |
+
+### Qué usa la API corporativa y qué no
+
+Los servicios siguen funcionando con Prisma y PostgreSQL. La API de Partners (MOCK en AWS) solo se usa para `npm run api:contrato` (41 pruebas del contrato) y, si pones `PARTNERS_API_AUDITORIA=true`, para enviar la auditoría en lotes. Sin ninguna de las dos cosas la plataforma funciona igual sin conexión a AWS.
+
+La guía anterior, con más detalle sobre Prisma y el envío de correos, sigue en [`SETUP.md`](SETUP.md); si difiere de este apartado, vale este.
 
 ### Variables de entorno (`backend/.env`)
 
