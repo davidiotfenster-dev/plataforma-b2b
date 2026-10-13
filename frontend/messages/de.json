@@ -77,7 +77,12 @@
       "CUENTA_RECHAZADA": "Ihre Registrierungsanfrage wurde nicht genehmigt. Wenn Sie einen Irrtum vermuten, wenden Sie sich an IoT FENSTER.",
       "CUENTA_EMPRESA_SUSPENDIDA": "Der Zugang Ihres Unternehmens ist gesperrt. Wenden Sie sich an IoT FENSTER.",
       "CUENTA_DESACTIVADA": "Ihr Benutzer ist deaktiviert. Wenden Sie sich an den Administrator Ihres Unternehmens oder an IoT FENSTER."
-    }
+    },
+    "welcomeTitle": "Willkommen im Bestellportal",
+    "welcomeText": "Ihr Katalog, Ihre Preise und die Verfolgung Ihrer Bestellungen an einem Ort.",
+    "benefit1": "Katalog mit Ihren Preisen",
+    "benefit2": "Bestellungen mit Verfolgung und PDF",
+    "benefit3": "In 5 Sprachen verfügbar"
   },
   "roles": {
     "PARTNER_ADMIN": "Administrator",
@@ -1060,7 +1065,18 @@
         "texto": "Probleme mit einer Bestellung oder dem Portal",
         "mensaje": "Hallo, ich möchte eine Störung melden."
       }
-    }
+    },
+    "nombre": "Pulsarito",
+    "pulsaritoMsg1": "Brauchen Sie Hilfe? Drücken Sie mich, ich helfe gern.",
+    "pulsaritoMsg2": "Suchen Sie etwas? Fragen Sie mich, wie eine Bestellung funktioniert.",
+    "pulsaritoMsg3": "Fragen zu Ihrer Bestellung oder Ihrem Katalog? Ich bin da.",
+    "pulsaritoMsg4": "Wussten Sie schon? Alle unsere Geräte haben 5 Jahre Garantie.",
+    "pulsaritoMsg5": "Unsere Geräte verbinden sich per WLAN 6, Bluetooth, Zigbee, Matter und Thread.",
+    "pulsaritoMsg6": "Die Witooth-Fernbedienung läuft 2 Jahre mit einer Batterie.",
+    "pulsaritoMsg7": "Der Pulsar braucht zur Montage nur eine 11-mm-Bohrung.",
+    "pulsaritoMsg8": "Das C-WALL hat ein RGB-Ambientelicht mit 25 LEDs rundherum.",
+    "pulsaritoMsg9": "Wir sitzen im Technologiepark Fuente Álamo in Murcia.",
+    "cerrarMensaje": "Hinweis schließen"
   },
   "legal": {
     "navLabel": "Rechtliches",

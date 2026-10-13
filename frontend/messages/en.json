@@ -77,7 +77,12 @@
       "CUENTA_RECHAZADA": "Your registration request was not approved. If you think this is a mistake, contact IoT FENSTER.",
       "CUENTA_EMPRESA_SUSPENDIDA": "Your company's access is suspended. Contact IoT FENSTER.",
       "CUENTA_DESACTIVADA": "Your user is deactivated. Contact your company administrator or IoT FENSTER."
-    }
+    },
+    "welcomeTitle": "Welcome to the ordering portal",
+    "welcomeText": "Your catalog, your prices and your order tracking, all in one place.",
+    "benefit1": "Catalog with your prices",
+    "benefit2": "Orders with tracking and PDF",
+    "benefit3": "Available in 5 languages"
   },
   "roles": {
     "PARTNER_ADMIN": "Administrator",
@@ -1060,7 +1065,18 @@
         "texto": "problems with an order or with the portal",
         "mensaje": "Hello, I would like to report an issue."
       }
-    }
+    },
+    "nombre": "Pulsarito",
+    "pulsaritoMsg1": "Need help? Press me and I'll lend a hand.",
+    "pulsaritoMsg2": "Looking for something? Ask me how to place an order.",
+    "pulsaritoMsg3": "Questions about your order or catalog? I'm here.",
+    "pulsaritoMsg4": "Did you know? All our devices come with a 5-year warranty.",
+    "pulsaritoMsg5": "Our devices connect via Wi-Fi 6, Bluetooth, Zigbee, Matter and Thread.",
+    "pulsaritoMsg6": "The Witooth remote runs for 2 years on a single battery.",
+    "pulsaritoMsg7": "The Pulsar needs just one 11 mm hole to install.",
+    "pulsaritoMsg8": "The C-WALL has an ambient RGB LED made of 25 lights around the edge.",
+    "pulsaritoMsg9": "We are based in the Fuente Álamo Technology Park, in Murcia.",
+    "cerrarMensaje": "Dismiss message"
   },
   "legal": {
     "navLabel": "Legal",

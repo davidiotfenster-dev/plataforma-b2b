@@ -77,7 +77,12 @@
       "CUENTA_RECHAZADA": "Tu solicitud de alta no ha sido aprobada. Si crees que es un error, contacta con IoT FENSTER.",
       "CUENTA_EMPRESA_SUSPENDIDA": "El acceso de tu empresa está suspendido. Contacta con IoT FENSTER.",
       "CUENTA_DESACTIVADA": "Tu usuario está desactivado. Contacta con el administrador de tu empresa o con IoT FENSTER."
-    }
+    },
+    "welcomeTitle": "Bienvenido al portal de pedidos",
+    "welcomeText": "Tu catálogo, tus precios y el seguimiento de tus pedidos, en un solo sitio.",
+    "benefit1": "Catálogo con tus precios",
+    "benefit2": "Pedidos con seguimiento y PDF",
+    "benefit3": "Disponible en 5 idiomas"
   },
   "roles": {
     "PARTNER_ADMIN": "Administrador",
@@ -1060,7 +1065,18 @@
         "texto": "problemas con un pedido o con el portal",
         "mensaje": "Hola, quiero comunicar una incidencia."
       }
-    }
+    },
+    "nombre": "Pulsarito",
+    "pulsaritoMsg1": "¿Necesitas ayuda? Púlsame y te echo una mano.",
+    "pulsaritoMsg2": "¿Buscas algo? Pregúntame cómo se hace un pedido.",
+    "pulsaritoMsg3": "¿Dudas con tu pedido o tu catálogo? Aquí estoy.",
+    "pulsaritoMsg4": "¿Sabías que todos nuestros dispositivos tienen 5 años de garantía?",
+    "pulsaritoMsg5": "Nuestros dispositivos se conectan por Wi-Fi 6, Bluetooth, Zigbee, Matter y Thread.",
+    "pulsaritoMsg6": "El mando Witooth dura 2 años con una sola batería.",
+    "pulsaritoMsg7": "El Pulsar se instala con un único taladro de 11 mm.",
+    "pulsaritoMsg8": "El C-WALL lleva un led ambiental RGB con 25 luces alrededor.",
+    "pulsaritoMsg9": "Estamos en el Parque Tecnológico de Fuente Álamo, en Murcia.",
+    "cerrarMensaje": "Cerrar mensaje"
   },
   "legal": {
     "navLabel": "Textos legales",

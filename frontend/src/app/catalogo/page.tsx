@@ -79,9 +79,9 @@ function TarjetaModelo({
   return (
     <div
       onClick={() => router.push(`/catalogo/${producto.id}`)}
-      className="group flex cursor-pointer flex-col rounded-xl border border-neutral-200 bg-white p-3 shadow-sm transition hover:border-neutral-300 hover:shadow-md sm:p-5"
+      className="group flex cursor-pointer flex-col rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-neutral-300 hover:shadow-md min-[480px]:p-3 sm:p-5"
     >
-      <div className="relative mb-3 flex h-28 items-center justify-center overflow-hidden rounded-lg bg-neutral-50 sm:mb-4 sm:h-44">
+      <div className="relative mb-3 flex h-44 items-center justify-center overflow-hidden rounded-lg bg-neutral-50 min-[480px]:h-28 sm:mb-4 sm:h-44">
         {yaEnCarrito > 0 && (
           <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-teal-600 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm">
             <Check className="size-3" aria-hidden /> {t("inCart", { cantidad: yaEnCarrito })}
@@ -95,7 +95,7 @@ function TarjetaModelo({
         )}
       </div>
       <p className="truncate text-[11px] uppercase tracking-wide text-neutral-400 sm:text-xs">{producto.skuComercial}</p>
-      <h2 className="mt-1 text-sm font-semibold leading-snug text-neutral-900 sm:text-lg">
+      <h2 className="mt-1 text-lg font-semibold leading-snug text-neutral-900 min-[480px]:text-sm sm:text-lg">
         {conColores ? modelo.nombre : producto.nombreComercial}
       </h2>
       <div className="mt-2 min-h-7 sm:mt-3 sm:min-h-8" onClick={(e) => e.stopPropagation()}>
@@ -250,7 +250,7 @@ export default function CatalogoPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {visibles.map((modelo) => (
             <TarjetaModelo
               key={modelo.clave}
@@ -272,10 +272,10 @@ function EsqueletoCatalogo({ titulo }: { titulo: string }) {
   return (
     <div className="relative left-1/2 w-[calc(100vw-2rem)] sm:w-[min(1700px,calc(100vw-6rem))] -translate-x-1/2" aria-busy="true">
       <h1 className="mb-5 text-2xl font-semibold text-neutral-900 sm:mb-6">{titulo}</h1>
-      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="animate-pulse rounded-xl border border-neutral-200 bg-white p-3 sm:p-5">
-            <div className="h-28 rounded-lg bg-neutral-100 sm:h-44" />
+          <div key={i} className="animate-pulse rounded-xl border border-neutral-200 bg-white p-4 min-[480px]:p-3 sm:p-5">
+            <div className="h-44 rounded-lg bg-neutral-100 min-[480px]:h-28 sm:h-44" />
             <div className="mt-4 h-3 w-1/3 rounded bg-neutral-100" />
             <div className="mt-2 h-4 w-2/3 rounded bg-neutral-100" />
             <div className="mt-6 h-6 w-1/2 rounded bg-neutral-100" />
