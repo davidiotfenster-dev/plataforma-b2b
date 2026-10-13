@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ConfigService } from '@nestjs/config';
 import { PartnersApiClient } from './partners-api.client.js';
+import { PartnersApiAdminRepository } from './partners-api-admin.repository.js';
 import { PartnersApiEmpresasRepository } from './partners-api-empresas.repository.js';
 import { PartnersApiError } from './partners-api.error.js';
 import { ejecutarConRequestId } from './contexto-peticion.js';
@@ -74,14 +75,46 @@ describe('PartnersApiClient', () => {
     expect(llamada(1).headers['Idempotency-Key']).toBe(primera.headers['Idempotency-Key']);
   });
 
-  it('una escritura sin Idempotency-Key no se reintenta (añadir al carrito no se duplica)', async () => {
+  it('una escritura sin Idempotency-Key no se reintenta (quitar una línea del carrito)', async () => {
     fetchMock.mockResolvedValue(json(503, {}));
     const repo = new PartnersApiEmpresasRepository(cliente());
     await expect(
-      repo.accionCarrito('company-001', 'user-001', { action: 'add', repId: 'r', cantidad: 1 }, { userId: 'user-001' }),
+      repo.accionCarrito('company-001', 'user-001', { action: 'remove', itemId: 'i' }, { userId: 'user-001' }),
     ).rejects.toMatchObject({ codigo: 'NO_DISPONIBLE' });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(llamada().headers['Idempotency-Key']).toBeUndefined();
+  });
+
+  it('añadir al carrito lleva Idempotency-Key y se reintenta con la misma clave (no suma dos veces)', async () => {
+    fetchMock.mockResolvedValueOnce(json(503, {})).mockResolvedValueOnce(json(200, { items: [] }));
+    const repo = new PartnersApiEmpresasRepository(cliente());
+    await repo.accionCarrito('company-001', 'user-001', { action: 'add', repId: 'r', cantidad: 1 }, { userId: 'user-001', partnerId: 'company-001' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(llamada(0).headers['Idempotency-Key']).toMatch(/^[0-9a-f-]{36}$/);
+    expect(llamada(1).headers['Idempotency-Key']).toBe(llamada(0).headers['Idempotency-Key']);
+  });
+
+  it('apply-rate: el job real lleva Idempotency-Key y la simulación no', async () => {
+    fetchMock.mockImplementation(() => Promise.resolve(json(202, { jobId: 'job-vbh-1', status: 'QUEUED' })));
+    const repo = new PartnersApiAdminRepository(cliente());
+    await repo.procesoMarca('VBH', { action: 'apply-rate', simulate: true }, { userId: 'user-001' });
+    await repo.procesoMarca('VBH', { action: 'apply-rate', simulate: false }, { userId: 'user-001' });
+
+    expect(llamada(0).headers['Idempotency-Key']).toBeUndefined();
+    expect(llamada(1).headers['Idempotency-Key']).toMatch(/^[0-9a-f-]{36}$/);
+    // El admin de IoT FENSTER no tiene empresa: no se manda X-Actor-Partner-Id en /admin/*.
+    expect(llamada(1).headers['X-Actor-User-Id']).toBe('user-001');
+    expect(llamada(1).headers['X-Actor-Partner-Id']).toBeUndefined();
+    expect(JSON.parse(llamada(1).body as string)).toEqual({ action: 'apply-rate', simulate: false });
+  });
+
+  it('un segundo job real de la marca (409 JOB_ALREADY_RUNNING) conserva el código del contrato', async () => {
+    fetchMock.mockResolvedValue(json(409, { codigo: 'JOB_ALREADY_RUNNING', mensaje: 'Ya existe un job real en curso' }));
+    const error = (await new PartnersApiAdminRepository(cliente())
+      .procesoMarca('VBH', { action: 'apply-rate', simulate: false }, { userId: 'user-001' })
+      .catch((e: unknown) => e)) as PartnersApiError;
+    expect(error.getStatus()).toBe(409);
+    expect(error.codigo).toBe('JOB_ALREADY_RUNNING');
   });
 
   it('GET se reintenta tras un fallo de red y se rinde con 503 tras agotar los intentos', async () => {

@@ -4,6 +4,7 @@ import { PartnersApiAuthRepository } from './partners-api-auth.repository.js';
 import { PartnersApiEmpresasRepository } from './partners-api-empresas.repository.js';
 import { PartnersApiAdminRepository } from './partners-api-admin.repository.js';
 import { PartnersApiAuditoriaRepository } from './partners-api-auditoria.repository.js';
+import { PartnersApiAjustesLegalesRepository } from './partners-api-ajustes-legales.repository.js';
 import { AuditoriaRemotaService } from './auditoria-remota.service.js';
 
 const PROVEEDORES = [
